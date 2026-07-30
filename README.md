@@ -34,24 +34,24 @@ El nivel se evidencia en _cómo_ resolviste el problema — no en _qué_ problem
 
 | # | Fecha | Paquete | Sesión | Estado |
 |---|-------|---------|--------|--------|
-| 01 | 2026-07-16 | Arranque | Kickoff + setup Java 21 | ⏳ |
-| 02 | 2026-07-23 | SOLID + TDD | TDD con JUnit 5 | ⏳ |
-| 03 | 2026-07-30 | SOLID + TDD | SOLID (SRP/OCP) | ⏳ |
-| 04 | 2026-08-06 | SOLID + TDD | Patrones (Strategy/Factory) | ⏳ |
-| 05 | 2026-08-13 | SOLID + TDD | Mockito (buenas prácticas) | ⏳ |
-| 06 | 2026-08-20 | Spring Web / Testing | REST limpio (DTO/errores) | ⏳ |
-| 07 | 2026-08-27 | Spring Web / Testing | DI/IoC (profiles/wiring) | ⏳ |
-| 08 | 2026-09-03 | Spring Web / Testing | WebMvcTest (slice tests) | ⏳ |
-| 09 | 2026-09-10 | Hibernate / JPA | Mapeos JPA | ⏳ |
-| 10 | 2026-09-17 | Hibernate / JPA | Transacciones | ⏳ |
-| 11 | 2026-09-24 | Hibernate / JPA | Performance ORM | ⏳ |
-| 12 | 2026-10-01 | Hibernate / JPA | JPQL + paginación + locking | ⏳ |
-| 13 | 2026-10-08 | Micro + Cloud + DevOps | Microservicios | ⏳ |
-| 14 | 2026-10-15 | Micro + Cloud + DevOps | Podman + compose | ⏳ |
-| 15 | 2026-10-22 | Micro + Cloud + DevOps | Azure DevOps Pipelines (CI) | ⏳ |
-| 16 | 2026-10-29 | Micro + Cloud + DevOps | Azure DevOps Release | ⏳ |
-| 17 | 2026-11-05 | Micro + Cloud + DevOps | Azure App Service | ⏳ |
-| 18 | 2026-11-12 | Micro + Cloud + DevOps | Observabilidad + cierre | ⏳ |
+| 01 | 2026-08-13 | Arranque | Kickoff + setup Java 21 | ⏳ |
+| 02 | 2026-08-20 | SOLID + TDD | TDD con JUnit 5 | ⏳ |
+| 03 | 2026-08-27 | SOLID + TDD | SOLID (SRP/OCP) | ⏳ |
+| 04 | 2026-09-03 | SOLID + TDD | Patrones (Strategy/Factory) | ⏳ |
+| 05 | 2026-09-10 | SOLID + TDD | Mockito (buenas prácticas) | ⏳ |
+| 06 | 2026-09-17 | Spring Web / Testing | REST limpio (DTO/errores) | ⏳ |
+| 07 | 2026-09-24 | Spring Web / Testing | DI/IoC (profiles/wiring) | ⏳ |
+| 08 | 2026-10-01 | Spring Web / Testing | WebMvcTest (slice tests) | ⏳ |
+| 09 | 2026-10-08 | Hibernate / JPA | Mapeos JPA | ⏳ |
+| 10 | 2026-10-15 | Hibernate / JPA | Transacciones | ⏳ |
+| 11 | 2026-10-22 | Hibernate / JPA | Performance ORM | ⏳ |
+| 12 | 2026-10-09 | Hibernate / JPA | JPQL + paginación + locking | ⏳ |
+| 13 | 2026-11-05 | Micro + Cloud + DevOps | Microservicios | ⏳ |
+| 14 | 2026-11-12 | Micro + Cloud + DevOps | Podman + compose | ⏳ |
+| 15 | 2026-11-19 | Micro + Cloud + DevOps | Azure DevOps Pipelines (CI) | ⏳ |
+| 16 | 2026-11-26 | Micro + Cloud + DevOps | Azure DevOps Release | ⏳ |
+| 17 | 2026-12-03 | Micro + Cloud + DevOps | Azure App Service | ⏳ |
+| 18 | 2026-12-10 | Micro + Cloud + DevOps | Observabilidad + cierre | ⏳ |
 
 **Vista por mes**
 
