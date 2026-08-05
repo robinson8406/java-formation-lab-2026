@@ -12,6 +12,7 @@ class TrackingIdGeneratorTest {
     @DisplayName("El ID generado debe tener el formato ORIG-DEST-XXXXXXXX")
     void shouldGenerateIdWithCorrectFormat() {
         // TODO: implementar
+        // Validar ejecucion de pipeline CI
         fail("Test no implementado");
     }
 
