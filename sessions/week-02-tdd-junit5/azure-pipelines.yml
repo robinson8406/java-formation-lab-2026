@@ -27,7 +27,7 @@ steps:
   - task: Maven@4
     displayName: 'Build & Test — week-02-tdd-junit5'
     inputs:
-      mavenPomFile: 'pom.xml'
+      mavenPomFile: 'sessions/week-02-tdd-junit5/pom.xml'
       goals: 'verify'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '21'
