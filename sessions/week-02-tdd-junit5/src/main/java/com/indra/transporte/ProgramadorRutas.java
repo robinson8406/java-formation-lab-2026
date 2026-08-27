@@ -18,6 +18,15 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        if (horario.getBus() == null) {
+            throw new IllegalArgumentException("El bus no puede ser nulo");
+        }
+        if (horario.getRuta() == null) {
+            throw new IllegalArgumentException("La ruta no puede ser nula");
+        }
+        if (horario.getHoraSalida() == null || horario.getHoraLlegada() == null) {
+            throw new IllegalArgumentException("Las horas de salida y llegada no pueden ser nulas");
+        }
         if (!horario.getHoraSalida().isBefore(horario.getHoraLlegada())) {
             throw new IllegalArgumentException("La hora de llegada debe ser posterior a la hora de salida");
         }
