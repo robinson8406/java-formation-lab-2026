@@ -34,7 +34,7 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
                 || horario.getHoraSalida() == null || horario.getHoraLlegada() == null) {
             throw new IllegalArgumentException("Bus, ruta y horas del horario son obligatorios");
         }
-        if (isBlank(horario.getBus().getPlaca()) || horario.getBus().getType() == null
+        if (isBlank(horario.getBus().placa()) || horario.getBus().type() == null
                 || isBlank(horario.getRuta().getTipo()) || isBlank(horario.getRuta().getCodigo())
                 || isBlank(horario.getRuta().getOrigen()) || isBlank(horario.getRuta().getDestino())) {
             throw new IllegalArgumentException("Los textos del bus y la ruta no pueden ser nulos o vacíos");
@@ -49,7 +49,7 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
 
     private void validarSolapamiento(Horario nuevoHorario) {
         boolean solapado = horarios.stream()
-                .filter(h -> h.getBus().getPlaca().equals(nuevoHorario.getBus().getPlaca()))
+                .filter(h -> h.getBus().placa().equals(nuevoHorario.getBus().placa()))
                 .anyMatch(h -> nuevoHorario.getHoraSalida().isBefore(h.getHoraLlegada())
                         && nuevoHorario.getHoraLlegada().isAfter(h.getHoraSalida()));
 
@@ -67,7 +67,7 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        Type tipoBus = horario.getBus().getType();
+        Type tipoBus = horario.getBus().type();
         String tipoRuta = horario.getRuta().getTipo();
 
         if (Type.ELECTRIC.equals(tipoBus) && !"Electric".equals(tipoRuta)) {
@@ -86,7 +86,7 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
         }
 
         Set<Type> tiposSoportados = horarios.stream()
-                .map(h -> h.getBus().getType())
+                .map(h -> h.getBus().type())
                 .collect(Collectors.toSet());
 
         if (!tiposSoportados.contains(type)) {
@@ -94,14 +94,14 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
         }
 
         boolean busExiste = horarios.stream()
-                .anyMatch(h -> h.getBus().getPlaca().equals(bus.getPlaca()));
+                .anyMatch(h -> h.getBus().placa().equals(bus.placa()));
         if (!busExiste) {
             throw new IllegalArgumentException("Bus desconocido");
         }
 
         return horarios.stream()
-                .filter(h -> h.getBus().getPlaca().equals(bus.getPlaca()))
-                .filter(h -> type.equals(h.getBus().getType()))
+                .filter(h -> h.getBus().placa().equals(bus.placa()))
+                .filter(h -> type.equals(h.getBus().type()))
                 .toList();
     }
 

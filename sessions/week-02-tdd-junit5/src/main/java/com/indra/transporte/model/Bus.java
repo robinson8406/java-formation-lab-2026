@@ -1,11 +1,4 @@
 package com.indra.transporte.model;
 
-import lombok.Data;
-import lombok.ToString;
-
-@Data
-@ToString
-public class Bus {
-    private final String placa;
-    private final Type type;
+public record Bus(String placa, Type type) {
 }
