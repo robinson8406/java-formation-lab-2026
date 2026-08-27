@@ -3,23 +3,23 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.indra.transporte.model.Horario;
+import com.indra.transporte.model.Schedule;
 
 import lombok.Data;
 
 @Data
 public class ProgramadorRutas {
 
-    List<Horario> horarios = new ArrayList<>();
+    List<Schedule> horarios = new ArrayList<>();
 
-    public void programar(Horario horario) {
+    public void programar(Schedule horario) {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
         horarios.add(horario);
     }
 
-    public boolean debeValidarTipoRutasYBuses(Horario horario) {
+    public boolean debeValidarTipoRutasYBuses(Schedule horario) {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
