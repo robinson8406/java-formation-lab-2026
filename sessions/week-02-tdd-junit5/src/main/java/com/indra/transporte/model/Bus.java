@@ -7,5 +7,5 @@ import lombok.ToString;
 @ToString
 public class Bus {
     private final String placa;
-    private final String tipo;
+    private final Type type;
 }
