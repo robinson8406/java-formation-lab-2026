@@ -3,6 +3,7 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
@@ -33,10 +34,15 @@ public class ProgramadorRutas {
         return true;
     }
 
+    private static final java.util.Set<String> TIPOS_SOPORTADOS = java.util.Set.of("Electric", "Diesel", "General");
+
     public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
         boolean busConocido = horarios.stream().anyMatch(h -> h.getBus().equals(bus));
         if (!busConocido) {
             throw new IllegalArgumentException("El bus es desconocido");
+        }
+        if (!TIPOS_SOPORTADOS.contains(tipo)) {
+            throw new UnsupportedTypeException("El tipo de ruta es desconocido: " + tipo);
         }
 
         List<Horario> resultado = new ArrayList<>();
