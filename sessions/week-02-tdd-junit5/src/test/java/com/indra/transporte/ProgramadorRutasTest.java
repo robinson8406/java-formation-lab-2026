@@ -149,4 +149,14 @@ public class ProgramadorRutasTest {
             assertThrows(IllegalArgumentException.class, () -> programador.programar(nuevo));
         }
     }
+
+    @Test
+    @DisplayName("Debe rechazar horario con rango inválido (llegada antes que la salida)")
+    void debeRechazarHorarioRangoInvalido() {
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta, LocalTime.of(10, 0), LocalTime.of(8, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> programador.programar(horario));
+    }
 }
