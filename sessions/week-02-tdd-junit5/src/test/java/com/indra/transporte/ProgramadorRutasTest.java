@@ -79,7 +79,16 @@ public class ProgramadorRutasTest {
     @Test
     @DisplayName("Debe devolver los horarios del tipo solicitado")
     void debeDevolverLosHorariosDelTipoSolicitado() {
-        fail("Implementar este test para devolver los horarios del tipo solicitado");
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta,
+                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+        programador.programar(horario);
+
+        var resultado = programador.consultarHorariosPorTipoBus(bus, "General");
+
+        assertEquals(1, resultado.size());
+        assertEquals(horario, resultado.get(0));
     }
 
     @Test
