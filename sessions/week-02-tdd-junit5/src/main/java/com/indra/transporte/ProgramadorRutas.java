@@ -18,6 +18,9 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        if (!horario.getHoraSalida().isBefore(horario.getHoraLlegada())) {
+            throw new IllegalArgumentException("La hora de llegada debe ser posterior a la hora de salida");
+        }
         boolean seSolapa = horarios.stream()
                 .filter(h -> h.getBus().equals(horario.getBus()))
                 .anyMatch(h -> horario.getHoraSalida().isBefore(h.getHoraLlegada())
