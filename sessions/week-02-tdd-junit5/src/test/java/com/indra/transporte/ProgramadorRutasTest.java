@@ -5,9 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.LocalTime;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
@@ -117,5 +122,31 @@ public class ProgramadorRutasTest {
 
         assertThrows(UnsupportedTypeException.class,
                 () -> programador.consultarHorariosPorTipoBus(bus, "Hidrogeno"));
+    }
+
+    @Nested
+    @DisplayName("Cuando un bus ya tiene horarios programados")
+    class CuandoUnBusYaTieneHorariosProgramados {
+        private final Bus bus = new Bus("ABC123", "Diesel");
+        private final Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+
+        @BeforeEach
+        void setUp() {
+            programador.programar(new Horario(bus, ruta, LocalTime.of(8, 0), LocalTime.of(10, 0)));
+        }
+
+        @ParameterizedTest(name = "{0}-{1} se solapa con 08:00-10:00")
+        @DisplayName("Debe rechazar horario solapado")
+        @CsvSource({
+                "08:30, 10:30",
+                "07:30, 09:00",
+                "09:00, 09:30",
+                "07:00, 11:00"
+        })
+        void debeRechazarHorarioSolapado(String salida, String llegada) {
+            Horario nuevo = new Horario(bus, ruta, LocalTime.parse(salida), LocalTime.parse(llegada));
+
+            assertThrows(IllegalArgumentException.class, () -> programador.programar(nuevo));
+        }
     }
 }
