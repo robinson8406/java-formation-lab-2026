@@ -18,6 +18,13 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        boolean seSolapa = horarios.stream()
+                .filter(h -> h.getBus().equals(horario.getBus()))
+                .anyMatch(h -> horario.getHoraSalida().isBefore(h.getHoraLlegada())
+                        && h.getHoraSalida().isBefore(horario.getHoraLlegada()));
+        if (seSolapa) {
+            throw new IllegalArgumentException("El horario se solapa con uno ya programado para este bus");
+        }
         horarios.add(horario);
     }
 
