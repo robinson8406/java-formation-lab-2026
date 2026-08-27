@@ -34,6 +34,11 @@ public class ProgramadorRutas {
     }
 
     public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
+        boolean busConocido = horarios.stream().anyMatch(h -> h.getBus().equals(bus));
+        if (!busConocido) {
+            throw new IllegalArgumentException("El bus es desconocido");
+        }
+
         List<Horario> resultado = new ArrayList<>();
         for (Horario horario : horarios) {
             if (horario.getBus().equals(bus) && tipo.equals(horario.getRuta().getTipo())) {
