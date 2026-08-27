@@ -18,7 +18,10 @@ trigger: none   # no se activa al hacer push directo
 pr:
   branches:
     include:
-      - 'week-*-start'   # se activa en PR hacia cualquier rama week-XX-start
+      - 'week-04-start'   # solo PRs hacia esta rama
+  paths:
+    include:
+      - 'sessions/week-04-patrones-strategy-factory/*'   # solo cambios de esta semana
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -27,7 +30,7 @@ steps:
   - task: Maven@4
     displayName: 'Build & Test — week-04-patrones-strategy-factory'
     inputs:
-      mavenPomFile: 'pom.xml'
+      mavenPomFile: 'sessions/week-04-patrones-strategy-factory/pom.xml'
       goals: 'verify'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '21'

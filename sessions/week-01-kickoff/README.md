@@ -1,6 +1,6 @@
 # Week 01 — Kickoff + Setup Java 21
 
-**Fecha**: 2026-08-13 · **Paquete**: Arranque
+**Fecha**: 2026-08-20 · **Paquete**: Arranque
 
 ## Objetivo
 

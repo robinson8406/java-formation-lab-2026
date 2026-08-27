@@ -19,6 +19,9 @@ pr:
   branches:
     include:
       - 'week-16-start'
+  paths:
+    include:
+      - 'sessions/week-16-azure-devops-release/*'   # solo cambios de esta semana
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -38,7 +41,7 @@ stages:
           - task: Maven@4
             displayName: 'mvn verify'
             inputs:
-              mavenPomFile: 'pom.xml'
+              mavenPomFile: 'sessions/week-16-azure-devops-release/pom.xml'
               goals: 'verify'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '21'

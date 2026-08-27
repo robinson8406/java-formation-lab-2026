@@ -1,7 +1,7 @@
 # Guía de Preparación — Week 01: Kickoff + Setup Java 21
 
 > **Audiencia**: Formadores y mentores  
-> **Fecha sesión**: 2026-08-13 (jueves)  
+> **Fecha sesión**: 2026-08-20 (jueves)  
 > **Tiempo de preparación estimado**: ~2 horas  
 
 ---
@@ -10,9 +10,9 @@
 
 | # | Qué | Dónde | Cuándo |
 |---|-----|-------|--------|
-| 1 | Repo público en GitHub con rama `week-01-start` | GitHub | D-7 (antes del 06 ago) |
+| 1 | Repo público en GitHub con rama `week-01-start` | GitHub | D-7 (antes del 13 ago) |
 | 2 | Esqueleto de código en `week-01-start` (TODOs) | GitHub | D-7 |
-| 3 | Pipeline conectado en Azure DevOps | Azure DevOps | D-5 (antes del 08 ago) |
+| 3 | Pipeline conectado en Azure DevOps | Azure DevOps | D-5 (antes del 15 ago) |
 | 4 | PR trigger validado (test rojo → pipeline falla) | Azure DevOps | D-3 |
 | 5 | Status check obligatorio en `week-01-start` | GitHub → Settings | D-3 |
 | 6 | Comunicar a participantes: fork + prereqs | Canal de comunicación | D-2 |
@@ -308,7 +308,7 @@ git commit -m "feat: implementación de referencia TrackingIdGenerator"
 
 ---
 
-## PASO 4 — Comunicar a los participantes (D-2, martes 11 ago)
+## PASO 4 — Comunicar a los participantes (D-2, martes 18 ago)
 
 Mensaje para canal Teams / Slack / email:
 
@@ -335,7 +335,7 @@ Antes del jueves necesitas:
    → esperado: BUILD FAILURE (los tests tienen fail() — eso está bien)
    → esperado: COMPILA sin errores de compilación
 
-Nos vemos el jueves 13 ago, 1h.
+Nos vemos el jueves 20 ago, 1h.
 Repo: https://github.com/robinson8406/java-formation-lab-2026
 ```
 
@@ -426,7 +426,7 @@ Cerrar el issue
 
 - [ ] Rama `week-01-solution` publicada
 - [ ] Al menos 1 issue de badge creado y cerrado (como demo)
-- [ ] Próxima rama `week-02-start` preparada (publicar lunes 17 ago)
+- [ ] Próxima rama `week-02-start` preparada (publicar lunes 24 ago)
 - [ ] Registrar en canal: % de participantes con PR verde
 
 ---
