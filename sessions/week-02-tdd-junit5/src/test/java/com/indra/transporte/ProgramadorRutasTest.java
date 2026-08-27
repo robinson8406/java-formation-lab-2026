@@ -159,4 +159,32 @@ public class ProgramadorRutasTest {
 
         assertThrows(IllegalArgumentException.class, () -> programador.programar(horario));
     }
+
+    @Test
+    @DisplayName("Debe rechazar horario con bus nulo")
+    void debeRechazarHorarioConBusNulo() {
+        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(null, ruta, LocalTime.of(8, 0), LocalTime.of(10, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> programador.programar(horario));
+    }
+
+    @Test
+    @DisplayName("Debe rechazar horario con ruta nula")
+    void debeRechazarHorarioConRutaNula() {
+        Bus bus = new Bus("ABC123", "Diesel");
+        Horario horario = new Horario(bus, null, LocalTime.of(8, 0), LocalTime.of(10, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> programador.programar(horario));
+    }
+
+    @Test
+    @DisplayName("Debe rechazar horario con horas nulas")
+    void debeRechazarHorarioConHorasNulas() {
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta, null, null);
+
+        assertThrows(IllegalArgumentException.class, () -> programador.programar(horario));
+    }
 }
