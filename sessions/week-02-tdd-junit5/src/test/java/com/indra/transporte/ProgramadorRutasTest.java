@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -138,19 +139,26 @@ public class ProgramadorRutasTest {
 
         }
 
-    }
-    @Test
-    @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
-    void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
-        fail("Implementar este test para lanzar IllegalArgumentException cuando el bus es desconocido");
-    }
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
+        void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
+            Bus unknownBus = new Bus("XYZ789", "Diesel");
+            IllegalArgumentException exception= assertThrows(IllegalArgumentException.class, () -> {
+                programador.consultarHorariosPorTipoBus(unknownBus,"Diesel");
+            });
+            assertEquals("Bus desconocido", exception.getMessage());
+        }
 
-    @Test
-    @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
-    void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
-        fail("Implementar este test para lanzar UnsupportedTypeException cuando el tipo es desconocido");
+        @Test
+        @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
+        void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
+           Bus bus = new Bus("ABC123", "UnknownType");
+            UnsupportedTypeException exception= assertThrows(UnsupportedTypeException.class, () -> {
+                programador.consultarHorariosPorTipoBus(bus,"UnknownType");
+            });
+            assertEquals("Tipo de bus desconocido", exception.getMessage());
+        }
     }
-
 
 
 }
