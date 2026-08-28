@@ -23,7 +23,7 @@ public class ProgramadorRutasTest {
     @DisplayName("Debe registrar un horario")
     void debeRegistrarUnHorario() {
         Bus bus = new Bus("ABC123", "Diesel");
-        Ruta ruta = new Ruta("Electric","R001", "Ciudad A", "Ciudad B");
+        Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
         Horario horario = Horario.builder()
                 .bus(bus)
                 .ruta(ruta)
@@ -133,7 +133,7 @@ public class ProgramadorRutasTest {
             programador.programar(horarioCr5);
             programador.programar(horarioCra3);
 
-            List<Horario> listHorarios = programador.consultarHorariosPorTipoBus(electricBus,"Electric");
+            List<Horario> listHorarios = programador.consultarHorariosPorTipoBus(electricBus, "Electric");
             assertEquals(2, listHorarios.size());
             assertEquals(List.of(horarioCra8, horarioCr5), listHorarios);
 
@@ -143,8 +143,8 @@ public class ProgramadorRutasTest {
         @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
         void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
             Bus unknownBus = new Bus("XYZ789", "Diesel");
-            IllegalArgumentException exception= assertThrows(IllegalArgumentException.class, () -> {
-                programador.consultarHorariosPorTipoBus(unknownBus,"Diesel");
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.consultarHorariosPorTipoBus(unknownBus, "Diesel");
             });
             assertEquals("Bus desconocido", exception.getMessage());
         }
@@ -152,11 +152,122 @@ public class ProgramadorRutasTest {
         @Test
         @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
         void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
-           Bus bus = new Bus("ABC123", "UnknownType");
-            UnsupportedTypeException exception= assertThrows(UnsupportedTypeException.class, () -> {
-                programador.consultarHorariosPorTipoBus(bus,"UnknownType");
+            Bus bus = new Bus("ABC123", "UnknownType");
+            UnsupportedTypeException exception = assertThrows(UnsupportedTypeException.class, () -> {
+                programador.consultarHorariosPorTipoBus(bus, "UnknownType");
             });
             assertEquals("Tipo de bus desconocido", exception.getMessage());
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Validaciones generales de horarios")
+    class validacionesGeneralesDeHorarios {
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando el horario es nulo")
+        void debeLanzarIllegalArgumentExceptionCuandoHorarioEsNulo() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(null);
+            });
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+        }
+
+
+        @Test
+        @DisplayName("Debe rechazar un horario con bus nulo")
+        void debeRechazarUnHorarioConBusNulo() {
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = Horario.builder()
+                    .bus(null)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.of(8, 0))
+                    .horaLlegada(java.time.LocalTime.of(10, 0))
+                    .build();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.debeValidarTipoRutasYBuses(horario);
+            });
+
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con ruta nula")
+        void debeRechazarUnHorarioConRutaNula() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Horario horario = Horario.builder()
+                    .bus(bus)
+                    .ruta(null)
+                    .horaSalida(java.time.LocalTime.of(8, 0))
+                    .horaLlegada(java.time.LocalTime.of(10, 0))
+                    .build();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.debeValidarTipoRutasYBuses(horario);
+            });
+
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+        }
+
+
+        @Test
+        @DisplayName("Debe rechazar un bus con placa vacía")
+        void debeRechazarUnBusConPlacaVacia() {
+            Bus bus = new Bus("", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.of(8, 0))
+                    .horaLlegada(java.time.LocalTime.of(10, 0))
+                    .build();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.debeValidarTipoRutasYBuses(horario);
+            });
+
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+
+        }
+
+        @Test
+        @DisplayName("Debe rechazar una ruta con código o ubicaciones vacías")
+        void debeRechazarUnaRutaConCodigoOUbicacionesVacias() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "", "", "");
+            Horario horario = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.of(8, 0))
+                    .horaLlegada(java.time.LocalTime.of(10, 0))
+                    .build();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.debeValidarTipoRutasYBuses(horario);
+            });
+
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con horas nulas")
+        void debeRechazarUnHorarioConHorasNulas() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(null)
+                    .horaLlegada(null)
+                    .build();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.debeValidarTipoRutasYBuses(horario);
+            });
+
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
         }
     }
 
