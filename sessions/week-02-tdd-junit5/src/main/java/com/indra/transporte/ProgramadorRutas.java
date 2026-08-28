@@ -3,6 +3,7 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
 import lombok.Data;
@@ -31,5 +32,16 @@ public class ProgramadorRutas {
         }
         return true;
     }
+
+
+    public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipoBus) {
+
+        throw new UnsupportedOperationException("Not implemented yet");
+
+    }
+
+
+
+
 
 }
