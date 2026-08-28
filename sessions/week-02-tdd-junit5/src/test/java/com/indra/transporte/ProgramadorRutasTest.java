@@ -187,10 +187,10 @@ public class ProgramadorRutasTest {
                     .build();
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                programador.debeValidarTipoRutasYBuses(horario);
+                programador.programar(horario);
             });
 
-            assertEquals("El horario no puede ser nulo", exception.getMessage());
+            assertEquals("El bus no puede ser nulo", exception.getMessage());
         }
 
         @Test
@@ -205,10 +205,10 @@ public class ProgramadorRutasTest {
                     .build();
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                programador.debeValidarTipoRutasYBuses(horario);
+                programador.programar(horario);
             });
 
-            assertEquals("El horario no puede ser nulo", exception.getMessage());
+            assertEquals("La ruta no puede ser nula", exception.getMessage());
         }
 
 
@@ -225,10 +225,10 @@ public class ProgramadorRutasTest {
                     .build();
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                programador.debeValidarTipoRutasYBuses(horario);
+                programador.programar(horario);
             });
 
-            assertEquals("El horario no puede ser nulo", exception.getMessage());
+            assertEquals("La placa del bus no puede estar vacía", exception.getMessage());
 
         }
 
@@ -245,10 +245,10 @@ public class ProgramadorRutasTest {
                     .build();
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                programador.debeValidarTipoRutasYBuses(horario);
+                programador.programar(horario);
             });
 
-            assertEquals("El horario no puede ser nulo", exception.getMessage());
+            assertEquals("El código de la ruta no puede estar vacío", exception.getMessage());
         }
 
         @Test
@@ -264,10 +264,10 @@ public class ProgramadorRutasTest {
                     .build();
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                programador.debeValidarTipoRutasYBuses(horario);
+                programador.programar(horario);
             });
 
-            assertEquals("El horario no puede ser nulo", exception.getMessage());
+            assertEquals("La hora de salida y la de llegada no pueden ser nulas", exception.getMessage());
         }
     }
 
