@@ -42,9 +42,9 @@ class ProgramadorRutasTest {
             var horario = new Horario(bus, ruta,
                     java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                programador.debeValidarTipoRutasYBuses(horario);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                programador.debeValidarTipoRutasYBuses(horario)
+            );
 
             assertEquals("Los buses eléctricos solo pueden ir a rutas eléctricas", exception.getMessage());
         }
@@ -95,7 +95,7 @@ class ProgramadorRutasTest {
         programador.programar(horarioDiesel);
 
         assertEquals(java.util.List.of(horarioElectrico),
-                programador.consultarHorariosPorTipoBus(busElectrico, Type.ELECTRIC));
+                programador.consultarHorariosPorTipoBus(busElectrico, "ELECTRIC"));
     }
 
     @Test
@@ -110,7 +110,7 @@ class ProgramadorRutasTest {
         programador.programar(horario);
 
         assertThrows(IllegalArgumentException.class, () ->
-                programador.consultarHorariosPorTipoBus(busDesconocido, Type.ELECTRIC));
+                programador.consultarHorariosPorTipoBus(busDesconocido, "ELECTRIC"));
     }
 
     @Test
@@ -125,7 +125,7 @@ class ProgramadorRutasTest {
         programador.programar(horario);
 
         assertThrows(com.indra.transporte.exception.UnsupportedTypeException.class, () ->
-                programador.consultarHorariosPorTipoBus(bus, Type.HYBRID));
+                programador.consultarHorariosPorTipoBus(bus, "HYBRID"));
     }
 
     @Test
