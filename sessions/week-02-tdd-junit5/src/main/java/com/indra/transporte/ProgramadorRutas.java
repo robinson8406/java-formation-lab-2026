@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
@@ -40,10 +41,35 @@ public class ProgramadorRutas {
 
     public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipoBus) {
 
+        validarTipoDelBus(tipoBus);
+        validarExistenciaBus(bus);
+
         return horarios.stream()
                 .filter(h -> Objects.equals(h.getBus().getPlaca(),bus.getPlaca()))
                 .filter(h->Objects.equals(h.getBus().getTipo(),tipoBus))
                 .toList();
+    }
+
+
+    private void validarExistenciaBus(Bus bus) {
+        if (bus == null) {
+            throw new IllegalArgumentException("Bus desconocido");
+        }
+
+        boolean busExistente = horarios.stream()
+                .map(Horario::getBus)
+                .anyMatch(b -> Objects.equals(b.getPlaca(),bus.getPlaca() )&& Objects.equals(b.getTipo(),bus.getTipo()));
+
+        if (!busExistente) {
+            throw new IllegalArgumentException("Bus desconocido");
+        }
+
+    }
+
+    private void validarTipoDelBus(String tipo) {
+        if (tipo == null || !Tipo.isSupported(tipo)) {
+            throw new UnsupportedTypeException("Tipo de bus desconocido");
+        }
     }
 
 
