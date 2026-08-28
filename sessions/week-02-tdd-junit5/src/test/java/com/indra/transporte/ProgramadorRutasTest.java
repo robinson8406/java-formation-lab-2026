@@ -90,8 +90,6 @@ public class ProgramadorRutasTest {
                     .horaLlegada(java.time.LocalTime.of(10, 0))
                     .build();
 
-
-
             assertDoesNotThrow(() -> programador.debeValidarTipoRutasYBuses(horario));
         }
     }
@@ -136,7 +134,7 @@ public class ProgramadorRutasTest {
 
             List<Horario> listHorarios = programador.consultarHorariosPorTipoBus(electricBus,"Electric");
             assertEquals(2, listHorarios.size());
-            assertEquals(List.of(horarioCra8, horarioCra3), listHorarios);
+            assertEquals(List.of(horarioCra8, horarioCr5), listHorarios);
 
         }
 
