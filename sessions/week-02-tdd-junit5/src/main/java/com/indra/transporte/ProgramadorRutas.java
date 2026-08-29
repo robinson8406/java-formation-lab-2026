@@ -21,6 +21,8 @@ public class ProgramadorRutas {
         validarHorarioVacio(horario);
         validarDatosDelBus(horario.getBus());
         validarDatosDeLaRuta(horario.getRuta());
+        validarRangoHorario(horario);
+        validarHorarioSolapado(horario);
         horarios.add(horario);
     }
 
@@ -110,5 +112,25 @@ public class ProgramadorRutas {
             throw new IllegalArgumentException("El origen y destino de la ruta no pueden estar vacíos");
         }
     }
+
+
+    private void validarRangoHorario(Horario horario){
+
+        if (horario.getHoraSalida().isAfter(horario.getHoraLlegada())) {
+            throw new IllegalArgumentException("La hora de salida no puede ser mayor a la de llegada");
+        }
+
+    }
+
+    private void validarHorarioSolapado(Horario horario) {
+        for (Horario horarioExistente : horarios) {
+            if (horarioExistente.getBus().getPlaca().equals(horario.getBus().getPlaca())) {
+                if (horarioExistente.getHoraSalida().isBefore(horario.getHoraLlegada()) && horarioExistente.getHoraLlegada().isAfter(horario.getHoraSalida())) {
+                    throw new IllegalArgumentException("El horario se solapa con otro horario existente para el mismo bus");
+                }
+            }
+        }
+    }
+
 
 }
