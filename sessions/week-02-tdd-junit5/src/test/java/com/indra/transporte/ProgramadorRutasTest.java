@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.Ruta;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
 
@@ -323,6 +325,91 @@ public class ProgramadorRutasTest {
 
         }
     }
+
+
+
+
+    @Nested
+    @DisplayName("Cuando un bus ya tiene horarios programados")
+    class CuandoUnBusYaTieneHorariosProgramados {
+
+
+        @ParameterizedTest
+        @CsvSource({
+                "08:00,07:30,false",
+                "15:00,11:00,false",
+                "10:00,10:30,true",
+                "17:01,17:30,true",
+                "19:00,18:30,false",
+                "20:00,18:30,false"
+        })
+        @DisplayName("Debe validar si dos horarios se solapan o no")
+        void  validarRangosHorario(String horaSalida,String horaLlegada, boolean esValido){
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.parse(horaSalida))
+                    .horaLlegada(java.time.LocalTime.parse(horaLlegada))
+                    .build();
+
+            if (!esValido) {
+                IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                    programador.programar(horario);
+                });
+                assertEquals("La hora de salida no puede ser mayor a la de llegada", exception.getMessage());
+            }else {
+                assertDoesNotThrow(() -> programador.programar(horario));
+            }
+
+        }
+
+
+
+        @ParameterizedTest
+        @CsvSource({
+                "08:00,10:00,08:30,10:30,true",
+                "08:00,10:00,10:00,11:00,false",
+                "08:00,10:00,09:00,09:30,true",
+                "08:00,10:00,10:01,11:00,false",
+                "08:00,10:00,07:00,07:30,false"
+        })
+        @DisplayName("Debe validar si dos horarios se solapan o no")
+        void debeValidarSolapamientoDeHorarios(String salidaExistente, String llegadaExistente,
+                                               String salidaNueva, String llegadaNueva, boolean debeSolapar) {
+            Bus bus = new Bus("ABC123", "Diesel");
+            Ruta rutaExistente = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Ruta rutaNueva = new Ruta("General", "R002", "Ciudad A", "Ciudad C");
+
+
+            Horario horarioExistente= Horario.builder()
+                    .bus(bus)
+                    .ruta(rutaExistente)
+                    .horaSalida(java.time.LocalTime.parse(salidaExistente))
+                    .horaLlegada(java.time.LocalTime.parse(llegadaExistente))
+                    .build();
+
+            Horario horarioNuevo = Horario.builder()
+                    .bus(bus)
+                    .ruta(rutaNueva)
+                    .horaSalida(java.time.LocalTime.parse(salidaNueva))
+                    .horaLlegada(java.time.LocalTime.parse(llegadaNueva))
+                    .build();
+
+            programador.programar(horarioExistente);
+
+            if (debeSolapar) {
+                IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                    programador.programar(horarioNuevo);
+                });
+                assertEquals("El horario se solapa con otro horario existente para el mismo bus", exception.getMessage());
+            } else {
+                assertDoesNotThrow(() -> programador.programar(horarioNuevo));
+            }
+        }
+    }
+
 
 
 
