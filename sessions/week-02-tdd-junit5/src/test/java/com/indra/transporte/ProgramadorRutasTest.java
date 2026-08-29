@@ -272,4 +272,59 @@ public class ProgramadorRutasTest {
     }
 
 
+    @Nested
+    @DisplayName("Cuando se validan los rangos de horas ")
+    class ValidacionDeRangosDeHoras {
+
+        @Test
+        @DisplayName("Debe rechazar un horario con hora de salida mayor a la de llegada")
+        void debeRechazarUnHorarioConHoraDeSalidaMayorALaDeLlegada() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.of(10, 0))
+                    .horaLlegada(java.time.LocalTime.of(8, 0))
+                    .build();
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(horario);
+            });
+
+            assertEquals("La hora de salida no puede ser mayor a la de llegada", exception.getMessage());
+        }
+
+
+        @Test
+        @DisplayName("Debe rechachar solapamiento de horarios para el mismo bus")
+        void debeRechacharSolapamientoDeHorariosParaElMismoBus() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad    B");
+            Horario horario1 = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.of(8, 0))
+                    .horaLlegada(java.time.LocalTime.of(10, 0))
+                    .build();
+
+            Horario horario2 = Horario.builder()
+                    .bus(bus)
+                    .ruta(ruta)
+                    .horaSalida(java.time.LocalTime.of(9, 0))
+                    .horaLlegada(java.time.LocalTime.of(11, 0))
+                    .build();
+
+            programador.programar(horario1);
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(horario2);
+            });
+            assertEquals("El horario se solapa con otro horario existente para el mismo bus", exception.getMessage());
+
+        }
+    }
+
+
+
+
 }
