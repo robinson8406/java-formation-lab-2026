@@ -3,7 +3,8 @@ package com.indra.transporte.model.Enums;
 public enum RouteType {
     Electric("Electric"),
     Diesel("Diesel"),
-    Gas("Gas");
+    Gas("Gas"),
+    Hybrid("Hybrid");
 
     private final String type;
 

@@ -1,4 +1,4 @@
-package test.java.com.indra.transporte;
+package com.indra.transporte;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,27 +23,47 @@ import com.indra.transporte.model.Schedule;
 
 public class RouterPlannerTest {
 
+    RoutePlanner programmer;
     private Bus electricBus;
     private Bus dieselBus;
     private Route electricRoute;
     private Route dieselRoute;
+    private Route hybridRoute;
 
     @BeforeEach
     void setUp() {
+        programmer = new RoutePlanner();
         electricBus = new Bus("1", "ABC123", BusType.Electric);
         dieselBus = new Bus("2", "DEF456", BusType.Diesel);
         electricRoute = new Route("R1", "Electric Route", RouteType.Electric);
         dieselRoute = new Route("R2", "Diesel Route", RouteType.Diesel);
+        hybridRoute = new Route("R3", "Hybrid Route", RouteType.Hybrid);
     }
 
     @Test
-    @DisplayName("Router Planner Tests")
+    @DisplayName("Validates electric buses on routes other than electric ones")
+    void testElectricBusOnlyOnOtherThanElectricRoutes() {
+        
+        assertFalse(programmer.isValidAssignment(electricBus, dieselRoute));
+        
+    }
+
+    @Test
+    @DisplayName("Validates electric buses on electric routes")
     void testElectricBusOnlyOnElectricRoutes() {
         
-        assertTrue(programmer.isValidAssignment(electricBus, RouteType.Diesel));
+        assertTrue(programmer.isValidAssignment(electricBus, electricRoute));
         
     }
     
+    @Test
+    @DisplayName("Validates non electric buses on hybrid routes")
+    void testBusOnHybridRoutes() {
+
+        assertTrue(programmer.isValidAssignment(dieselBus, hybridRoute));
+    }
+
+
     @Test
     @DisplayName("Return valid schedules for compatible bus and type")
     void testCheckValidSchedules() {
@@ -94,7 +114,7 @@ public class RouterPlannerTest {
         Schedule schedule = new Schedule(LocalTime.of(8,0), LocalTime.of(10,0));
 
         assertThrows(IllegalArgumentException.class, () -> {
-            programmer.assignSchedule(null, dieselRoute, schedule);
+            programmer.assignSchedule(dieselBus, null, schedule);
         });
     }
 
@@ -106,6 +126,15 @@ public class RouterPlannerTest {
 
         assertThrows(UnsupportedTypeException.class, () -> { programmer.getValidSchedules(electricBus, RouteType.Diesel); });
 
+    }
+
+    @Test
+    @DisplayName("Reject null bus parameter")
+    void testRejectNullBusParameter() {
+        
+       assertThrows(IllegalArgumentException.class, () -> {
+            programmer.registerBus(new Bus(null, "ABC890", BusType.Gas));
+        });
     }
 
 }
