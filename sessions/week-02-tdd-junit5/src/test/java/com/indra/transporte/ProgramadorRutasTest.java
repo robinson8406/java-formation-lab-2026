@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.indra.transporte.exception.UnsupportedTypeException;
+import com.indra.transporte.model.Tipo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -236,7 +237,7 @@ public class ProgramadorRutasTest {
                 ),
                 Arguments.of(
                         "tipo nulo",
-                        new Ruta(null, "R001", "Ciudad A", "Ciudad B"),
+                        new Ruta((Tipo) null, "R001", "Ciudad A", "Ciudad B"),
                         "El tipo de la ruta no puede ser nulo o vacío"
                 ),
                 Arguments.of(
@@ -286,7 +287,7 @@ public class ProgramadorRutasTest {
                 ),
                 Arguments.of(
                         "tipo nulo",
-                        new Bus("ABC123", null),
+                        new Bus("ABC123", (Tipo) null),
                         "El tipo del bus no puede ser nulo o vacío"
                 ),
                 Arguments.of(

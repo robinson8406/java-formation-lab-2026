@@ -1,28 +1,34 @@
 package com.indra.transporte.model;
 
 public enum Tipo {
-
-
     ELECTRIC("Electric"),
-    DIESEL("Diesel");
+    DIESEL("Diesel"),
+    GENERAL("General");
 
-    private final String value;
+    private final String valor;
 
-    Tipo(String value) {
-        this.value = value;
+    Tipo(String valor) {
+        this.valor = valor;
     }
 
     public String getValue() {
-        return value;
+        return valor;
     }
 
-    public static boolean isSupported(String tipo) {
-        for (Tipo t : Tipo.values()) {
-            if (t.getValue().equals(tipo)) {
-                return true;
+    public static Tipo fromValue(String valor) {
+        if (valor == null) {
+            return null;
+        }
+
+        for (Tipo tipo : values()) {
+            if (tipo.valor.equalsIgnoreCase(valor)) {
+                return tipo;
             }
         }
-        return false;
+        return null;
     }
 
+    public static boolean isSupported(String valor) {
+        return fromValue(valor) != null;
+    }
 }
