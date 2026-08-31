@@ -1,34 +1,35 @@
 package com.indra.transporte.model;
 
+import lombok.Getter;
+
+@Getter
 public enum Tipo {
     ELECTRIC("Electric"),
     DIESEL("Diesel"),
     GENERAL("General");
 
-    private final String valor;
+    private final String name;
 
-    Tipo(String valor) {
-        this.valor = valor;
+    Tipo(String name) {
+        this.name = name;
     }
 
-    public String getValor() {
-        return valor;
-    }
-
-    public static Tipo fromValue(String valor) {
-        if (valor == null) {
+    public static Tipo fromValue(String name) {
+        if (name == null) {
             return null;
         }
 
         for (Tipo tipo : values()) {
-            if (tipo.valor.equalsIgnoreCase(valor)) {
+            if (tipo.getName().equalsIgnoreCase(name)) {
                 return tipo;
             }
         }
+
         return null;
     }
 
-    public static boolean isSupported(String valor) {
-        return fromValue(valor) != null;
+    public static boolean isSupported(String name) {
+        return fromValue(name) != null;
     }
+
 }

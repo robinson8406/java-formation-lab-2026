@@ -7,7 +7,7 @@ import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
-import com.indra.transporte.model.Type;
+import com.indra.transporte.model.Tipo;
 
 public class ProgramadorRutasImpl implements ProgramadorRutas {
 
@@ -36,8 +36,8 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
                 || horario.horaSalida() == null || horario.horaLlegada() == null) {
             throw new IllegalArgumentException("Bus, ruta y horas del horario son obligatorios");
         }
-        if (isBlank(horario.bus().placa()) || horario.bus().type() == null
-                || isBlank(horario.ruta().tipo()) || isBlank(horario.ruta().codigo())
+        if (isBlank(horario.bus().placa()) || horario.bus().tipo() == null
+                || isBlank(horario.ruta().codigo())
                 || isBlank(horario.ruta().origen()) || isBlank(horario.ruta().destino())) {
             throw new IllegalArgumentException("Los textos del bus y la ruta no pueden ser nulos o vacíos");
         }
@@ -69,10 +69,10 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        Type tipoBus = horario.bus().type();
-        String tipoRuta = horario.ruta().tipo();
+        Tipo tipoBus = horario.bus().tipo();
+        Tipo tipoRuta = horario.ruta().tipo();
 
-        if (Type.ELECTRIC.equals(tipoBus) && !Type.ELECTRIC.getName().equals(tipoRuta)) {
+        if (Tipo.ELECTRIC.equals(tipoBus) && !Tipo.ELECTRIC.equals(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
@@ -82,9 +82,6 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
     public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
         if (bus == null) {
             throw new IllegalArgumentException("El bus no puede ser nulo");
-        }
-        if (tipo == null) {
-            throw new UnsupportedTypeException("Tipo de bus no soportado: null");
         }
 
         validarTipoSoportado(tipo);
@@ -97,14 +94,12 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
 
         return horarios.stream()
                 .filter(h -> h.bus().placa().equals(bus.placa()))
-                .filter(h -> Type.valueOf(tipo).equals(h.bus().type()))
+                .filter(h -> Tipo.fromValue(tipo).equals(h.bus().tipo()))
                 .toList();
     }
 
     private static void validarTipoSoportado(String tipo) {
-        try {
-            Type.valueOf(tipo);
-        } catch (IllegalArgumentException e) {
+        if (!Tipo.isSupported(tipo)) {
             throw new UnsupportedTypeException("Tipo de bus no soportado: " + tipo);
         }
     }
