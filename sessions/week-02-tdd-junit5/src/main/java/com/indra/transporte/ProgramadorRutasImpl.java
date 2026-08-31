@@ -27,6 +27,7 @@ public class ProgramadorRutasImpl implements ProgramadorRutas {
         validarCamposObligatorios(horario);
         validarRangoHorario(horario);
         validarSolapamiento(horario);
+        debeValidarTipoRutasYBuses(horario);
 
         horarios.add(horario);
     }
