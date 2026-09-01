@@ -4,14 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.beans.Transient;
 import org.junit.jupiter.api.BeforeEach;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.indra.transporte.exception.UnsupportedTypeException;
@@ -133,7 +130,7 @@ public class RouterPlannerTest {
     void testRejectNullBusParameter() {
         
        assertThrows(IllegalArgumentException.class, () -> {
-            programmer.registerBus(new Bus(null, "ABC890", BusType.Gas));
+            programmer.registerBus(new Bus("3", "ABC890", null));
         });
     }
 
