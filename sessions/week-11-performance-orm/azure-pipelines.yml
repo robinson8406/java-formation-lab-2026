@@ -18,7 +18,10 @@ trigger: none   # no se activa al hacer push directo
 pr:
   branches:
     include:
-      - 'week-*-start'   # se activa en PR hacia cualquier rama week-XX-start
+      - 'week-11-start'   # solo PRs hacia esta rama
+  paths:
+    include:
+      - 'sessions/week-11-performance-orm/*'   # solo cambios de esta semana
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -27,7 +30,7 @@ steps:
   - task: Maven@4
     displayName: 'Build & Test — week-11-performance-orm'
     inputs:
-      mavenPomFile: 'pom.xml'
+      mavenPomFile: 'sessions/week-11-performance-orm/pom.xml'
       goals: 'verify'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '21'

@@ -17,6 +17,9 @@ pr:
   branches:
     include:
       - 'week-18-start'
+  paths:
+    include:
+      - 'sessions/week-18-observabilidad-cierre/*'   # solo cambios de esta semana
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -36,7 +39,7 @@ stages:
           - task: Maven@4
             displayName: 'mvn verify'
             inputs:
-              mavenPomFile: 'pom.xml'
+              mavenPomFile: 'sessions/week-18-observabilidad-cierre/pom.xml'
               goals: 'verify'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '21'

@@ -17,12 +17,16 @@
 trigger:
   branches:
     include:
-      # TODO: lista las ramas aquí
+      - main
+      - 'week-15*'
 
 pr:
   branches:
     include:
-      # TODO: ¿hacia qué rama deben apuntar los PRs?
+      - 'week-15-start'   # solo PRs hacia esta rama
+  paths:
+    include:
+      - 'sessions/week-15-azure-devops-ci/*'   # solo cambios de esta semana
 
 # TODO 2: Elige el agente de ejecución.
 pool:
@@ -50,7 +54,7 @@ stages:
           - task: Maven@4
             displayName: 'mvn verify'
             inputs:
-              mavenPomFile: 'pom.xml'
+              mavenPomFile: 'sessions/week-15-azure-devops-ci/pom.xml'
               goals: ''                           # TODO: ¿qué goal necesitas?
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: ''                # TODO: versión de Java
