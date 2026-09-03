@@ -25,6 +25,9 @@ public class ProgramadorRutas {
         if (conflicto != null) {
             throw new HorarioSolapadoException(horario, conflicto);
         }
+        if (horario.getHoraLlegada().isBefore(horario.getHoraSalida())) {
+            throw new IllegalArgumentException("Rango horario inválido");
+        }
         horarios.add(horario);
     }
 
