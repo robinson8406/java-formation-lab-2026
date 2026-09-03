@@ -3,6 +3,7 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
 import lombok.Data;
@@ -30,6 +31,13 @@ public class ProgramadorRutas {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
+    }
+
+    public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
+        return horarios.stream()
+                .filter(h -> h.getBus().equals(bus))
+                .filter(h -> h.getBus().getTipo().equals(tipo))
+                .toList();
     }
 
 }
