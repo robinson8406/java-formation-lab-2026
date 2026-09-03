@@ -21,13 +21,8 @@ public class ProgramadorRutas {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
 
-        Horario conflicto = buscarHorarioSolapado(horario);
-        if (conflicto != null) {
-            throw new HorarioSolapadoException(horario, conflicto);
-        }
-        if (horario.getHoraLlegada().isBefore(horario.getHoraSalida())) {
-            throw new IllegalArgumentException("Rango horario inválido");
-        }
+        validarHorarioSolapado(horario);
+        validarRangoHorario(horario);
         horarios.add(horario);
     }
 
@@ -76,6 +71,19 @@ public class ProgramadorRutas {
                 )
                 .findFirst()
                 .orElse(null);
+    }
+
+    private void validarHorarioSolapado(Horario horario) {
+        Horario conflicto = buscarHorarioSolapado(horario);
+        if (conflicto != null) {
+            throw new HorarioSolapadoException(horario, conflicto);
+        }
+    }
+
+    private void validarRangoHorario(Horario nuevo) {
+        if (nuevo.getHoraLlegada().isBefore(nuevo.getHoraSalida())) {
+            throw new IllegalArgumentException("Rango horario inválido");
+        }
     }
 
 }
