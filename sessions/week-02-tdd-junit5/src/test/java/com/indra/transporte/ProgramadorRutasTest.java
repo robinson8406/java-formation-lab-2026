@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.indra.transporte.exception.HorarioSolapadoException;
 import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.TipoVehiculoRuta;
 import org.junit.jupiter.api.DisplayName;
@@ -145,6 +146,6 @@ public class ProgramadorRutasTest {
                 java.time.LocalTime.of(8, 30),
                 java.time.LocalTime.of(10, 30)
         );
-        assertThrows(IllegalArgumentException.class, () -> programador.programar(solapado));
+        assertThrows(HorarioSolapadoException.class, () -> programador.programar(solapado));
     }
 }
