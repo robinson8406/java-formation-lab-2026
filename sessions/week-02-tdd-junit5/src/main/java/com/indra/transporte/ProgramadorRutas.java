@@ -3,6 +3,7 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
@@ -34,8 +35,12 @@ public class ProgramadorRutas {
         return true;
     }
 
-    public List<Horario> consultarHorariosPorTipoBus(Bus bus, TipoVehiculoRuta  tipo) {
+    public List<Horario> consultarHorariosPorTipoBus(Bus bus, TipoVehiculoRuta tipo) {
         validarBusConocido(bus);
+
+        if (tipo == null) {
+            throw new UnsupportedTypeException("Tipo desconocido");
+        }
 
         return horarios.stream()
                 .filter(h -> h.getBus().equals(bus))
