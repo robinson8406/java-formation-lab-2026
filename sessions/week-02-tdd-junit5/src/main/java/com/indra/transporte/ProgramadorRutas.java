@@ -16,6 +16,19 @@ public class ProgramadorRutas {
     List<Horario> horarios = new ArrayList<>();
 
     public void programar(Horario horario) {
+        boolean solapado = horarios.stream()
+                .filter(h -> h.getBus().equals(horario.getBus()))
+                .anyMatch(h ->
+                        horario.getHoraSalida().isBefore(h.getHoraLlegada())
+                                && horario.getHoraLlegada().isAfter(h.getHoraSalida())
+                );
+
+        if (solapado) {
+            throw new IllegalArgumentException("Horario solapado para el bus");
+        }
+
+        horarios.add(horario);
+
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
