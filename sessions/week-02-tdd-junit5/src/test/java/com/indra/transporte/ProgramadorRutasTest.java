@@ -111,6 +111,21 @@ public class ProgramadorRutasTest {
         }
 
         @Test
+        @DisplayName("Debe consultar horarios sin distinguir mayúsculas y minúsculas en el tipo")
+        void debeConsultarHorariosIgnorandoMayusculasDelTipo() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = new Horario(bus, ruta,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+
+            programador.programar(horario);
+
+            List<Horario> horarios = programador.consultarHorariosPorTipoBus(bus, "electric");
+
+            assertEquals(List.of(horario), horarios);
+        }
+
+        @Test
         @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
         void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
             Bus busDesconocido = new Bus("ZZZ000", "Electric");
@@ -141,15 +156,12 @@ public class ProgramadorRutasTest {
 
         @ParameterizedTest
         @CsvSource({
-                "08:00,10:00,08:30,10:30,true",
-                "08:00,10:00,10:00,11:00,false",
-                "08:00,10:00,09:00,09:30,true",
-                "08:00,10:00,10:01,11:00,false",
-                "08:00,10:00,07:00,07:30,false"
+            "08:00,10:00,08:30,10:30",
+            "08:00,10:00,09:00,09:30"
         })
-        @DisplayName("Debe validar si dos horarios se solapan o no")
-        void debeValidarSolapamientoDeHorarios(String salidaExistente, String llegadaExistente,
-                String salidaNueva, String llegadaNueva, boolean debeSolapar) {
+        @DisplayName("Debe rechazar horarios que se solapan")
+        void debeRechazarHorariosSolapados(String salidaExistente, String llegadaExistente,
+                String salidaNueva, String llegadaNueva) {
             Bus bus = new Bus("ABC123", "Diesel");
             Ruta rutaExistente = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
             Ruta rutaNueva = new Ruta("General", "R002", "Ciudad A", "Ciudad C");
@@ -161,14 +173,34 @@ public class ProgramadorRutasTest {
 
             programador.programar(horarioExistente);
 
-            if (debeSolapar) {
-                IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                    programador.programar(horarioNuevo);
-                });
-                assertEquals("El horario se solapa con otro ya programado", exception.getMessage());
-            } else {
-                assertDoesNotThrow(() -> programador.programar(horarioNuevo));
-            }
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(horarioNuevo);
+            });
+
+            assertEquals("El horario se solapa con otro ya programado", exception.getMessage());
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "08:00,10:00,10:00,11:00",
+            "08:00,10:00,10:01,11:00",
+            "08:00,10:00,07:00,07:30"
+        })
+        @DisplayName("Debe permitir horarios que no se solapan")
+        void debePermitirHorariosSinSolapamiento(String salidaExistente, String llegadaExistente,
+                String salidaNueva, String llegadaNueva) {
+            Bus bus = new Bus("ABC123", "Diesel");
+            Ruta rutaExistente = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Ruta rutaNueva = new Ruta("General", "R002", "Ciudad A", "Ciudad C");
+
+            Horario horarioExistente = new Horario(bus, rutaExistente,
+                    java.time.LocalTime.parse(salidaExistente), java.time.LocalTime.parse(llegadaExistente));
+            Horario horarioNuevo = new Horario(bus, rutaNueva,
+                    java.time.LocalTime.parse(salidaNueva), java.time.LocalTime.parse(llegadaNueva));
+
+            programador.programar(horarioExistente);
+
+            assertDoesNotThrow(() -> programador.programar(horarioNuevo));
         }
     }
 
