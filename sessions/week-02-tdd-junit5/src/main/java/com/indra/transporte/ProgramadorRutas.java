@@ -93,7 +93,8 @@ public class ProgramadorRutas {
             throw new IllegalArgumentException("Bus desconocido");
         }
 
-        if (tipo == null || !Tipo.isSupported(tipo)) {
+        Tipo tipoSolicitado = Tipo.fromValue(tipo);
+        if (tipoSolicitado == null) {
             throw new UnsupportedTypeException("Tipo de bus no soportado");
         }
 
@@ -108,7 +109,7 @@ public class ProgramadorRutas {
 
         return horarios.stream()
                 .filter(h -> Objects.equals(h.getBus().getPlaca(), bus.getPlaca()))
-                .filter(h -> Objects.equals(h.getBus().getTipo(), tipo))
+                .filter(h -> Objects.equals(h.getBus().getTipo(), tipoSolicitado.getValor()))
                 .toList();
     }
 
