@@ -67,6 +67,10 @@ public class ProgramadorRutas {
         String tipoBus = horario.getBus().getTipo();
         String tipoRuta = horario.getRuta().getTipo();
 
+        if (!Tipo.isSupported(tipoBus)) {
+            throw new UnsupportedTypeException("Tipo de bus no soportado");
+        }
+
         if (Tipo.ELECTRIC.getValor().equals(tipoBus) && !Tipo.ELECTRIC.getValor().equals(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
