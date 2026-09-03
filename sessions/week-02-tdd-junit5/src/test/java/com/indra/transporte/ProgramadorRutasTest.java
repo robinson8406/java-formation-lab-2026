@@ -125,4 +125,26 @@ public class ProgramadorRutasTest {
         assertThrows(UnsupportedTypeException.class,
                 () -> programador.consultarHorariosPorTipoBus(bus, null));
     }
+
+    @Test
+    @DisplayName("Debe rechazar un horario solapado para el mismo bus")
+    void debeRechazarHorarioSolapado() {
+        Bus bus = new Bus("ABC123", TipoVehiculoRuta.DIESEL);
+        Ruta ruta = new Ruta(TipoVehiculoRuta.GENERAL, "R001", "Ciudad A", "Ciudad B");
+
+        programador.programar(new Horario(
+                bus,
+                ruta,
+                java.time.LocalTime.of(8, 0),
+                java.time.LocalTime.of(10, 0)
+        ));
+
+        Horario solapado = new Horario(
+                bus,
+                ruta,
+                java.time.LocalTime.of(8, 30),
+                java.time.LocalTime.of(10, 30)
+        );
+        assertThrows(IllegalArgumentException.class, () -> programador.programar(solapado));
+    }
 }
