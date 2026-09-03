@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.indra.transporte.model.TipoVehiculoRuta;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,8 @@ public class ProgramadorRutasTest {
     @Test
     @DisplayName("Debe registrar un horario")
     void debeRegistrarUnHorario() {
-        Bus bus = new Bus("ABC123", "Diesel");
-        Ruta ruta = new Ruta("Electric","R001", "Ciudad A", "Ciudad B");
+        Bus bus = new Bus("ABC123", TipoVehiculoRuta.DIESEL);
+        Ruta ruta = new Ruta(TipoVehiculoRuta.ELECTRIC,"R001", "Ciudad A", "Ciudad B");
         Horario horario = new Horario(bus, ruta,
                 LocalTime.of(8, 0), LocalTime.of(10, 0));
 
@@ -38,8 +39,8 @@ public class ProgramadorRutasTest {
         @Test
         @DisplayName("Debe rechazar rutas no eléctricas")
         void debeRechazarRutasNoElectricas() {
-            Bus bus = new Bus("ABC123", "Electric");
-            Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Bus bus = new Bus("ABC123", TipoVehiculoRuta.ELECTRIC);
+            Ruta ruta = new Ruta(TipoVehiculoRuta.GENERAL, "R001", "Ciudad A", "Ciudad B");
             Horario horario = new Horario(bus, ruta,
                     LocalTime.of(8, 0), LocalTime.of(10, 0));
 
@@ -53,8 +54,8 @@ public class ProgramadorRutasTest {
         @Test
         @DisplayName("Debe permitir rutas eléctricas")
         void debePermitirRutasElectricas() {
-            Bus bus = new Bus("ABC123", "Electric");
-            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Bus bus = new Bus("ABC123", TipoVehiculoRuta.ELECTRIC);
+            Ruta ruta = new Ruta(TipoVehiculoRuta.ELECTRIC, "R001", "Ciudad A", "Ciudad B");
             Horario horario = new Horario(bus, ruta,
                     LocalTime.of(8, 0), LocalTime.of(10, 0));
 
@@ -69,8 +70,8 @@ public class ProgramadorRutasTest {
         @Test
         @DisplayName("Debe permitir cualquier tipo de ruta")
         void debePermitirCualquierTipoDeRuta() {
-            Bus bus = new Bus("ABC123", "Diesel");
-            Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Bus bus = new Bus("ABC123", TipoVehiculoRuta.DIESEL);
+            Ruta ruta = new Ruta(TipoVehiculoRuta.GENERAL, "R001", "Ciudad A", "Ciudad B");
             Horario horario = new Horario(bus, ruta,
                     LocalTime.of(8, 0), LocalTime.of(10, 0));
 
@@ -81,8 +82,8 @@ public class ProgramadorRutasTest {
     @Test
     @DisplayName("Debe devolver los horarios del tipo solicitado")
     void debeDevolverLosHorariosDelTipoSolicitado() {
-        Bus bus = new Bus("ABC123", "Diesel");
-        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+        Bus bus = new Bus("ABC123", TipoVehiculoRuta.DIESEL);
+        Ruta ruta = new Ruta(TipoVehiculoRuta.GENERAL, "R001", "Ciudad A", "Ciudad B");
 
         Horario h1 = new Horario(bus, ruta,
                 LocalTime.of(8, 0), LocalTime.of(10, 0));
@@ -92,7 +93,7 @@ public class ProgramadorRutasTest {
         programador.programar(h1);
         programador.programar(h2);
 
-        var resultado = programador.consultarHorariosPorTipoBus(bus, "Diesel");
+        var resultado = programador.consultarHorariosPorTipoBus(bus, TipoVehiculoRuta.DIESEL);
 
         assertEquals(2, resultado.size());
     }

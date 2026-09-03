@@ -12,5 +12,5 @@ public class Bus {
     @EqualsAndHashCode.Include
     private final String placa;
 
-    private final String tipo;
+    private final TipoVehiculoRuta tipo;
 }

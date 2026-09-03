@@ -6,6 +6,7 @@ import java.util.List;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 
+import com.indra.transporte.model.TipoVehiculoRuta;
 import lombok.Data;
 
 @Data
@@ -24,16 +25,16 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        String tipoBus = horario.getBus().getTipo();
-        String tipoRuta = horario.getRuta().getTipo();
+        TipoVehiculoRuta tipoBus = horario.getBus().getTipo();
+        TipoVehiculoRuta tipoRuta = horario.getRuta().getTipo();
 
-        if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
+        if (TipoVehiculoRuta.ELECTRIC.equals(tipoBus) && !TipoVehiculoRuta.ELECTRIC.equals(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
     }
 
-    public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
+    public List<Horario> consultarHorariosPorTipoBus(Bus bus, TipoVehiculoRuta  tipo) {
         return horarios.stream()
                 .filter(h -> h.getBus().equals(bus))
                 .filter(h -> h.getBus().getTipo().equals(tipo))
