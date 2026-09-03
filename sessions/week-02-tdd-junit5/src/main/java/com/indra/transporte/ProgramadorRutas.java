@@ -37,10 +37,7 @@ public class ProgramadorRutas {
 
     public List<Horario> consultarHorariosPorTipoBus(Bus bus, TipoVehiculoRuta tipo) {
         validarBusConocido(bus);
-
-        if (tipo == null) {
-            throw new UnsupportedTypeException("Tipo desconocido");
-        }
+        validarTipoSoportado(tipo);
 
         return horarios.stream()
                 .filter(h -> h.getBus().equals(bus))
@@ -55,5 +52,10 @@ public class ProgramadorRutas {
         }
     }
 
+    private void validarTipoSoportado(TipoVehiculoRuta tipo) {
+        if (tipo == null) {
+            throw new UnsupportedTypeException("Tipo desconocido");
+        }
+    }
 
 }
