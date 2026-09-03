@@ -17,10 +17,7 @@ public class ProgramadorRutas {
     List<Horario> horarios = new ArrayList<>();
 
     public void programar(Horario horario) {
-        if (horario == null) {
-            throw new IllegalArgumentException("El horario no puede ser nulo");
-        }
-
+        validarParametros(horario);
         validarHorarioSolapado(horario);
         validarRangoHorario(horario);
         horarios.add(horario);
@@ -83,6 +80,21 @@ public class ProgramadorRutas {
     private void validarRangoHorario(Horario nuevo) {
         if (nuevo.getHoraLlegada().isBefore(nuevo.getHoraSalida())) {
             throw new IllegalArgumentException("Rango horario inválido");
+        }
+    }
+
+    private void validarParametros(Horario nuevo) {
+        if (nuevo == null) {
+            throw new IllegalArgumentException("Horario no puede ser null");
+        }
+        if (nuevo.getBus() == null){
+            throw new IllegalArgumentException("Bus no puede ser null");
+        }
+        if (nuevo.getRuta() == null){
+            throw new IllegalArgumentException("Ruta no puede ser null");
+        }
+        if (nuevo.getBus().getPlaca() == null || nuevo.getBus().getPlaca().isBlank()) {
+            throw new IllegalArgumentException("La placa del bus no puede ser vacía");
         }
     }
 
