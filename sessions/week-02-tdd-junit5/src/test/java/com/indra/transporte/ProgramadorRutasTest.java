@@ -13,6 +13,8 @@ import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.Ruta;
 
+import java.time.LocalTime;
+
 public class ProgramadorRutasTest {
     private final ProgramadorRutas programador = new ProgramadorRutas();
 
@@ -22,7 +24,7 @@ public class ProgramadorRutasTest {
         Bus bus = new Bus("ABC123", "Diesel");
         Ruta ruta = new Ruta("Electric","R001", "Ciudad A", "Ciudad B");
         Horario horario = new Horario(bus, ruta,
-                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+                LocalTime.of(8, 0), LocalTime.of(10, 0));
 
         programador.programar(horario);
 
@@ -39,7 +41,7 @@ public class ProgramadorRutasTest {
             Bus bus = new Bus("ABC123", "Electric");
             Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
             Horario horario = new Horario(bus, ruta,
-                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+                    LocalTime.of(8, 0), LocalTime.of(10, 0));
 
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
                 programador.debeValidarTipoRutasYBuses(horario);
@@ -54,7 +56,7 @@ public class ProgramadorRutasTest {
             Bus bus = new Bus("ABC123", "Electric");
             Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
             Horario horario = new Horario(bus, ruta,
-                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+                    LocalTime.of(8, 0), LocalTime.of(10, 0));
 
             assertDoesNotThrow(() -> programador.debeValidarTipoRutasYBuses(horario));
         }
@@ -70,7 +72,7 @@ public class ProgramadorRutasTest {
             Bus bus = new Bus("ABC123", "Diesel");
             Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
             Horario horario = new Horario(bus, ruta,
-                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+                    LocalTime.of(8, 0), LocalTime.of(10, 0));
 
             assertDoesNotThrow(() -> programador.debeValidarTipoRutasYBuses(horario));
         }
@@ -79,7 +81,20 @@ public class ProgramadorRutasTest {
     @Test
     @DisplayName("Debe devolver los horarios del tipo solicitado")
     void debeDevolverLosHorariosDelTipoSolicitado() {
-        fail("Implementar este test para devolver los horarios del tipo solicitado");
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+
+        Horario h1 = new Horario(bus, ruta,
+                LocalTime.of(8, 0), LocalTime.of(10, 0));
+        Horario h2 = new Horario(bus, ruta,
+                LocalTime.of(11, 0), LocalTime.of(12, 0));
+
+        programador.programar(h1);
+        programador.programar(h2);
+
+        var resultado = programador.consultarHorariosPorTipoBus(bus, "Diesel");
+
+        assertEquals(2, resultado.size());
     }
 
     @Test
