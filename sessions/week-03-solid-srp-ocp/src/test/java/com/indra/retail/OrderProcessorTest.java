@@ -49,6 +49,23 @@ class OrderProcessorTest {
         assertEquals("Stock insuficiente para el pedido 123", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("Verifica descuento 15% loyalty para clientes con más de 1 año de antigüedad")
+    void processWithLoyaltyDiscount() {
+        Costumer costumer = new Costumer("1", "test@mail.com", LocalDate.of(2022, 10, 1));
+        order = new Order("123", INITIAL_PRICE, DiscountType.LOYALTY, REQUESTED_QTY, costumer);
+        BigDecimal price = orderProcessor.process(order, 10);
+        assertEquals(0, price.compareTo(new BigDecimal("975")));
+    }
+
+    @Test
+    @DisplayName("Verifica que no se aplique descuento loyalty para clientes con menos de 1 año de antigüedad")
+    void processWithLoyaltyDiscountForNewCustomer() {
+        Costumer costumer = new Costumer("1", "test@mail.com", LocalDate.now());
+        order = new Order("123", INITIAL_PRICE, DiscountType.LOYALTY, REQUESTED_QTY, costumer);
+        BigDecimal price = orderProcessor.process(order, 10);
+        assertEquals(0, price.compareTo(new BigDecimal("1000")));
+    }
 
 
 }

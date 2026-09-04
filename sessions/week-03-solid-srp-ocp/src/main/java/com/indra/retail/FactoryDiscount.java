@@ -17,9 +17,6 @@ public class FactoryDiscount {
 
     public Discounts create(Order order) {
         Supplier<Discounts> supplier = discounts.get(order.getDiscountType());
-        if (supplier == null) {
-            throw new IllegalArgumentException("Tipo de descuento no soportado");
-        }
         return supplier.get();
     }
 
