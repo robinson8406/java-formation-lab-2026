@@ -17,15 +17,7 @@ public class OrderProcessor {
             throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
         }
 
-        // Punto de partida del reto: descuento mezclado aquí, viola SRP y OCP.
-        BigDecimal finalPrice;
-        if (order.getDiscountType() == DiscountType.STANDARD) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.95));
-        } else if (order.getDiscountType() == DiscountType.SEASONAL) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.80));
-        } else {
-            finalPrice = order.getPrice();
-        }
+        BigDecimal finalPrice = order.getDiscountCalculator().applyDiscount(order);
 
         orderNotifier.notifyCustomer(order.getCustomerEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
