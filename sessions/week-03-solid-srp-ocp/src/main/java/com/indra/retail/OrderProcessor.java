@@ -20,9 +20,9 @@ public class OrderProcessor {
         }
 
         // Punto de partida del reto: descuento mezclado aquí, viola SRP y OCP.
-        BigDecimal finalPrice = discountCalculator.apply(order.getPrice(), order.getDiscountType());
+        BigDecimal finalPrice = discountCalculator.apply(order);
 
-        orderNotifier.notifyCustomer(order.getCustomerEmail(),
+        orderNotifier.notifyCustomer(order.getCustomer().getEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
 
         return finalPrice;

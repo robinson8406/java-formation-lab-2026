@@ -8,14 +8,14 @@ public class Order {
     private final BigDecimal price;
     private final DiscountType discountType;
     private final int requestedQuantity;
-    private final String customerEmail;
+    private final Costumer customer;
 
-    public Order(String id, BigDecimal price, DiscountType discountType, int requestedQuantity, String customerEmail) {
+    public Order(String id, BigDecimal price, DiscountType discountType, int requestedQuantity, Costumer customer) {
         this.id = id;
         this.price = price;
         this.discountType = discountType;
         this.requestedQuantity = requestedQuantity;
-        this.customerEmail = customerEmail;
+        this.customer = customer;
     }
 
     public String getId() {
@@ -34,7 +34,7 @@ public class Order {
         return requestedQuantity;
     }
 
-    public String getCustomerEmail() {
-        return customerEmail;
+    public Costumer getCustomer() {
+        return customer;
     }
 }

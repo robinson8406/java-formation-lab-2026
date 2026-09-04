@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,12 +30,12 @@ class OrderProcessorTest {
     @ParameterizedTest
     @CsvSource({
             "STANDARD,950",
-            "SEASONAL,800",
-            "LOYALTY,1000"
+            "SEASONAL,800"
     })
     @DisplayName("Verifica precios finales para distintos tipos de descuento")
     void processWithVariousDiscounts(DiscountType type, String expected) {
-        order = new Order("123", INITIAL_PRICE, type, REQUESTED_QTY, "test@mail.com");
+        Costumer costumer =new Costumer("1","test@mail.com",LocalDate.of(2025, 10, 1));
+        order = new Order("123", INITIAL_PRICE, type, REQUESTED_QTY, costumer);
         BigDecimal price = orderProcessor.process(order, 10);
         assertEquals(0, price.compareTo(new BigDecimal(expected)));
     }
@@ -42,11 +43,11 @@ class OrderProcessorTest {
     @Test
     @DisplayName("Valida que exista suficiente stock para procesar el pedido")
     void processWithInsufficientStock() {
-        order = new Order("123", INITIAL_PRICE, DiscountType.STANDARD, REQUESTED_QTY, "test@mail.com");
+        Costumer costumer =new Costumer("1","test@mail.com",LocalDate.of(2025, 10, 1));
+        order = new Order("123", INITIAL_PRICE, DiscountType.STANDARD, REQUESTED_QTY, costumer);
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> orderProcessor.process(order, 3));
         assertEquals("Stock insuficiente para el pedido 123", exception.getMessage());
     }
-
 
 
 

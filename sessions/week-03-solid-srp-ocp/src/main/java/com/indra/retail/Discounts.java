@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface Discounts {
 
-    BigDecimal calculate(BigDecimal price);
+    BigDecimal calculate(Order order);
 
 
 

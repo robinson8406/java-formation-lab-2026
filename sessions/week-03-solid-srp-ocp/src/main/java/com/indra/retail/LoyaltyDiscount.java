@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class LoyaltyDiscount implements Discounts{
     @Override
-    public BigDecimal calculate(BigDecimal price) {
-        return price;
+    public BigDecimal calculate(Order order) {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

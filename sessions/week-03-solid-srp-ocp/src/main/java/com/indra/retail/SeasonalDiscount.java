@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class SeasonalDiscount implements Discounts{
     @Override
-    public BigDecimal calculate(BigDecimal price) {
-        return price.multiply(BigDecimal.valueOf(0.80));
+    public BigDecimal calculate(Order order) {
+        return order.getPrice().multiply(BigDecimal.valueOf(0.80));
     }
 }

@@ -10,8 +10,8 @@ public class DiscountCalculator {
         this.factoryDiscount = new FactoryDiscount();
     }
 
-    public BigDecimal apply(BigDecimal price, DiscountType type) {
-        return factoryDiscount.create(type).calculate(price);
+    public BigDecimal apply(Order order) {
+        return factoryDiscount.create(order).calculate(order);
     }
 
 }
