@@ -42,10 +42,10 @@ class OrderProcessorTest {
     @Test
     @DisplayName("Valida que exista suficiente stock para procesar el pedido")
     void processWithInsufficientStock() {
+        order = new Order("123", INITIAL_PRICE, DiscountType.STANDARD, REQUESTED_QTY, "test@mail.com");
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> orderProcessor.process(order, 3));
         assertEquals("Stock insuficiente para el pedido 123", exception.getMessage());
     }
-
 
 
 
