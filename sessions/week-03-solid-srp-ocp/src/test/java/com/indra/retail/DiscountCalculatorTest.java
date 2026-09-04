@@ -47,4 +47,18 @@ class DiscountCalculatorTest {
 		 assertEquals(BigDecimal.valueOf(1000), disc.applyDiscount(order));
 		
 	}
+	
+	@Test
+	@DisplayName("Debe validar tipo loyalty")
+	void shouldCalculateDiscountLoyalty() {
+		 DiscountStrategy disc =  new DiscountStrategyLoyalty();
+		 Order order =  new Order("1", BigDecimal.valueOf(1000), disc, 10, "mail@indra.es");
+		 
+		 assertEquals(
+				    0,
+				    new BigDecimal("850")
+				        .compareTo(disc.applyDiscount(order))
+				);
+		
+	}
 } 
