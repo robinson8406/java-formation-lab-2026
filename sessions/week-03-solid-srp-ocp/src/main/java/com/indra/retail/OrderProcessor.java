@@ -8,10 +8,10 @@ public class OrderProcessor {
     private final OrderNotifier orderNotifier;
     private final DiscountCalculator discountCalculator;
 
-    public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier, DiscountCalculator discountCalculator) {
+    public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier) {
         this.stockValidator = stockValidator;
         this.orderNotifier = orderNotifier;
-        this.discountCalculator = discountCalculator;
+        this.discountCalculator = new DiscountCalculator();
     }
 
     public BigDecimal process(Order order, int availableStock) {
