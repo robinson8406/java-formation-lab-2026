@@ -1,4 +1,6 @@
-package com.indra.retail;
+package com.indra.retail.domain.model;
+
+import com.indra.retail.domain.discount.DiscountStrategy;
 
 import java.math.BigDecimal;
 
@@ -6,14 +8,14 @@ public class Order {
 
     private final String id;
     private final BigDecimal price;
-    private final DiscountType discountType;
+    private final DiscountStrategy discountStrategy;
     private final int requestedQuantity;
     private final Costumer customer;
 
-    public Order(String id, BigDecimal price, DiscountType discountType, int requestedQuantity, Costumer customer) {
+    public Order(String id, BigDecimal price, DiscountStrategy discountStrategy, int requestedQuantity, Costumer customer) {
         this.id = id;
         this.price = price;
-        this.discountType = discountType;
+        this.discountStrategy = discountStrategy;
         this.requestedQuantity = requestedQuantity;
         this.customer = customer;
     }
@@ -26,8 +28,8 @@ public class Order {
         return price;
     }
 
-    public DiscountType getDiscountType() {
-        return discountType;
+    public DiscountStrategy getDiscountStrategy() {
+        return discountStrategy;
     }
 
     public int getRequestedQuantity() {

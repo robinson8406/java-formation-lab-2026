@@ -1,4 +1,4 @@
-package com.indra.retail;
+package com.indra.retail.validation;
 
 public class StockValidator {
 

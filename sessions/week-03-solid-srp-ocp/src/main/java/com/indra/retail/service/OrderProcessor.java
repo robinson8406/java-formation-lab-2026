@@ -1,4 +1,8 @@
-package com.indra.retail;
+package com.indra.retail.service;
+
+import com.indra.retail.notification.OrderNotifier;
+import com.indra.retail.validation.StockValidator;
+import com.indra.retail.domain.model.Order;
 
 import java.math.BigDecimal;
 
@@ -11,7 +15,7 @@ public class OrderProcessor {
     public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier) {
         this.stockValidator = stockValidator;
         this.orderNotifier = orderNotifier;
-        this.discountCalculator = new DiscountCalculator();
+        this.discountCalculator= new DiscountCalculator();
     }
 
     public BigDecimal process(Order order, int availableStock) {

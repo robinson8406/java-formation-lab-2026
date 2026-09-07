@@ -1,4 +1,4 @@
-package com.indra.retail;
+package com.indra.retail.domain.model;
 
 import java.time.LocalDate;
 

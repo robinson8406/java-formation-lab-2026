@@ -1,10 +1,13 @@
-package com.indra.retail;
+package com.indra.retail.domain.discount;
+
+import com.indra.retail.domain.model.Order;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.time.LocalDate;
 
-public class LoyaltyDiscount implements Discounts{
+public final class LoyaltyDiscount implements DiscountStrategy {
+
     @Override
     public BigDecimal calculate(Order order) {
        
