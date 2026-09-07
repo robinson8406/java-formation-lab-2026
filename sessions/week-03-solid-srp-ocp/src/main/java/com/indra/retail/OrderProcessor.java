@@ -19,9 +19,7 @@ public class OrderProcessor {
             throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
         }
 
-        // Punto de partida del reto: descuento mezclado aquí, viola SRP y OCP.
         BigDecimal finalPrice = discountCalculator.apply(order);
-
         orderNotifier.notifyCustomer(order.getCustomer().getEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
 

@@ -11,7 +11,7 @@ public class DiscountCalculator {
     }
 
     public BigDecimal apply(Order order) {
-        return factoryDiscount.create(order).calculate(order);
+        return factoryDiscount.create(order.getDiscountType()).calculate(order);
     }
 
 }

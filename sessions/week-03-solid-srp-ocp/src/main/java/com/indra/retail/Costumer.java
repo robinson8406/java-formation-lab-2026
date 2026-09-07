@@ -3,6 +3,7 @@ package com.indra.retail;
 import java.time.LocalDate;
 
 public class Costumer {
+
     private final String id;
     private final String email;
     private final LocalDate customerJoinDate;
