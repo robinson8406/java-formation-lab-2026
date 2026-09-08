@@ -1,8 +1,6 @@
 package com.indra.retail;
 
 import org.junit.jupiter.api.Test;
-
-import com.indra.retail.DiscountCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
