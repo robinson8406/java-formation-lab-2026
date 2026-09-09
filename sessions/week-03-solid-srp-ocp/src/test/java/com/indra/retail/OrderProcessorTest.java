@@ -30,7 +30,8 @@ class OrderProcessorTest {
     @ParameterizedTest
     @CsvSource({
             "STANDARD,100.00,95.0000",
-            "SEASONAL,100.00,80.000"
+            "SEASONAL,100.00,80.000",
+            "LOYALTY,100.00,85.0000"
     })
     @DisplayName("Debe aplicar el descuento configurado segun el tipo")
     void shouldApplyDiscountByType(DiscountType discountType, String price, String expectedTotal) {
@@ -52,4 +53,5 @@ class OrderProcessorTest {
 
         assertEquals("Stock insuficiente para el pedido ORD-003", exception.getMessage());
     }
+
 }

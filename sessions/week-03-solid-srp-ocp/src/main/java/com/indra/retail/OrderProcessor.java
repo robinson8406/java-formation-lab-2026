@@ -36,6 +36,7 @@ public class OrderProcessor {
         DiscountCalculator discountCalculator = switch (order.getDiscountType()) {
             case STANDARD -> new StandardDiscount();
             case SEASONAL -> new SeasonalDiscount();
+            case LOYALTY -> new LoyaltyDiscount();
         };
 
         return discountCalculator.apply(order.getPrice());
