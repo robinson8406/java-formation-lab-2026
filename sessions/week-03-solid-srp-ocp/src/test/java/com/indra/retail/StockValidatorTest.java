@@ -1,5 +1,6 @@
 package com.indra.retail;
 
+import com.indra.retail.stock.StockValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
