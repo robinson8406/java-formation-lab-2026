@@ -1,6 +1,5 @@
 package com.indra.retail;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -9,7 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class DiscountCalculatorTest {
-    private final DiscountCalculator discountCalculator = new DiscountCalculator();
+    private final DiscountStrategyFactory factory = new DiscountStrategyFactory();
+    private final DiscountCalculator discountCalculator = new DiscountCalculator(factory);
 
     @Test
     @DisplayName("Debe aplicar el descuento STANDARD al precio de la orden")
