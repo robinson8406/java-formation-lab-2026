@@ -29,17 +29,17 @@ public class OrderProcessor {
     }
 
     private static BigDecimal applyDiscount(Order order) {
-        if (null == order.discountType()) {
+        var discountCalculator = order.discountType();
+
+        if (null == discountCalculator) {
             return order.price();
         }
 
-        DiscountCalculator discountCalculator = switch (order.discountType()) {
-            case STANDARD -> new StandardDiscount();
-            case SEASONAL -> new SeasonalDiscount();
-            case LOYALTY -> new LoyaltyDiscount();
+        return switch (discountCalculator) {
+            case Standard standard -> standard.apply(order.price());
+            case Seasonal seasonal -> seasonal.apply(order.price());
+            case Loyalty loyalty -> loyalty.apply(order.price());
         };
-
-        return discountCalculator.apply(order.price());
     }
 
 }

@@ -2,7 +2,7 @@ package com.indra.retail;
 
 import java.math.BigDecimal;
 
-public interface DiscountCalculator {
+public sealed interface DiscountCalculator permits Standard, Seasonal, Loyalty {
 
     BigDecimal apply(BigDecimal price);
 

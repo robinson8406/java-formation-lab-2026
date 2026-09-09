@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public record Order(
         String id,
         BigDecimal price,
-        DiscountType discountType,
+        DiscountCalculator discountType,
         int requestedQuantity,
         String customerEmail
 ) {}
