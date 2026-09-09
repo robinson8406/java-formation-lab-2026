@@ -16,30 +16,30 @@ public class OrderProcessor {
         validateStock(order, availableStock);
         var finalPrice = applyDiscount(order);
 
-        orderNotifier.notifyCustomer(order.getCustomerEmail(),
-                "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
+        orderNotifier.notifyCustomer(order.customerEmail(),
+                "Tu pedido " + order.id() + " fue procesado. Total: " + finalPrice);
 
         return finalPrice;
     }
 
     private void validateStock(Order order, int availableStock) {
-        if (!stockValidator.hasEnoughStock(availableStock, order.getRequestedQuantity())) {
-            throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
+        if (!stockValidator.hasEnoughStock(availableStock, order.requestedQuantity())) {
+            throw new IllegalStateException("Stock insuficiente para el pedido " + order.id());
         }
     }
 
     private static BigDecimal applyDiscount(Order order) {
-        if (null == order.getDiscountType()) {
-            return order.getPrice();
+        if (null == order.discountType()) {
+            return order.price();
         }
 
-        DiscountCalculator discountCalculator = switch (order.getDiscountType()) {
+        DiscountCalculator discountCalculator = switch (order.discountType()) {
             case STANDARD -> new StandardDiscount();
             case SEASONAL -> new SeasonalDiscount();
             case LOYALTY -> new LoyaltyDiscount();
         };
 
-        return discountCalculator.apply(order.getPrice());
+        return discountCalculator.apply(order.price());
     }
 
 }
