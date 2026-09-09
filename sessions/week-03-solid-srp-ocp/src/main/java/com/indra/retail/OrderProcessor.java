@@ -6,10 +6,12 @@ public class OrderProcessor {
 
     private final StockValidator stockValidator;
     private final OrderNotifier orderNotifier;
+    private final DiscountCalculator discountCalculator;
 
-    public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier) {
+    public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier,  DiscountCalculator discountCalculator) {
         this.stockValidator = stockValidator;
         this.orderNotifier = orderNotifier;
+        this.discountCalculator = discountCalculator;
     }
 
     public BigDecimal process(Order order, int availableStock) {
@@ -18,14 +20,7 @@ public class OrderProcessor {
         }
 
         // Punto de partida del reto: descuento mezclado aquí, viola SRP y OCP.
-        BigDecimal finalPrice;
-        if (order.getDiscountType() == DiscountType.STANDARD) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.95));
-        } else if (order.getDiscountType() == DiscountType.SEASONAL) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.80));
-        } else {
-            finalPrice = order.getPrice();
-        }
+        BigDecimal finalPrice = discountCalculator.apply(order.getPrice(), order.getDiscountType());
 
         orderNotifier.notifyCustomer(order.getCustomerEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
