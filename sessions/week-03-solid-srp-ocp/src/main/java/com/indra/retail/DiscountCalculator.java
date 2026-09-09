@@ -9,6 +9,8 @@ public class DiscountCalculator {
             finalPrice = price.multiply(BigDecimal.valueOf(0.95));
         } else if (type == DiscountType.SEASONAL) {
             finalPrice = price.multiply(BigDecimal.valueOf(0.80));
+        } else if (type == DiscountType.LOYALTY) {
+            finalPrice = price.multiply(BigDecimal.valueOf(0.85));
         } else {
             finalPrice = price;
         }
