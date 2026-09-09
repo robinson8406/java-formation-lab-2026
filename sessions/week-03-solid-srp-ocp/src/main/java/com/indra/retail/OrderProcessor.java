@@ -33,11 +33,7 @@ public class OrderProcessor {
             return order.price();
         }
 
-        return switch (discountCalculator) {
-            case Standard standard -> standard.apply(order.price());
-            case Seasonal seasonal -> seasonal.apply(order.price());
-            case Loyalty loyalty -> loyalty.apply(order.price());
-        };
+        return discountCalculator.apply(order.price());
     }
 
 }
