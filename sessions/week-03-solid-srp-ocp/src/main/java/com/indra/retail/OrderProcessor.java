@@ -13,23 +13,32 @@ public class OrderProcessor {
     }
 
     public BigDecimal process(Order order, int availableStock) {
-        if (!stockValidator.hasEnoughStock(availableStock, order.getRequestedQuantity())) {
-            throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
-        }
-
-        // Punto de partida del reto: descuento mezclado aquí, viola SRP y OCP.
-        BigDecimal finalPrice;
-        if (order.getDiscountType() == DiscountType.STANDARD) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.95));
-        } else if (order.getDiscountType() == DiscountType.SEASONAL) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.80));
-        } else {
-            finalPrice = order.getPrice();
-        }
+        validateStock(order, availableStock);
+        var finalPrice = applyDiscount(order);
 
         orderNotifier.notifyCustomer(order.getCustomerEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
 
         return finalPrice;
     }
+
+    private void validateStock(Order order, int availableStock) {
+        if (!stockValidator.hasEnoughStock(availableStock, order.getRequestedQuantity())) {
+            throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
+        }
+    }
+
+    private static BigDecimal applyDiscount(Order order) {
+        if (null == order.getDiscountType()) {
+            return order.getPrice();
+        }
+
+        DiscountCalculator discountCalculator = switch (order.getDiscountType()) {
+            case STANDARD -> new StandardDiscount();
+            case SEASONAL -> new SeasonalDiscount();
+        };
+
+        return discountCalculator.apply(order.getPrice());
+    }
+
 }

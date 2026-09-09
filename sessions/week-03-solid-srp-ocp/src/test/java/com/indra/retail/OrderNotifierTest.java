@@ -29,4 +29,17 @@ class OrderNotifierTest {
     void shouldThrowWhenEmailIsBlank() {
         assertThrows(IllegalArgumentException.class, () -> orderNotifier.notifyCustomer("  ", "mensaje"));
     }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el mensaje es nulo")
+    void shouldThrowWhenMessageIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> orderNotifier.notifyCustomer("cliente@indra.com", null));
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el mensaje está vacío")
+    void shouldThrowWhenMessageIsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> orderNotifier.notifyCustomer("cliente@indra.com", "  "));
+    }
+
 }
