@@ -1,7 +1,5 @@
 package com.indra.retail;
 
-import java.math.BigDecimal;
-
 public class OrderProcessor {
 
     private final StockValidator stockValidator;
@@ -12,7 +10,7 @@ public class OrderProcessor {
         this.orderNotifier = orderNotifier;
     }
 
-    public BigDecimal process(Order order, int availableStock) {
+    public Money process(Order order, int availableStock) {
         validateStock(order, availableStock);
         var finalPrice = applyDiscount(order);
 
@@ -28,7 +26,7 @@ public class OrderProcessor {
         }
     }
 
-    private static BigDecimal applyDiscount(Order order) {
+    private static Money applyDiscount(Order order) {
         var discountCalculator = order.discountType();
 
         if (null == discountCalculator) {

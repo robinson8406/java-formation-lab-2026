@@ -1,10 +1,8 @@
 package com.indra.retail;
 
-import java.math.BigDecimal;
-
 public record Order(
         String id,
-        BigDecimal price,
+        Money price,
         DiscountCalculator discountType,
         int requestedQuantity,
         String customerEmail

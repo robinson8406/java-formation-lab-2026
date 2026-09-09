@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 public final class Seasonal implements DiscountCalculator {
 
     @Override
-    public BigDecimal apply(BigDecimal price) {
-        return price.multiply(BigDecimal.valueOf(0.80));
+    public Money apply(Money price) {
+        return Money.of(price.amount().multiply(BigDecimal.valueOf(0.80)));
     }
 
 }
