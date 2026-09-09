@@ -28,4 +28,13 @@ public class DiscountCalculatorTest {
         BigDecimal priceDiscount = discountCalculator.apply(order.getPrice(), order.getDiscountType());
         assertTrue(priceDiscount.compareTo(BigDecimal.valueOf(800)) == 0);
     }
+
+    @Test
+    @DisplayName("Debe aplicar el descuento LOYALTY al precio de la orden")
+    void shouldApplyLoyaltyDiscount() {
+        Order order = new Order("ORDER1", BigDecimal.valueOf(1000), DiscountType.LOYALTY,
+                1, "pepe@gmail.com");
+        BigDecimal priceDiscount = discountCalculator.apply(order.getPrice(), order.getDiscountType());
+        assertTrue(priceDiscount.compareTo(BigDecimal.valueOf(850)) == 0);
+    }
 }
