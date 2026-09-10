@@ -1,15 +1,19 @@
 package com.indra.logistics;
 
-public class TrackingIdGenerator {
+import java.util.UUID;
 
-    /**
-     * Genera un ID de seguimiento con formato ORIG-DEST-XXXXXXXX
-     * @param origin  código de origen (ej: "BOG")
-     * @param destination código de destino (ej: "MED")
-     * @return ID único de seguimiento
-     */
+public class TrackingIdGenerator {
     public String generate(String origin, String destination) {
-        // TODO: implementar
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (origin == null || origin.isEmpty()) {
+            throw new IllegalArgumentException("Origin cannot be null or empty");
+        }
+        if (destination == null || destination.isEmpty()) {
+            throw new IllegalArgumentException("Destination cannot be null or empty");
+        }
+        String trimmedOrigin = origin.trim();
+        String trimmedDestination = destination.trim();
+        // Generar un ID de 8 caracteres hexadecimales
+        return trimmedOrigin + "-" + trimmedDestination + "-" + 
+               UUID.randomUUID().toString().toUpperCase().substring(0, 8);
     }
 }
