@@ -1,6 +1,7 @@
 package com.indra.retail;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Order {
 
@@ -12,7 +13,7 @@ public class Order {
 
     public Order(String id, BigDecimal price, DiscountType discountType, int requestedQuantity, String customerEmail) {
         this.id = id;
-        this.price = price;
+        this.price = Objects.requireNonNull(price, "El precio es obligatorio");
         this.discountType = discountType;
         this.requestedQuantity = requestedQuantity;
         this.customerEmail = customerEmail;

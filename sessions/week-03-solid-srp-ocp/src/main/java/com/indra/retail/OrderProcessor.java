@@ -6,26 +6,27 @@ public class OrderProcessor {
 
     private final StockValidator stockValidator;
     private final OrderNotifier orderNotifier;
+    private final DiscountCalculator discountCalculator;
+
 
     public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier) {
+        this(stockValidator, orderNotifier, new DiscountCalculator());
+    }
+
+    public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier, DiscountCalculator discountCalculator) {
         this.stockValidator = stockValidator;
         this.orderNotifier = orderNotifier;
+        this.discountCalculator = discountCalculator;
     }
 
     public BigDecimal process(Order order, int availableStock) {
+
         if (!stockValidator.hasEnoughStock(availableStock, order.getRequestedQuantity())) {
             throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
         }
 
-        // Punto de partida del reto: descuento mezclado aquí, viola SRP y OCP.
-        BigDecimal finalPrice;
-        if (order.getDiscountType() == DiscountType.STANDARD) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.95));
-        } else if (order.getDiscountType() == DiscountType.SEASONAL) {
-            finalPrice = order.getPrice().multiply(BigDecimal.valueOf(0.80));
-        } else {
-            finalPrice = order.getPrice();
-        }
+        BigDecimal subtotal = order.getPrice().multiply(BigDecimal.valueOf(order.getRequestedQuantity()));
+        BigDecimal finalPrice = discountCalculator.calculateDiscount(subtotal, order.getDiscountType());
 
         orderNotifier.notifyCustomer(order.getCustomerEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
