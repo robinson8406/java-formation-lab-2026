@@ -1,6 +1,6 @@
 package com.indra.retail;
 
-public sealed interface DiscountCalculator permits Standard, Seasonal, Loyalty {
+public interface DiscountCalculator {
 
     Money apply(Money price);
 

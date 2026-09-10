@@ -2,7 +2,7 @@ package com.indra.retail;
 
 import java.math.BigDecimal;
 
-public final class Standard implements DiscountCalculator {
+public class Standard implements DiscountCalculator {
 
     @Override
     public Money apply(Money price) {
