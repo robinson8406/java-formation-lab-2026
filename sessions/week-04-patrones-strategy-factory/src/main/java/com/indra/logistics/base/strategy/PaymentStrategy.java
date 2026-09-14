@@ -10,4 +10,8 @@ public interface PaymentStrategy {
     BigDecimal calculateFee(BigDecimal amount);
 
     String confirmationMessage();
+
+    default String confirmationMessage(BigDecimal amount) {
+        return confirmationMessage();
+    }
 }
