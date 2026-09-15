@@ -5,12 +5,14 @@ import java.math.RoundingMode;
 
 import org.springframework.stereotype.Component;
 
+import com.indra.logistics.base.domain.PaymentMethod;
+
 @Component
 public class CashPayment implements PaymentStrategy {
 
     @Override
-    public String methodCode() {
-        return "CASH";
+    public PaymentMethod methodCode() {
+        return PaymentMethod.CASH;
     }
 
     @Override
