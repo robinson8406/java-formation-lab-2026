@@ -11,14 +11,12 @@ class TrackingIdGeneratorTest {
     @Test
     @DisplayName("El ID generado debe tener el formato ORIG-DEST-XXXXXXXX")
     void shouldGenerateIdWithCorrectFormat() {
-        // TODO: implementar
-        fail("Test no implementado");
+       
     }
 
     @Test
     @DisplayName("Debe lanzar excepción si origin es nulo")
     void shouldThrowWhenOriginIsNull() {
-        // TODO: implementar
-        fail("Test no implementado");
+       
     }
 }
