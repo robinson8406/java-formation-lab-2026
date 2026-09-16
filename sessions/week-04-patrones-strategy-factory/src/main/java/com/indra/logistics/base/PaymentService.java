@@ -2,9 +2,12 @@ package com.indra.logistics.base;
 
 import java.math.BigDecimal;
 
+import org.springframework.stereotype.Service;
+
 import com.indra.logistics.base.factory.PaymentStrategyFactoryImpl;
 import com.indra.logistics.base.strategy.PaymentStrategy;
 
+@Service
 public class PaymentService {
 
     public PaymentResult process(PaymentRequest request) {

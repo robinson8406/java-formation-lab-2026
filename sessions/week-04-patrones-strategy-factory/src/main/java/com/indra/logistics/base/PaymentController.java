@@ -8,20 +8,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.AllArgsConstructor;
 
 @RestController
+@RequestMapping("/payments/{paymentMethod}")
+@AllArgsConstructor 
 public class PaymentController {
 
-    private final PaymentService paymentService = new PaymentService();
+    private final PaymentService paymentService;
 
-    @GetMapping("/payments/{paymentMethod}")
+    @GetMapping("")
     public PaymentResult getFee(@PathVariable String paymentMethod) {
         return getFee(paymentMethod, BigDecimal.valueOf(100));
     }
 
-    @GetMapping("/payments/{paymentMethod}/{amount}")
+    @GetMapping("/{amount}")
     public PaymentResult getFee(@PathVariable String paymentMethod, @PathVariable BigDecimal amount) {
         return paymentService.process(new PaymentRequest(amount, paymentMethod));
     }

@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 
 class PaymentControllerTest {
 
-    private final PaymentController paymentController = new PaymentController();
+    private final PaymentController paymentController = new PaymentController( new PaymentService() );
 
     @Test
     void getFee_PaymentMethodWithoutAmount_Success() {
