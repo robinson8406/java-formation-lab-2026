@@ -3,6 +3,7 @@ package com.indra.logistics.base;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,7 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PaymentController {
 
-    private final PaymentService paymentService = new PaymentService();
+    @Autowired
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
 
     @GetMapping("/payments/{paymentMethod}")
     public PaymentResult getFee(@PathVariable String paymentMethod) {

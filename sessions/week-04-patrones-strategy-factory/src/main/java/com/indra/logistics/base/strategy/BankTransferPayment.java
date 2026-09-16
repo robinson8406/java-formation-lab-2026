@@ -8,20 +8,22 @@ import org.springframework.stereotype.Component;
 import static com.indra.logistics.base.util.MoneyCalculator.round;
 
 @Component
-public class CashPayment implements PaymentStrategy {
+public class BankTransferPayment implements PaymentStrategy {
+
+    private static final BigDecimal COMMISSION_RATE  = new BigDecimal("0.025");
 
     @Override
     public PaymentMethod methodCode() {
-        return PaymentMethod.CASH;
+        return PaymentMethod.BANK_TRANSFER;
     }
 
     @Override
     public BigDecimal calculateFee(BigDecimal amount) {
-        return round(amount.multiply(BigDecimal.ZERO));
+        return round(amount.multiply(COMMISSION_RATE));
     }
 
     @Override
     public String confirmationMessage() {
-        return "Pago en efectivo registrado, sin comisión.";
+        return "Pago por transferencia bancaria registrado, comisión bancaria aplicada.";
     }
 }

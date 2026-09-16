@@ -1,19 +1,47 @@
 package com.indra.logistics.base;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
+import com.indra.logistics.base.factory.PaymentStrategyFactory;
+import com.indra.logistics.base.factory.PaymentStrategyFactoryImpl;
+import com.indra.logistics.base.strategy.PaymentStrategy;
+import com.indra.logistics.base.strategy.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+
+//@SpringBootTest
 class PaymentControllerTest {
 
-    private final PaymentController paymentController = new PaymentController();
+   // @Autowired
+    private PaymentController paymentController;
+
+    @BeforeEach
+    void setUp() {
+        List<PaymentStrategy> strategies = List.of(
+                new MastercardPayment(),
+                new VisaPayment(),
+                new PaypalPayment(),
+                new CashPayment(),
+                new BankTransferPayment(),
+                new DebitCardPayment(),
+                new AmexPayment()
+        );
+        PaymentStrategyFactory factory =new PaymentStrategyFactoryImpl(strategies);
+        PaymentService service =  new PaymentService(factory);
+        paymentController = new PaymentController(service);
+    }
+
+
 
     @Nested
     @DisplayName("Verificar comisiones y totales metodo de pago VISA")
