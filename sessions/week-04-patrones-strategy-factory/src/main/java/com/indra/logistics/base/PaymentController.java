@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PaymentController {
 
-    private final PaymentService paymentService = new PaymentService();
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @GetMapping("/payments/{paymentMethod}")
     public PaymentResult getFee(@PathVariable String paymentMethod) {
