@@ -1,6 +1,6 @@
 # Week 04 — Patrones: Strategy + Factory
 
-**Fecha**: 2026-07-23 · **Paquete**: SOLID + TDD
+**Fecha**: 2026-09-10 · **Paquete**: SOLID + TDD
 
 ## Objetivo
 
