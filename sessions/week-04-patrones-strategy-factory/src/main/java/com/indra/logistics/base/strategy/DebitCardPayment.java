@@ -6,9 +6,10 @@ import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CashPayment implements PaymentStrategy {
+public class DebitCardPayment implements PaymentStrategy {
 
-    private static final String METHOD_CODE = "CASH";
+    private static final String METHOD_CODE = "DEBIT_CARD";
+    private static final BigDecimal COMMISSION_RATE = BigDecimal.valueOf(0.04);
 
     @Override
     public String methodCode() {
@@ -17,11 +18,11 @@ public class CashPayment implements PaymentStrategy {
 
     @Override
     public BigDecimal calculateFee(BigDecimal amount) {
-        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        return amount.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
     public String confirmationMessage() {
-        return "Pago en efectivo registrado, sin comisión.";
+        return "Pago con tarjeta de débito procesado, se aplica comisión bancaria.";
     }
 }
