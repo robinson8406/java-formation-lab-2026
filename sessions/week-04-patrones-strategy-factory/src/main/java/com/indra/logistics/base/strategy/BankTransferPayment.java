@@ -6,23 +6,23 @@ import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CashPayment implements PaymentStrategy {
+public class BankTransferPayment implements PaymentStrategy {
 
     @Override
     public String methodCode()
     {
-        return "CASH";
+        return "BANK_TRANSFER";
     }
 
     @Override
     public BigDecimal calculateFee(BigDecimal amount)
     {
-        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        return amount.multiply(BigDecimal.valueOf(0.025)).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
     public String confirmationMessage()
     {
-        return "Pago en efectivo registrado, sin comisión.";
+        return "Pago por transferencia bancaria registrado, comisión bancaria aplicada.";
     }
 }

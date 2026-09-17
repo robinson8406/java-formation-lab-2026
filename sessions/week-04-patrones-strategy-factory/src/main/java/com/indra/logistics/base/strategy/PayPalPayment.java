@@ -6,23 +6,23 @@ import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CashPayment implements PaymentStrategy {
+public class PayPalPayment implements PaymentStrategy {
 
     @Override
     public String methodCode()
     {
-        return "CASH";
+        return "PAYPAL";
     }
 
     @Override
     public BigDecimal calculateFee(BigDecimal amount)
     {
-        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        return amount.multiply(BigDecimal.valueOf(0.02)).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
     public String confirmationMessage()
     {
-        return "Pago en efectivo registrado, sin comisión.";
+        return "Pago con PayPal procesado, comisión de plataforma aplicada.";
     }
 }

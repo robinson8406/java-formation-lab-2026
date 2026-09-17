@@ -6,23 +6,23 @@ import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CashPayment implements PaymentStrategy {
+public class VisaPayment implements PaymentStrategy {
 
     @Override
     public String methodCode()
     {
-        return "CASH";
+        return "VISA";
     }
 
     @Override
     public BigDecimal calculateFee(BigDecimal amount)
     {
-        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        return amount.multiply(BigDecimal.valueOf(0.035)).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
     public String confirmationMessage()
     {
-        return "Pago en efectivo registrado, sin comisión.";
+        return "Pago con tarjeta de crédito Visa procesado, se aplica comisión bancaria.";
     }
 }
