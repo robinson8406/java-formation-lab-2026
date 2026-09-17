@@ -8,6 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,24 +22,27 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-        import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 // PASO 1
 // Debes agregar la extension de Mockito
-
+@ExtendWith(MockitoExtension.class)
 class InventoryServiceTest {
 
     // PASO 2
     // Este es el MOCK
-    
+    @Mock
     private ICatalogRepository repository;
 
     // PASO 3
     // Este es la clase que vamos a testear apoyándonos de MOCK
-    
+    @InjectMocks
     private InventoryService inventoryService;
+
+    @Captor
+    private ArgumentCaptor<Product> productCaptor;
 
     private ProductDto productDto;
     private Product product;
@@ -45,12 +52,10 @@ class InventoryServiceTest {
         productDto = new ProductDto();
         productDto.setId("1");
         productDto.setName("Producto A");
-        // ajusta setters según los campos reales de ProductDto
 
         product = new Product();
         product.setId("1");
         product.setName("Producto A");
-        // ajusta setters según los campos reales de Product
     }
 
     // ----------------------------------------------------------------
@@ -65,12 +70,28 @@ class InventoryServiceTest {
         void create_validProduct_returnsId() {
             // PASO 4.1
             // Adicionar el paso WHEN
-            
+            when(repository.save(any(Product.class))).thenReturn(product);
 
             String result = inventoryService.create(productDto);
 
             assertEquals("1", result);
             verify(repository, times(1)).save(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Debe capturar y validar que los campos del DTO fueron correctamente mapeados a la entidad")
+        void create_validProduct_capturesAndValidatesMappedEntity() {
+            when(repository.save(any(Product.class))).thenReturn(product);
+
+            String result = inventoryService.create(productDto);
+
+            assertEquals("1", result);
+            verify(repository).save(productCaptor.capture());
+            Product saved = productCaptor.getValue();
+            assertNotNull(saved);
+            assertEquals("1", saved.getId());
+            assertEquals("Producto A", saved.getName());
+            verifyNoMoreInteractions(repository);
         }
 
         @Test
@@ -111,7 +132,22 @@ class InventoryServiceTest {
 
             // PASO 4.2
             // Implementar la sentencia verify para indicar que la actualizacion fue exitosa
-            
+            verify(repository, times(1)).save(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Debe verificar con ArgumentCaptor que los datos mapeados se envíen a actualizar")
+        void update_validProduct_capturesAndValidatesMappedEntity() {
+            when(repository.save(any(Product.class))).thenReturn(product);
+
+            inventoryService.update(productDto);
+
+            verify(repository).save(productCaptor.capture());
+            Product updated = productCaptor.getValue();
+            assertNotNull(updated);
+            assertEquals("1", updated.getId());
+            assertEquals("Producto A", updated.getName());
+            verifyNoMoreInteractions(repository);
         }
 
         @Test
@@ -148,12 +184,34 @@ class InventoryServiceTest {
         void getById_existingId_returnsListWithOneElement() {
             // PASO 4.3
             // Agregar el WHEN
-            
+            when(repository.findById("1")).thenReturn(Optional.of(product));
+
             List<ProductDto> result = inventoryService.getById("1");
 
             assertEquals(1, result.size());
             assertEquals("1", result.get(0).getId());
             verify(repository, times(1)).findById("1");
+        }
+
+        @ParameterizedTest(name = "Consulta ID {0} -> Retorna {1}")
+        @CsvSource({
+            "1, Producto A",
+            "2, Producto B"
+        })
+        @DisplayName("Debe consultar por ID y retornar el producto mapeado correctamente (Parametrizado)")
+        void getById_parameterized_returnsMappedProduct(String id, String name) {
+            Product customProduct = new Product();
+            customProduct.setId(id);
+            customProduct.setName(name);
+
+            when(repository.findById(id)).thenReturn(Optional.of(customProduct));
+
+            List<ProductDto> result = inventoryService.getById(id);
+
+            assertEquals(1, result.size());
+            assertEquals(id, result.get(0).getId());
+            assertEquals(name, result.get(0).getName());
+            verify(repository, times(1)).findById(id);
         }
 
         @Test
