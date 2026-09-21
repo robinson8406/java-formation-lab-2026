@@ -24,17 +24,17 @@ import static org.mockito.Mockito.*;
 
 // PASO 1
 // Debes agregar la extension de Mockito
-
+@ExtendWith(MockitoExtension.class)
 class InventoryServiceTest {
 
     // PASO 2
     // Este es el MOCK
-    
+    @Mock
     private ICatalogRepository repository;
 
     // PASO 3
     // Este es la clase que vamos a testear apoyándonos de MOCK
-    
+    @InjectMocks
     private InventoryService inventoryService;
 
     private ProductDto productDto;
@@ -65,7 +65,7 @@ class InventoryServiceTest {
         void create_validProduct_returnsId() {
             // PASO 4.1
             // Adicionar el paso WHEN
-            
+            when(repository.save(any(Product.class))).thenReturn(product);
 
             String result = inventoryService.create(productDto);
 
@@ -111,6 +111,7 @@ class InventoryServiceTest {
 
             // PASO 4.2
             // Implementar la sentencia verify para indicar que la actualizacion fue exitosa
+            verify(repository, times(1)).save(any(Product.class));
             
         }
 
@@ -148,7 +149,7 @@ class InventoryServiceTest {
         void getById_existingId_returnsListWithOneElement() {
             // PASO 4.3
             // Agregar el WHEN
-            
+            when(repository.findById("1")).thenReturn(Optional.of(product));
             List<ProductDto> result = inventoryService.getById("1");
 
             assertEquals(1, result.size());
