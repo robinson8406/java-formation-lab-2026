@@ -48,12 +48,9 @@ class InventoryControllerTest {
 
     @BeforeEach
     void setUp() {
-        product = new ProductDto(); // ajusta según los campos reales de tu DTO
+        product = new ProductDto();
     }
 
-    // ----------------------------------------------------------------
-    // GET
-    // ----------------------------------------------------------------
     @Nested
     @DisplayName("GET /inventory")
     class GetTests {
@@ -123,9 +120,6 @@ class InventoryControllerTest {
         }
     }
 
-    // ----------------------------------------------------------------
-    // POST
-    // ----------------------------------------------------------------
     @Nested
     @DisplayName("POST /inventory")
     class PostTests {
@@ -163,9 +157,6 @@ class InventoryControllerTest {
         }
     }
 
-    // ----------------------------------------------------------------
-    // PUT
-    // ----------------------------------------------------------------
     @Nested
     @DisplayName("PUT /inventory")
     class PutTests {
@@ -202,9 +193,6 @@ class InventoryControllerTest {
         }
     }
 
-    // ----------------------------------------------------------------
-    // PATCH
-    // ----------------------------------------------------------------
     @Nested
     @DisplayName("PATCH /inventory/{id}")
     class PatchTests {

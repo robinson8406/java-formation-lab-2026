@@ -20,8 +20,6 @@ public class InventoryGetUseCase implements IInventoryGetUseCase {
     }
 
 
-
-
     @Override
     public List<ProductDto> read(Map<String, String> pathVariables) {
 

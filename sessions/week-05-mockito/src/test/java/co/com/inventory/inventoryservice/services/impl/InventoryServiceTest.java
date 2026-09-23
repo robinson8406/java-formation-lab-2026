@@ -8,6 +8,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,19 +27,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-// PASO 1
-// Debes agregar la extension de Mockito
-
+@ExtendWith(MockitoExtension.class)
 class InventoryServiceTest {
 
-    // PASO 2
-    // Este es el MOCK
-    
+    @Mock
     private ICatalogRepository repository;
 
-    // PASO 3
-    // Este es la clase que vamos a testear apoyándonos de MOCK
-    
+    @Captor
+    private ArgumentCaptor<Product> productCaptor;
+
+    @InjectMocks
     private InventoryService inventoryService;
 
     private ProductDto productDto;
@@ -45,32 +47,37 @@ class InventoryServiceTest {
         productDto = new ProductDto();
         productDto.setId("1");
         productDto.setName("Producto A");
-        // ajusta setters según los campos reales de ProductDto
 
         product = new Product();
         product.setId("1");
         product.setName("Producto A");
-        // ajusta setters según los campos reales de Product
+
     }
 
-    // ----------------------------------------------------------------
-    // CREATE
-    // ----------------------------------------------------------------
     @Nested
-    @DisplayName("create")
+    @DisplayName("Crear productos")
     class CreateTests {
 
         @Test
         @DisplayName("Debe retornar el id del producto cuando la creación es exitosa")
         void create_validProduct_returnsId() {
-            // PASO 4.1
-            // Adicionar el paso WHEN
-            
-
+            when(repository.save(any(Product.class))).thenReturn(product);
             String result = inventoryService.create(productDto);
 
             assertEquals("1", result);
             verify(repository, times(1)).save(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Debe enviar al repositorio el producto mapeado durante la creación")
+        void create_validProduct_savesMappedProduct() {
+            when(repository.save(any(Product.class))).thenReturn(product);
+
+            inventoryService.create(productDto);
+
+            verify(repository).save(productCaptor.capture());
+            assertEquals("1", productCaptor.getValue().getId());
+            assertEquals("Producto A", productCaptor.getValue().getName());
         }
 
         @Test
@@ -88,30 +95,34 @@ class InventoryServiceTest {
         @Test
         @DisplayName("Debe lanzar IllegalStateException cuando el mapeo falla (productDto null)")
         void create_nullProductDto_throwsIllegalStateException() {
-            assertThrows(IllegalStateException.class,
-                    () -> inventoryService.create(null));
-
+            assertThrows(IllegalStateException.class, () -> inventoryService.create(null));
             verify(repository, never()).save(any());
         }
     }
 
-    // ----------------------------------------------------------------
-    // UPDATE
-    // ----------------------------------------------------------------
     @Nested
-    @DisplayName("update")
+    @DisplayName("Actualizar productos")
     class UpdateTests {
 
         @Test
         @DisplayName("Debe ejecutar la actualización sin lanzar excepción cuando es exitosa")
         void update_validProduct_completesSuccessfully() {
             when(repository.save(any(Product.class))).thenReturn(product);
-
             assertDoesNotThrow(() -> inventoryService.update(productDto));
 
-            // PASO 4.2
-            // Implementar la sentencia verify para indicar que la actualizacion fue exitosa
-            
+            verify(repository, times(1)).save(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Debe enviar al repositorio el producto mapeado durante la actualización")
+        void update_validProduct_savesMappedProduct() {
+            when(repository.save(any(Product.class))).thenReturn(product);
+
+            inventoryService.update(productDto);
+
+            verify(repository).save(productCaptor.capture());
+            assertEquals("1", productCaptor.getValue().getId());
+            assertEquals("Producto A", productCaptor.getValue().getName());
         }
 
         @Test
@@ -136,43 +147,35 @@ class InventoryServiceTest {
         }
     }
 
-    // ----------------------------------------------------------------
-    // GET BY ID
-    // ----------------------------------------------------------------
     @Nested
-    @DisplayName("getById")
+    @DisplayName("Buscar productos por identificador")
     class GetByIdTests {
 
         @Test
         @DisplayName("Debe retornar una lista con un elemento cuando el producto existe")
         void getById_existingId_returnsListWithOneElement() {
-            // PASO 4.3
-            // Agregar el WHEN
-            
+            when(repository.findById(anyString())).thenReturn(Optional.of(product));
             List<ProductDto> result = inventoryService.getById("1");
-
             assertEquals(1, result.size());
-            assertEquals("1", result.get(0).getId());
+            assertEquals("1", result.getFirst().getId());
             verify(repository, times(1)).findById("1");
         }
 
-        @Test
+        @ParameterizedTest
+        @CsvSource({"999", "abc", "no-existe"})
         @DisplayName("Debe retornar una lista vacía cuando el producto no existe")
-        void getById_nonExistingId_returnsEmptyList() {
-            when(repository.findById("999")).thenReturn(Optional.empty());
+        void getById_nonExistingId_returnsEmptyList(String id) {
+            when(repository.findById(anyString())).thenReturn(Optional.empty());
 
-            List<ProductDto> result = inventoryService.getById("999");
+            List<ProductDto> result = inventoryService.getById(id);
 
             assertTrue(result.isEmpty());
-            verify(repository, times(1)).findById("999");
+            verify(repository).findById(id);
         }
     }
 
-    // ----------------------------------------------------------------
-    // GET BY NAME
-    // ----------------------------------------------------------------
     @Nested
-    @DisplayName("getByName")
+    @DisplayName("Buscar productos por nombre")
     class GetByNameTests {
 
         @Test
@@ -183,27 +186,25 @@ class InventoryServiceTest {
             List<ProductDto> result = inventoryService.getByName("Producto A");
 
             assertEquals(1, result.size());
-            assertEquals("Producto A", result.get(0).getName());
+            assertEquals("Producto A", result.getFirst().getName());
             verify(repository, times(1)).findByName("Producto A");
         }
 
-        @Test
+        @ParameterizedTest
+        @ValueSource(strings = {"Inexistente", "Sin resultados", "Producto X"})
         @DisplayName("Debe retornar una lista vacía cuando no hay resultados")
-        void getByName_noResults_returnsEmptyList() {
-            when(repository.findByName("Inexistente")).thenReturn(Collections.emptyList());
+        void getByName_noResults_returnsEmptyList(String name) {
+            when(repository.findByName(anyString())).thenReturn(Collections.emptyList());
 
-            List<ProductDto> result = inventoryService.getByName("Inexistente");
+            List<ProductDto> result = inventoryService.getByName(name);
 
             assertTrue(result.isEmpty());
-            verify(repository, times(1)).findByName("Inexistente");
+            verify(repository).findByName(name);
         }
     }
 
-    // ----------------------------------------------------------------
-    // GET ALL
-    // ----------------------------------------------------------------
     @Nested
-    @DisplayName("getAll")
+    @DisplayName("Consultar todos los productos")
     class GetAllTests {
 
         @Test

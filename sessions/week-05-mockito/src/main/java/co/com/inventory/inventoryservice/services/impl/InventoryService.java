@@ -34,7 +34,7 @@ public class InventoryService implements IInventoryService {
 
             return product.getId();
         }catch (Exception e){
-            log.error(e.getMessage(), e);
+            log.error(e.getMessage());
             throw  new IllegalStateException("Proceso de creación NO exitoso!");
         }
     }
