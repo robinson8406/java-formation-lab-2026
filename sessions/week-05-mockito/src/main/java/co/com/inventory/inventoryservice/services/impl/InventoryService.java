@@ -29,13 +29,17 @@ public class InventoryService implements IInventoryService {
     public String create(ProductDto productDto) throws IllegalStateException {
 
         try{
+            if (productDto == null) {
+                throw new IllegalArgumentException("The productDto object cannot be null.");
+            }
+
             Product product = modelMapper.map(productDto, Product.class);
             product = repository.save(product);
 
             return product.getId();
         }catch (Exception e){
             log.error(e.getMessage(), e);
-            throw  new IllegalStateException("Proceso de creación NO exitoso!");
+            throw  new IllegalStateException("Unsuccessful creation process!");
         }
     }
 
@@ -43,10 +47,15 @@ public class InventoryService implements IInventoryService {
     public void update(ProductDto productDto) throws IllegalStateException {
 
         try{
+            if (productDto == null) {
+                throw new IllegalArgumentException("The productDto object cannot be null.");
+            }
+
             Product product = modelMapper.map(productDto, Product.class);
             repository.save(product);
         }catch (Exception e){
-            throw  new IllegalStateException("Proceso de actualizacion NO exitoso!");
+            log.error(e.getMessage(), e);
+            throw  new IllegalStateException("Update process unsuccessful!");
         }
     }
 

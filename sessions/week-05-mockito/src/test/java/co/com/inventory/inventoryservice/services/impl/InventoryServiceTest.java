@@ -18,23 +18,22 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-        import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 // PASO 1
 // Debes agregar la extension de Mockito
-
+@ExtendWith(MockitoExtension.class)
 class InventoryServiceTest {
 
     // PASO 2
     // Este es el MOCK
-    
+    @Mock
     private ICatalogRepository repository;
 
     // PASO 3
     // Este es la clase que vamos a testear apoyándonos de MOCK
-    
+    @InjectMocks
     private InventoryService inventoryService;
 
     private ProductDto productDto;
@@ -45,12 +44,15 @@ class InventoryServiceTest {
         productDto = new ProductDto();
         productDto.setId("1");
         productDto.setName("Producto A");
-        // ajusta setters según los campos reales de ProductDto
+        productDto.setDescription("Description A");
+        productDto.setUnits("value units");
+
 
         product = new Product();
         product.setId("1");
         product.setName("Producto A");
-        // ajusta setters según los campos reales de Product
+        product.setDescription("Description A");
+        product.setUnits("value units");
     }
 
     // ----------------------------------------------------------------
@@ -65,7 +67,7 @@ class InventoryServiceTest {
         void create_validProduct_returnsId() {
             // PASO 4.1
             // Adicionar el paso WHEN
-            
+            when(repository.save(any(Product.class))).thenReturn(product);
 
             String result = inventoryService.create(productDto);
 
@@ -81,7 +83,7 @@ class InventoryServiceTest {
             IllegalStateException ex = assertThrows(IllegalStateException.class,
                     () -> inventoryService.create(productDto));
 
-            assertEquals("Proceso de creación NO exitoso!", ex.getMessage());
+            assertEquals("Unsuccessful creation process!", ex.getMessage());
             verify(repository, times(1)).save(any(Product.class));
         }
 
@@ -111,7 +113,7 @@ class InventoryServiceTest {
 
             // PASO 4.2
             // Implementar la sentencia verify para indicar que la actualizacion fue exitosa
-            
+            verify(repository, times(1)).save(any(Product.class));
         }
 
         @Test
@@ -122,7 +124,7 @@ class InventoryServiceTest {
             IllegalStateException ex = assertThrows(IllegalStateException.class,
                     () -> inventoryService.update(productDto));
 
-            assertEquals("Proceso de actualizacion NO exitoso!", ex.getMessage());
+            assertEquals("Update process unsuccessful!", ex.getMessage());
             verify(repository, times(1)).save(any(Product.class));
         }
 
@@ -148,7 +150,8 @@ class InventoryServiceTest {
         void getById_existingId_returnsListWithOneElement() {
             // PASO 4.3
             // Agregar el WHEN
-            
+            when(repository.findById("1")).thenReturn(Optional.of(product));
+
             List<ProductDto> result = inventoryService.getById("1");
 
             assertEquals(1, result.size());
