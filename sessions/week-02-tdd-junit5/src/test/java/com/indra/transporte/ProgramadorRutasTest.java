@@ -2,13 +2,18 @@ package com.indra.transporte;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.Ruta;
@@ -79,18 +84,45 @@ public class ProgramadorRutasTest {
     @Test
     @DisplayName("Debe devolver los horarios del tipo solicitado")
     void debeDevolverLosHorariosDelTipoSolicitado() {
-        fail("Implementar este test para devolver los horarios del tipo solicitado");
+        Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "ABC123", "Ciudad A", "Ciudad B");
+            Horario horario = new Horario(bus, ruta,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+        programador.programar(horario);
+        List<Horario> horarios = programador.consultarHorariosPorTipoBus("ABC123", "Electric");
+        assertNotNull(horarios);
     }
 
     @Test
     @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
     void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
-        fail("Implementar este test para lanzar IllegalArgumentException cuando el bus es desconocido");
+        assertThrows(IllegalArgumentException.class, () -> {
+            programador.consultarHorariosPorTipoBus("DESCONOCIDO", "Electric");
+        });
     }
 
     @Test
     @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
     void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
-        fail("Implementar este test para lanzar UnsupportedTypeException cuando el tipo es desconocido");
+        Bus bus = new Bus("ABC123", "Electric");
+        Ruta ruta = new Ruta("Electric", "ABC123", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+        programador.programar(horario);
+        assertThrows(UnsupportedTypeException.class, () -> {
+            programador.consultarHorariosPorTipoBus("ABC123", "DESCONOCIDO");
+        });
+    }
+
+    @Test 
+    @DisplayName("Debe validar horario solapado")
+    void debeValidarHorarioSolapado() {
+        assertFalse(true);
+    }
+    
+    @Test 
+    @DisplayName("Debe rechazar horario rango invalido")
+    void debeRechazarHorarioRangoInvalido() {
+        assertFalse(true);
     }
 }
