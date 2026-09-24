@@ -3,6 +3,7 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Horario;
 
 import lombok.Data;
@@ -32,4 +33,16 @@ public class ProgramadorRutas {
         return true;
     }
 
+    public List<Horario> consultarHorariosPorTipoBus(String bus, String tipoBus) {
+
+         if (tipoBus == null) {
+            throw new UnsupportedTypeException("El tipo de bus no puede ser nulo");
+        }
+         if (bus == null) {
+            throw new IllegalArgumentException("El bus no puede ser nulo");
+        }
+        return horarios.stream()
+                       .filter(h -> tipoBus.equals(h.getBus().getTipo()))
+                       .toList();
+    }
 }
