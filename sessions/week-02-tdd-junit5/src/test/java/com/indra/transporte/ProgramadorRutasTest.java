@@ -117,12 +117,26 @@ public class ProgramadorRutasTest {
     @Test 
     @DisplayName("Debe validar horario solapado")
     void debeValidarHorarioSolapado() {
-        assertFalse(true);
+        Bus bus = new Bus("ABC123", "Electric");
+        Ruta ruta = new Ruta("Electric", "ABC123", "Ciudad A", "Ciudad B");
+        Horario horario1 = new Horario(bus, ruta,
+                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+        programador.programar(horario1);
+
+        Horario horario2 = new Horario(bus, ruta,
+                java.time.LocalTime.of(9, 0), java.time.LocalTime.of(11, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> programador.debeRechazarHorarioSolapado(horario2));
     }
     
     @Test 
     @DisplayName("Debe rechazar horario rango invalido")
     void debeRechazarHorarioRangoInvalido() {
-        assertFalse(true);
+        Bus bus = new Bus("ABC123", "Electric");
+        Ruta ruta = new Ruta("Electric", "ABC123", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta,
+                java.time.LocalTime.of(10, 0), java.time.LocalTime.of(8, 0));
+
+        assertThrows(IllegalArgumentException.class, () -> programador.debeRechazarHorarioRangoInvalido(horario));
     }
 }
