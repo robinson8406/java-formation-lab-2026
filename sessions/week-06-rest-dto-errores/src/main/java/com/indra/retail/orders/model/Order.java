@@ -1,5 +1,6 @@
 package com.indra.retail.orders.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +12,7 @@ public class Order {
     private List<OrderItem> items;
     private String deliveryAddress;
     private OrderStatus status;
-    private double totalAmount;
+    private BigDecimal totalAmount;
     private LocalDate estimatedDelivery;
     private String internalWarehouseCode;
     private String createdByEmployeeId;
@@ -25,8 +26,10 @@ public class Order {
         this.items = items;
         this.deliveryAddress = deliveryAddress;
         this.status = OrderStatus.CREATED;
-        this.totalAmount = items == null ? 0.0
-                : items.stream().mapToDouble(i -> i.getUnitPrice() * i.getQuantity()).sum();
+        this.totalAmount = items == null ? BigDecimal.ZERO
+                : items.stream()
+                        .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
         this.estimatedDelivery = LocalDate.now().plusDays(5);
     }
 
@@ -70,11 +73,11 @@ public class Order {
         this.status = status;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 

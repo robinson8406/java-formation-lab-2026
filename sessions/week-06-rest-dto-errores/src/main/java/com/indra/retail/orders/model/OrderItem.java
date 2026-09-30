@@ -1,15 +1,17 @@
 package com.indra.retail.orders.model;
 
+import java.math.BigDecimal;
+
 public class OrderItem {
 
     private String sku;
     private int quantity;
-    private double unitPrice;
+    private BigDecimal unitPrice;
 
     public OrderItem() {
     }
 
-    public OrderItem(String sku, int quantity, double unitPrice) {
+    public OrderItem(String sku, int quantity, BigDecimal unitPrice) {
         this.sku = sku;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
@@ -31,11 +33,11 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public double getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(double unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
 }
