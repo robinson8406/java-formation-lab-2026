@@ -1,7 +1,11 @@
 package com.indra.retail.orders.web;
 
+import com.indra.retail.orders.model.CreateOrderRequest;
 import com.indra.retail.orders.model.Order;
 import com.indra.retail.orders.service.OrderService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,4 +35,11 @@ public class OrderController {
     public Order getById(@PathVariable String orderId) {
         return orderService.findById(orderId);
     }
+
+    @PostMapping("/v2")
+    public ResponseEntity<CreateOrderRequest> create(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
+        CreateOrderRequest created = orderService.create(createOrderRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
 }
