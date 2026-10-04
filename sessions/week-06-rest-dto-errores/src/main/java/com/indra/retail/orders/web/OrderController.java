@@ -2,6 +2,7 @@ package com.indra.retail.orders.web;
 
 import com.indra.retail.orders.model.CreateOrderRequest;
 import com.indra.retail.orders.model.Order;
+import com.indra.retail.orders.model.OrderResponse;
 import com.indra.retail.orders.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -26,20 +27,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> create(@RequestBody Order order) {
-        Order created = orderService.create(order);
+    public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest order) {
+        OrderResponse created = orderService.create(order);
         return ResponseEntity.status(HttpStatus.OK).body(created);
     }
 
     @GetMapping("/{orderId}")
-    public Order getById(@PathVariable String orderId) {
+    public OrderResponse getById(@PathVariable String orderId) {
         return orderService.findById(orderId);
     }
-
-    @PostMapping("/v2")
-    public ResponseEntity<CreateOrderRequest> create(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
-        CreateOrderRequest created = orderService.create(createOrderRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
 }
