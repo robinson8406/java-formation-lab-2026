@@ -30,7 +30,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponse> create(@Valid @RequestBody CreateOrderRequest order) {
         OrderResponse created = orderService.create(order);
-        return ResponseEntity.status(HttpStatus.OK).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/{orderId}")
