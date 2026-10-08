@@ -40,7 +40,7 @@ El nivel se evidencia en _cómo_ resolviste el problema — no en _qué_ problem
 | 05 | 2026-09-17 | SOLID + TDD | Mockito (buenas prácticas) | ✅ |
 | 06 | 2026-09-24 | Spring Web / Testing | REST limpio (DTO/errores) | ✅ |
 | 07 | 2026-10-01 | Spring Web / Testing | DI/IoC (profiles/wiring) | ✅ |
-| 08 | 2026-10-08 | Spring Web / Testing | WebMvcTest (slice tests) | ⏳ |
+| 08 | 2026-10-08 | Spring Web / Testing | WebMvcTest (slice tests) | ✅ |
 | 09 | 2026-10-15 | Hibernate / JPA | Mapeos JPA | ⏳ |
 | 10 | 2026-10-22 | Hibernate / JPA | Transacciones | ⏳ |
 | 11 | 2026-10-29 | Hibernate / JPA | Performance ORM | ⏳ |
