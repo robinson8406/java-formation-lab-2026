@@ -3,59 +3,57 @@
 ## Qué viene dado en `week-04-start`
 
 El start llega con:
-- Interfaz `ShippingStrategy` ya definida con los 3 métodos (`calculateCost`, `estimatedDays`, `channelName`).
-- `StandardShipping` ya implementada y con su test en verde — sirve de modelo exacto.
-- `ShippingService` con un `if-else` de canal que debes eliminar.
-- Clase `ShippingStrategyFactory` con firma definida pero sin implementación (método retorna `null`).
-- Test de `ShippingService` en rojo: falla porque la factory retorna `null`.
+- Interfaz `PaymentStrategy` ya definida con los 3 métodos (`calculateFee`, `methodCode`, `confirmationMessage`).
+- Clase `CashPayment` ya implementada con la interfaz `PaymentStrategy`.
+- `PaymentController` ya implementada y con su test en verde — sirve de modelo exacto.
+- `PaymentService` con un `if-else` de medio de pago que debes eliminar y cambiarse por el patron.
+- Clase `PaymentStrategyFactory` con firma definida pero sin implementación (método retorna `null`).
 
-Tu trabajo es completar **2 estrategias + la factory** para que todo quede en verde.
+Tu trabajo es implementar el patron Strategy/Factory **estrategias + la factory** eliminando el `if-else` y que el PaymentControllerTest pase todo en verde.
 
 ---
 
 ## Contexto del reto
 
-**Indra Logistics** necesita agregar los canales `EXPRESS` y `STORE_PICKUP` al sistema de envíos. Cada vez que se agrega uno, el QA reporta regresiones en los canales anteriores porque todo está en el mismo bloque `if-else`.
+**Indra Logistics** necesita cambiar la forma en que se obtienen las comiciones según los metodos de pago a un modelo que no genere regresiones ya que actualmente todo esta dentro de un bloque `if-else`.
 
 ## Lo que debes implementar
 
-**Tarea 1 — 2 estrategias nuevas**
+**Tarea 1 — implementar estrategias**
 
-Siguiendo exactamente el modelo de `StandardShipping`:
-- `ExpressShipping`: costo = `weightKg * 8.0 + distanceKm * 0.05`; 1 día; canal `EXPRESS`.
-- `StorePickup`: costo = `0.0`; 0 días; canal `STORE_PICKUP`.
-- 1 test por cada estrategia (copiar la estructura del test de `StandardShipping`).
+Siguiendo los valores retornados por el bloque `if-else` se requieren crear las respectivas estrategias para cada uno de los metodos de pago ejemplo :
+- `CASH`: fee = `0`; total = amount + fee; message `Pago en efectivo registrado, sin comisión.`.
+- `VISA`: fee = `amount * 0.035` (roundUp); total = `amount + fee`; message = `Pago con tarjeta de crédito Visa procesado, se aplica comisión bancaria.`.
+- 1 test por cada estrategia (copiar la estructura del test de `PaymentControllerTest`).
 
-**Tarea 2 — Completar `ShippingStrategyFactory`**
-
+**Tarea 2 — Completar `PaymentStrategyFactory`**
+- Puede ser con un switch o el uso de un listado automatico @Component
 ```java
-public ShippingStrategy getStrategy(String channelCode) {
-    return switch (channelCode) {
-        case "STANDARD"     -> new StandardShipping();
-        case "EXPRESS"      -> new ExpressShipping();
-        case "STORE_PICKUP" -> new StorePickup();
-        default             -> throw new UnknownChannelException(channelCode);
+public PaymentStrategyFactory getStrategy(String methodCode) {
+    return switch (methodCode) {
+        case "CASH"         -> new CashPayment();
+        //TODO
+        default             -> throw new UnknownPaymentMethodException(methodCode);
     };
 }
+
 ```
 
-Elimina el `if-else` de canal en `ShippingService` usando la factory.
+Elimina el `if-else` de canal en `PaymentService` usando la factory.
 
 ## Restricciones técnicas (para todos)
 
-- `ShippingService` no debe referenciar `ExpressShipping` ni `StorePickup` directamente.
-- Agregar una 4.ª estrategia no debe requerir modificar `ShippingService`.
-- **Criterio no funcional (calidad)**: cada estrategia en su propio archivo; los tests de `StandardShipping` no deben verse afectados.
+- Agregar nuevas estrategias no debe requerir modificar `PaymentService`.
+- **Criterio no funcional (calidad)**: cada estrategia en su propio archivo; los tests de `PaymentControllerTest` no deben verse afectados.
 
 ## Criterio de aceptación del PR
 
-- [ ] `ExpressShipping` y `StorePickup` implementadas con su test
-- [ ] `ShippingStrategyFactory` completa (3 canales + excepción para desconocido)
-- [ ] `ShippingService` sin `if-else` de canal
+- [ ] Cada estrategia implementada con su respectivo test implementadas con su test
+- [ ] `PaymentStrategyFactory` completa (7 medios de pago + excepción para desconocido)
+- [ ] `PaymentService` sin `if-else` de metodo de pago
 - [ ] Tests del start siguen en verde
 - [ ] `mvn verify` en verde
 
 ## Bonus (opcional)
 
 - Registrar las estrategias como `@Component` de Spring y que la factory las descubra automáticamente desde `List<ShippingStrategy>`.
-- Agregar `SameDayDelivery` sin tocar ninguna clase existente.

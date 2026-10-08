@@ -3,23 +3,22 @@
 ## Checklist del reviewer
 
 ### Strategy
-- [ ] Interfaz `ShippingStrategy` con los 3 métodos requeridos
-- [ ] 3 implementaciones concretas, cada una en su propio archivo
-- [ ] `ShippingService` no referencia ninguna clase concreta de estrategia
+- [ ] Interfaz `PaymentStrategy` con los 3 métodos requeridos
+- [ ] 7 implementaciones concretas, cada una en su propio archivo
+- [ ] `PaymentService` no referencia ninguna clase concreta de estrategia
 
 ### Factory
-- [ ] `ShippingStrategyFactory.getStrategy()` funciona para los 3 canales
-- [ ] `UnknownChannelException` lanzada para canal desconocido
-- [ ] Agregar una nueva estrategia no requiere modificar `ShippingService`
+- [ ] `PaymentStrategyFactory.getStrategy()` funciona para los 7 metodos de pago
+- [ ] `UnknownPaymentMethodException` lanzada para canal desconocido
+- [ ] Agregar una nueva estrategia no requiere modificar `PaymentService`
 
 ### Tests
 - [ ] Al menos 1 test por estrategia (independiente)
-- [ ] Test para canal desconocido en la Factory
+- [ ] Test para metodo desconocido en la Factory
 - [ ] `mvn verify` en verde
 
 ### Calidad
-- [ ] Sin `if-else` de canal en `ShippingService`
-- [ ] Sin duplicación de lógica entre estrategias
+- [ ] Sin `if-else` de metodo de pago en `PaymentService`
 
 ## Escala de madurez
 

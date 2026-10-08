@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOLID: SRP & OCP — Semana 03 | Indra</title>
+  <style>
+    :root {
+      --indra-dark: #0d2535;
+      --indra-teal: #1d7878;
+      --indra-teal-light: #3da0a0;
+      --indra-accent: #3da0a0;
+      --indra-bg: #ede9df;
+      --indra-white: #ffffff;
+      --indra-gray: #dad5c9;
+      --indra-text: #0d2535;
+      --indra-muted: #647a7a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+      background: var(--indra-dark);
+      color: var(--indra-text);
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+    .slide {
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    .slide-inner {
+      width: 100%; height: 100%;
+      padding: 52px 72px;
+      display: flex; flex-direction: column;
+    }
+    .label {
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--indra-accent); margin-bottom: 8px;
+    }
+    .slide-header { margin-bottom: 32px; }
+    .slide-header h2 { font-size: 38px; font-weight: 700; color: #fff; }
+    .slide-header h2 em { font-style: normal; color: var(--indra-accent); }
+    .slide-header p { margin-top: 10px; color: rgba(255,255,255,.55); font-size: 16px; }
+    code { font-family: 'Courier New', monospace; }
+
+    .pillars {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px; flex: 1;
+    }
+    .pillar {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px; padding: 32px 28px;
+      display: flex; flex-direction: column; gap: 16px;
+      position: relative; overflow: hidden;
+    }
+    .pillar.srp { border-top: 4px solid var(--indra-teal); }
+    .pillar.ocp { border-top: 4px solid #9c27b0; }
+    .pillar-badge {
+      align-self: flex-start;
+      font-size: 12px; font-weight: 800; letter-spacing: 2px;
+      padding: 5px 14px; border-radius: 20px; text-transform: uppercase;
+    }
+    .pillar.srp .pillar-badge { background: rgba(61,160,160,.18); color: var(--indra-accent); border: 1px solid rgba(61,160,160,.35); }
+    .pillar.ocp .pillar-badge { background: rgba(156,39,176,.18); color: #ce93d8; border: 1px solid rgba(156,39,176,.35); }
+    .pillar h3 { font-size: 26px; font-weight: 800; color: #fff; }
+    .pillar .definition {
+      font-size: 17px; color: rgba(255,255,255,.85); line-height: 1.55;
+    }
+    .pillar .definition strong { color: var(--indra-accent); }
+    .pillar.ocp .definition strong { color: #ce93d8; }
+    .pillar .example {
+      margin-top: auto;
+      background: rgba(0,0,0,.35);
+      border-radius: 8px; padding: 14px 16px;
+      font-size: 13px; color: var(--indra-accent);
+      font-family: 'Courier New', monospace; line-height: 1.7;
+    }
+    .pillar.ocp .example { color: #ce93d8; }
+    .pillar .fail {
+      font-size: 13.5px; color: rgba(255,150,80,.9);
+      display: flex; gap: 8px; align-items: flex-start;
+    }
+
+    .key-insight {
+      margin-top: 24px;
+      background: linear-gradient(135deg, rgba(0,212,200,.1), rgba(42,179,179,.05));
+      border: 1px solid rgba(0,212,200,.2);
+      border-radius: 10px; padding: 16px 24px;
+      font-size: 15px; color: rgba(255,255,255,.9);
+      text-align: center;
+    }
+    .key-insight strong { color: var(--indra-accent); }
+
+    .diagrams-grid {
+      margin-top: 24px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .diagram-box {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px; padding: 18px 20px;
+    }
+    .diagram-box.before { border-top: 4px solid rgba(255,150,80,.7); }
+    .diagram-box.after { border-top: 4px solid var(--indra-teal); }
+    .diagram-box .diagram-title {
+      font-size: 12px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .diagram-box.before .diagram-title { color: rgba(255,150,80,.9); }
+    .diagram-box.after .diagram-title { color: var(--indra-accent); }
+    .diagram-box .diagram-note {
+      margin-top: 10px; font-size: 12.5px; color: rgba(255,255,255,.6); line-height: 1.5;
+    }
+    .mermaid { display: flex; justify-content: center; }
+
+    .slide-footer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 36px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(0,0,0,.55);
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .footer-logo { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.6); letter-spacing: 2.5px; }
+    .footer-page { font-size: 10px; color: rgba(255,255,255,.6); }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Ancla visual — Semana 03</div>
+        <h2>Las 2 definiciones que <em>necesitas hoy</em></h2>
+        <p>Todo lo demás lo vemos en vivo sobre <code style="color:var(--indra-accent)">OrderProcessor</code></p>
+      </div>
+
+      <div class="pillars">
+        <div class="pillar srp">
+          <span class="pillar-badge">S · SRP</span>
+          <h3>Single Responsibility Principle</h3>
+          <p class="definition">Una clase debe tener <strong>una única razón para cambiar</strong>. Si mezcla orquestación + reglas de negocio, un cambio en una rompe la otra.</p>
+          <div class="fail">⚠️ Síntoma: <span>tests de stock fallan al tocar código de descuentos.</span></div>
+          <div class="example">OrderProcessor<br>├─ StockValidator&nbsp;&nbsp;&nbsp;// 1 razón: stock<br>├─ OrderNotifier&nbsp;&nbsp;&nbsp;&nbsp;// 1 razón: notificar<br>└─ DiscountCalculator // 1 razón: descuentos</div>
+        </div>
+
+        <div class="pillar ocp">
+          <span class="pillar-badge">O · OCP</span>
+          <h3>Open/Closed Principle</h3>
+          <p class="definition">El código debe estar <strong>abierto a extensión, cerrado a modificación</strong>. Agregar un caso nuevo no debe tocar los casos existentes.</p>
+          <div class="fail">⚠️ Síntoma: <span>cada descuento nuevo obliga a editar el mismo <code style="color:#ce93d8">if/else</code>.</span></div>
+          <div class="example">// agregar LOYALTY:<br>+ case LOYALTY -&gt; ...<br>// STANDARD y SEASONAL: 0 líneas tocadas</div>
+        </div>
+      </div>
+
+      <div class="key-insight">
+        Hoy refactorizamos <strong>OrderProcessor</strong>: separamos responsabilidades (SRP) y agregamos un descuento nuevo <strong>sin tocar</strong> el código existente (OCP).
+      </div>
+
+      <div class="diagrams-grid">
+        <div class="diagram-box before">
+          <div class="diagram-title">⚠️ Antes — todo en 1 clase</div>
+          <pre class="mermaid">
+classDiagram
+    class OrderProcessor {
+      +process(order, stock)
+      valida stock
+      if STANDARD desc 5%
+      if SEASONAL desc 20%
+      notifica cliente
+    }
+          </pre>
+          <div class="diagram-note">3 razones para cambiar · agregar LOYALTY = editar esta clase (rompe SRP y OCP)</div>
+        </div>
+
+        <div class="diagram-box after">
+          <div class="diagram-title">✅ Después — SRP + OCP aplicados</div>
+          <pre class="mermaid">
+classDiagram
+    class OrderProcessor {
+      +process(order, stock)
+    }
+    class StockValidator {
+      +hasEnoughStock(available, requested)
+    }
+    class OrderNotifier {
+      +notifyCustomer(email, msg)
+    }
+    class DiscountCalculator {
+      +apply(price, type)
+    }
+    class DiscountType {
+      &lt;&lt;enumeration&gt;&gt;
+      STANDARD
+      SEASONAL
+      LOYALTY
+    }
+    OrderProcessor --&gt; StockValidator
+    OrderProcessor --&gt; OrderNotifier
+    OrderProcessor --&gt; DiscountCalculator
+    DiscountCalculator --&gt; DiscountType
+          </pre>
+          <div class="diagram-note">4 clases, 1 razón cada una · LOYALTY se agrega sin tocar STANDARD/SEASONAL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span class="footer-logo">✕ INDRA GROUP</span>
+    <span class="footer-page">Semana 03 · SOLID: SRP &amp; OCP</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+</body>
+</html>

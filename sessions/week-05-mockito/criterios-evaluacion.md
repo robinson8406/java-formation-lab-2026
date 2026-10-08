@@ -3,26 +3,19 @@
 ## Checklist del reviewer
 
 ### Mocks
-- [ ] `@Mock` y `@InjectMocks` usados (no `Mockito.mock()` manual)
-- [ ] `@ExtendWith(MockitoExtension.class)` presente
-- [ ] Sin `@SpringBootTest`
+- [ ] `@Mock` y `@InjectMocks` definidos. 
+- [ ] `@ExtendWith(MockitoExtension.class)` implementados.  
+- [ ] sentencia `when` definida. 
+- [ ] sentencia `verify` definida. 
+
 
 ### Escenarios
-- [ ] Test: pago aprobado → `PaymentResult.SUCCESS`
-- [ ] Test: fraude detectado → `FraudulentPaymentException` y gateway no invocado
-- [ ] Test: gateway falla → `PaymentProcessingException`
+- [ ] Test: Producto creado. 
+- [ ] Test: Producto actualizado 
+- [ ] Test: Producto 
 
-### ArgumentCaptor
-- [ ] `ArgumentCaptor` usado para verificar el payload al `AuditLogger`
-- [ ] El captor verifica datos relevantes del `PaymentRequest`
 
 ### Calidad de tests
-- [ ] Sin `verify()` redundantes que no agregan información
 - [ ] Nombres de tests descriptivos del escenario y resultado
 - [ ] `mvn verify` en verde
 
-## Escala de madurez
-
-| Junior | Semi-senior | Senior | Experto |
-|--------|-------------|--------|---------|
-| Tests con mocks básicos, algunos verify redundantes | 3 escenarios, ArgumentCaptor correcto | BDDMockito, tests como especificaciones, sin ruido | Identifica qué NO mockear, propone tests de integración para los contratos |

@@ -7,17 +7,16 @@
 - [ ] Los tests fallan antes de que exista la implementación (se deduce del historial)
 
 ### Tests
-- [ ] Al menos 5 tests cubriendo los escenarios del enunciado
-- [ ] Tests para casos borde: monto cero, moneda desconocida, cliente inválido
+- [ ] Al menos 8 tests cubriendo los escenarios del enunciado
+- [ ] Tests para casos borde: Bus null o vacio, Tipo de bus desconocido, horarios solapados
 - [ ] `@DisplayName` o nombres de método que explican el escenario
 - [ ] Sin `if` ni lógica condicional dentro de los tests
 
 ### Funcionalidad
-- [ ] Cálculo correcto para STANDARD y PREMIUM
-- [ ] Recargo de EUR aplicado correctamente
-- [ ] `UnsupportedCurrencyException` lanzada para monedas desconocidas
-- [ ] `IllegalArgumentException` para montos <= 0
-- [ ] Redondeo a 2 decimales correcto
+- [ ] Cálculo de horario correcto para tipo de Bus y Ruta
+- [ ] Asignacion correcta de horarios sin solapamiento de horas
+- [ ] `UnsupportedTypeException` lanzada para tipos desconocidos
+- [ ] `IllegalArgumentException` para rutas, buses u horarios desconocidos
 
 ### Calidad
 - [ ] `mvn verify` en verde
