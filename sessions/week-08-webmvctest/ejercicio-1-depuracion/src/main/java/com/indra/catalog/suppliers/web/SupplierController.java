@@ -32,7 +32,7 @@ public class SupplierController {
     }
 
     @PostMapping
-    public ResponseEntity<SupplierResponse> create(@RequestBody CreateSupplierRequest request) {
+    public ResponseEntity<SupplierResponse> create(@Valid @RequestBody CreateSupplierRequest request) {
         Supplier created = supplierService.create(SupplierWebMapper.toDomain(request));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
