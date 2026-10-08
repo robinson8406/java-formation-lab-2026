@@ -1,24 +1,37 @@
 package com.indra.notifications.service;
 
 import com.indra.notifications.audit.NotificationAuditLog;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.indra.notifications.config.NotificationProperties;
+import com.indra.notifications.email.EmailSender;
+import com.indra.notifications.email.TransientEmailException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationService {
 
-    @Autowired
-    private NotificationAuditLog auditLog;
+    private final EmailSender emailSender;
+    private final NotificationAuditLog auditLog;
+    private final NotificationProperties properties;
+
+    public NotificationService(EmailSender emailSender, NotificationAuditLog auditLog,
+            NotificationProperties properties) {
+        this.emailSender = emailSender;
+        this.auditLog = auditLog;
+        this.properties = properties;
+    }
 
     public void notify(String to, String subject, String body) {
-        String env = System.getenv("APP_ENV");
-
-        if ("prod".equals(env)) {
-            System.out.println("[SMTP] Conectando a servidor real y enviando a " + to);
-        } else {
-            System.out.println("[FAKE] Simulando envío a " + to + ": " + subject + " -> " + body);
+        int retriesRemaining = properties.getRetryAttempts();
+        while (true) {
+            try {
+                emailSender.send(to, subject, body);
+                break;
+            } catch (TransientEmailException exception) {
+                if (retriesRemaining-- <= 0) {
+                    throw exception;
+                }
+            }
         }
-
         auditLog.record(to, subject);
     }
 }
