@@ -44,7 +44,7 @@ public class SupplierController {
         Supplier created = supplierService.create(supplier);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("{id}")
+                .path("/{id}")
                 .buildAndExpand(created.getId())
                 .toUri();
         return ResponseEntity.created(location).body(mapper.toResponse(created));
