@@ -36,7 +36,7 @@ public class SupplierController {
         Supplier created = supplierService.create(SupplierWebMapper.toDomain(request));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("{id}")
+                .path("/{id}")
                 .buildAndExpand(created.id())
                 .toUri();
         return ResponseEntity.created(location).body(SupplierWebMapper.toResponse(created));
