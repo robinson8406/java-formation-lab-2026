@@ -1,9 +1,9 @@
-package com.indra.catalog.suppliers.web;
+package com.indra.catalog.products.web;
 
-import com.indra.catalog.suppliers.application.SupplierService;
-import com.indra.catalog.suppliers.domain.Supplier;
-import com.indra.catalog.suppliers.web.dto.CreateSupplierRequest;
-import com.indra.catalog.suppliers.web.dto.SupplierResponse;
+import com.indra.catalog.products.application.ProductService;
+import com.indra.catalog.products.domain.model.Product;
+import com.indra.catalog.products.web.dto.CreateProductRequest;
+import com.indra.catalog.products.web.dto.ProductResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -17,34 +17,34 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/suppliers")
-public class SupplierController {
+@RequestMapping("/api/products")
+public class ProductController {
 
-    private final SupplierService supplierService;
+    private final ProductService productService;
 
-    public SupplierController(SupplierService supplierService) {
-        this.supplierService = supplierService;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SupplierResponse> findById(@PathVariable String id) {
-        return ResponseEntity.ok(SupplierWebMapper.toResponse(supplierService.findById(id)));
+    public ResponseEntity<ProductResponse> findById(@PathVariable String id) {
+        return ResponseEntity.ok(ProductWebMapper.toResponse(productService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<SupplierResponse> create(@Valid @RequestBody CreateSupplierRequest request) {
-        Supplier created = supplierService.create(SupplierWebMapper.toDomain(request));
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
+        Product created = productService.create(ProductWebMapper.toDomain(request));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.id())
                 .toUri();
-        return ResponseEntity.created(location).body(SupplierWebMapper.toResponse(created));
+        return ResponseEntity.created(location).body(ProductWebMapper.toResponse(created));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        supplierService.delete(id);
+        productService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

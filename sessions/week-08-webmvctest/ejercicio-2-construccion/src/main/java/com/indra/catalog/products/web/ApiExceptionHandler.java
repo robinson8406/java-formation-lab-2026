@@ -1,7 +1,7 @@
-package com.indra.catalog.suppliers.web;
+package com.indra.catalog.products.web;
 
-import com.indra.catalog.suppliers.domain.SupplierNotFoundException;
-import com.indra.catalog.suppliers.web.dto.ErrorResponse;
+import com.indra.catalog.products.domain.exception.ProductNotFoundException;
+import com.indra.catalog.products.web.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
@@ -18,10 +18,10 @@ public class ApiExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-    @ExceptionHandler(SupplierNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(SupplierNotFoundException exception, HttpServletRequest request) {
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ProductNotFoundException exception, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
-                Instant.now(), 404, "SUPPLIER_NOT_FOUND", List.of(exception.getMessage()), request.getRequestURI()));
+                Instant.now(), 404, "PRODUCT_NOT_FOUND", List.of(exception.getMessage()), request.getRequestURI()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
