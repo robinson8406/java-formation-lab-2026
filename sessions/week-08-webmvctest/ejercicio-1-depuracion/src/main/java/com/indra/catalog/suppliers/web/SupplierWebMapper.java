@@ -3,20 +3,21 @@ package com.indra.catalog.suppliers.web;
 import com.indra.catalog.suppliers.domain.Supplier;
 import com.indra.catalog.suppliers.web.dto.CreateSupplierRequest;
 import com.indra.catalog.suppliers.web.dto.SupplierResponse;
-import org.springframework.stereotype.Component;
 
-@Component
-public class SupplierWebMapper {
+/**
+ * Traductor HTTP puro: no tiene estado ni dependencias, por lo que no necesita
+ * ser un bean de Spring ni cargarse en el slice {@code @WebMvcTest}.
+ */
+final class SupplierWebMapper {
 
-    public Supplier toDomain(CreateSupplierRequest request) {
-        Supplier supplier = new Supplier();
-        supplier.setName(request.name());
-        supplier.setTaxId(request.taxId());
-        supplier.setEmail(request.email());
-        return supplier;
+    private SupplierWebMapper() {
     }
 
-    public SupplierResponse toResponse(Supplier supplier) {
-        return new SupplierResponse(supplier.getId(), supplier.getName(), supplier.getTaxId(), supplier.getEmail());
+    static Supplier toDomain(CreateSupplierRequest request) {
+        return Supplier.register(request.name(), request.taxId(), request.email());
+    }
+
+    static SupplierResponse toResponse(Supplier supplier) {
+        return new SupplierResponse(supplier.id(), supplier.name(), supplier.taxId(), supplier.email());
     }
 }
