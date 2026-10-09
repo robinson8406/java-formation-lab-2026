@@ -8,6 +8,15 @@ public class Supplier {
     private String email;
     private String internalNotes;
 
+    public void normalize() {
+        if (name != null) {
+            this.name = name.trim().toUpperCase();
+        }
+        if (taxId != null) {
+            this.taxId = taxId.replace(".", "").trim();
+        }
+    }
+
     public String getId() {
         return id;
     }

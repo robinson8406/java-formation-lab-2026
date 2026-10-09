@@ -5,7 +5,9 @@ import com.indra.catalog.suppliers.domain.SupplierRepository;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class InMemorySupplierRepository implements SupplierRepository {
 
     private final Map<String, Supplier> suppliers = new ConcurrentHashMap<>();
