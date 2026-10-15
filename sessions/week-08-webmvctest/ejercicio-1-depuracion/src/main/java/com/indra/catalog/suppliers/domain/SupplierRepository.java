@@ -8,7 +8,5 @@ public interface SupplierRepository {
 
     Optional<Supplier> findById(String id);
 
-    boolean existsById(String id);
-
-    void deleteById(String id);
+    boolean deleteById(String id);
 }

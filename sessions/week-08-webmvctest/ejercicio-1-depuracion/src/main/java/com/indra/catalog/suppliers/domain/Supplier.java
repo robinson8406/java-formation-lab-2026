@@ -1,50 +1,24 @@
 package com.indra.catalog.suppliers.domain;
 
-public class Supplier {
+import java.util.Locale;
+import java.util.Objects;
 
-    private String id;
-    private String name;
-    private String taxId;
-    private String email;
-    private String internalNotes;
+public record Supplier(String id, String name, String taxId, String email, String internalNotes) {
 
-    public String getId() {
-        return id;
+    public Supplier {
+        name = Objects.requireNonNull(name, "name").strip().toUpperCase(Locale.ROOT);
+        taxId = Objects.requireNonNull(taxId, "taxId").replace(".", "").strip();
+        email = Objects.requireNonNull(email, "email").strip();
+
+        if (name.isBlank() || taxId.isBlank() || email.isBlank()) {
+            throw new IllegalArgumentException("Los datos del proveedor son obligatorios");
+        }
+        if (id != null && id.isBlank()) {
+            throw new IllegalArgumentException("El identificador no puede estar vacío");
+        }
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getTaxId() {
-        return taxId;
-    }
-
-    public void setTaxId(String taxId) {
-        this.taxId = taxId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getInternalNotes() {
-        return internalNotes;
-    }
-
-    public void setInternalNotes(String internalNotes) {
-        this.internalNotes = internalNotes;
+    public Supplier withId(String supplierId) {
+        return new Supplier(supplierId, name, taxId, email, internalNotes);
     }
 }

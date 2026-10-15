@@ -96,5 +96,9 @@ mvn -pl ejercicio-2-construccion verify
 mvn -pl ejercicio-2-construccion test -Dtest='ProductControllerTest*'
 ```
 
+Para iniciar la aplicación, define `PRODUCT_EDITOR_PASSWORD` y `PRODUCT_ADMIN_PASSWORD`
+en el entorno. No hay contraseñas de ejecución por defecto; las pruebas usan credenciales
+aisladas definidas en sus propiedades de test.
+
 > ⚠️ Con Spring Security en el classpath, `@WebMvcTest` aplica la seguridad por defecto, **no** la tuya,
 > a menos que la importes. Entender por qué es parte del reto.
