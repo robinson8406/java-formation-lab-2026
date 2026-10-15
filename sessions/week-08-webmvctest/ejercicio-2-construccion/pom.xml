@@ -17,6 +17,8 @@
   <properties>
     <java.version>21</java.version>
     <maven.compiler.release>21</maven.compiler.release>
+    <!-- Tests: el JVM arranca más rápido limitando el JIT a C1 (contextos de test viven segundos) -->
+    <argLine>-XX:TieredStopAtLevel=1</argLine>
   </properties>
 
   <dependencies>

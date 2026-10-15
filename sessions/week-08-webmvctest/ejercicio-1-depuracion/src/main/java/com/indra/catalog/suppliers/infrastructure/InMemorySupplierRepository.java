@@ -5,14 +5,23 @@ import com.indra.catalog.suppliers.domain.SupplierRepository;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class InMemorySupplierRepository implements SupplierRepository {
 
     private final Map<String, Supplier> suppliers = new ConcurrentHashMap<>();
+    private final AtomicLong sequence = new AtomicLong();
+
+    @Override
+    public String nextId() {
+        return "SUP-%03d".formatted(sequence.incrementAndGet());
+    }
 
     @Override
     public Supplier save(Supplier supplier) {
-        suppliers.put(supplier.getId(), supplier);
+        suppliers.put(supplier.id(), supplier);
         return supplier;
     }
 

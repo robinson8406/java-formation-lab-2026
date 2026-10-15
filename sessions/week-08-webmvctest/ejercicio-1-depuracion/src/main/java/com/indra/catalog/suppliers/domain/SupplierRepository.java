@@ -11,4 +11,7 @@ public interface SupplierRepository {
     boolean existsById(String id);
 
     void deleteById(String id);
+
+    String nextId();
+
 }
