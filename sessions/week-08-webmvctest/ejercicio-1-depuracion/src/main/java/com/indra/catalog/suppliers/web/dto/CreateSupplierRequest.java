@@ -1,5 +1,6 @@
 package com.indra.catalog.suppliers.web.dto;
 
+import com.indra.catalog.suppliers.application.CreateSupplierCommand;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -13,4 +14,8 @@ public record CreateSupplierRequest(
         @NotBlank(message = "el correo es obligatorio")
         @Email(message = "el correo no es válido")
         String email) {
+
+    public CreateSupplierCommand toCommand() {
+        return new CreateSupplierCommand(name, taxId, email);
+    }
 }

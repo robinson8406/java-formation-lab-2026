@@ -1,50 +1,24 @@
 package com.indra.catalog.suppliers.domain;
 
-public class Supplier {
+import java.util.Objects;
 
-    private String id;
-    private String name;
-    private String taxId;
-    private String email;
-    private String internalNotes;
+/**
+ * Proveedor del catálogo. Inmutable: las invariantes y la normalización exigida por Compras
+ * (razón social en mayúsculas, NIT sin puntos) se aplican una sola vez al construirlo.
+ */
+public record Supplier(String id, String name, String taxId, String email, String internalNotes) {
 
-    public String getId() {
-        return id;
+    public Supplier {
+        Objects.requireNonNull(id, "id");
+        name = requireText(name, "La razón social es obligatoria").toUpperCase();
+        taxId = requireText(taxId, "El NIT es obligatorio").replace(".", "");
+        email = requireText(email, "El correo es obligatorio");
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getTaxId() {
-        return taxId;
-    }
-
-    public void setTaxId(String taxId) {
-        this.taxId = taxId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getInternalNotes() {
-        return internalNotes;
-    }
-
-    public void setInternalNotes(String internalNotes) {
-        this.internalNotes = internalNotes;
+    private static String requireText(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
+        return value.trim();
     }
 }

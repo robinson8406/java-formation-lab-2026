@@ -1,12 +1,11 @@
 package com.indra.catalog.suppliers.web;
 
-import com.indra.catalog.suppliers.application.SupplierServiceImpl;
-import com.indra.catalog.suppliers.domain.Supplier;
+import com.indra.catalog.suppliers.application.SupplierService;
 import com.indra.catalog.suppliers.web.dto.CreateSupplierRequest;
 import com.indra.catalog.suppliers.web.dto.SupplierResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.time.LocalDateTime;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,36 +16,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+/** Solo traduce HTTP ↔ caso de uso: las reglas de negocio viven en el dominio y en el servicio. */
 @RestController
-@RequestMapping("/api/suppliers")
+@RequestMapping(path = "/api/suppliers", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SupplierController {
 
-    private final SupplierServiceImpl supplierService;
+    private final SupplierService supplierService;
 
-    public SupplierController(SupplierServiceImpl supplierService) {
+    public SupplierController(SupplierService supplierService) {
         this.supplierService = supplierService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SupplierResponse> findById(@PathVariable String id) {
-        return ResponseEntity.ok(SupplierWebMapper.toResponse(supplierService.findById(id)));
+    public SupplierResponse findById(@PathVariable String id) {
+        return SupplierResponse.from(supplierService.findById(id));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SupplierResponse> create(@Valid @RequestBody CreateSupplierRequest request) {
-        Supplier supplier = SupplierWebMapper.toDomain(request);
-        // Normalización exigida por el área de compras: razón social en mayúsculas y NIT sin puntos
-        supplier.setName(supplier.getName().trim().toUpperCase());
-        supplier.setTaxId(supplier.getTaxId().replace(".", "").trim());
-        supplier.setInternalNotes("Creado vía API el " + LocalDateTime.now());
-
-        Supplier created = supplierService.create(supplier);
-
+        SupplierResponse created = SupplierResponse.from(supplierService.create(request.toCommand()));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(created.getId())
+                .buildAndExpand(created.id())
                 .toUri();
-        return ResponseEntity.created(location).body(SupplierWebMapper.toResponse(created));
+        return ResponseEntity.created(location).body(created);
     }
 
     @DeleteMapping("/{id}")

@@ -1,4 +1,4 @@
-package com.indra.catalog.suppliers.web.dto;
+package com.indra.catalog.suppliers.web.error;
 
 import java.time.Instant;
 import java.util.List;
