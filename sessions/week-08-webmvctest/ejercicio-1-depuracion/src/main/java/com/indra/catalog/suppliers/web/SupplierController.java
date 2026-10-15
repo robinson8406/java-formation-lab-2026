@@ -21,21 +21,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class SupplierController {
 
     private final SupplierServiceImpl supplierService;
-    private final SupplierWebMapper mapper;
 
-    public SupplierController(SupplierServiceImpl supplierService, SupplierWebMapper mapper) {
+    public SupplierController(SupplierServiceImpl supplierService) {
         this.supplierService = supplierService;
-        this.mapper = mapper;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SupplierResponse> findById(@PathVariable String id) {
-        return ResponseEntity.ok(mapper.toResponse(supplierService.findById(id)));
+        return ResponseEntity.ok(SupplierWebMapper.toResponse(supplierService.findById(id)));
     }
 
     @PostMapping
     public ResponseEntity<SupplierResponse> create(@RequestBody CreateSupplierRequest request) {
-        Supplier supplier = mapper.toDomain(request);
+        Supplier supplier = SupplierWebMapper.toDomain(request);
         // Normalización exigida por el área de compras: razón social en mayúsculas y NIT sin puntos
         supplier.setName(supplier.getName().trim().toUpperCase());
         supplier.setTaxId(supplier.getTaxId().replace(".", "").trim());
@@ -47,7 +45,7 @@ public class SupplierController {
                 .path("{id}")
                 .buildAndExpand(created.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(mapper.toResponse(created));
+        return ResponseEntity.created(location).body(SupplierWebMapper.toResponse(created));
     }
 
     @DeleteMapping("/{id}")
