@@ -3,33 +3,32 @@ package com.indra.retail.manager;
 import com.indra.retail.entities.Customer;
 import com.indra.retail.entities.Order;
 import com.indra.retail.entities.OrderItem;
+import com.indra.retail.entities.OrderStatus;
 import com.indra.retail.entities.Product;
+import java.math.BigDecimal;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * CRUD básico (crear, consultar, actualizar, eliminar) con EntityManager.
- * Cada test usa datos únicos, así que no dependen del orden de ejecución.
- */
 @SpringBootTest
 class EntityManagerRecordManagerTest {
 
-    @Autowired
-    private EntityManagerRecordManager manager;
+    private final EntityManagerRecordManager manager;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
-    private TransactionTemplate transactionTemplate;
+    public EntityManagerRecordManagerTest(EntityManagerRecordManager manager, TransactionTemplate transactionTemplate) {
+        this.manager = manager;
+        this.transactionTemplate = transactionTemplate;
+    }
 
     private static String uniqueEmail() {
         return UUID.randomUUID() + "@indracompany.com";
@@ -85,8 +84,6 @@ class EntityManagerRecordManagerTest {
     @Test
     @DisplayName("Persiste un Order con sus ítems en cascada")
     void shouldPersistOrderWithItems() {
-        // Todo en una transacción: las entidades quedan managed y el test no
-        // depende de qué cascade tenga el mapeo.
         Long[] ids = transactionTemplate.execute(status -> {
             Customer customer = manager.create(new Customer("Marta", uniqueEmail()));
             Product product = manager.create(new Product("Monitor", new BigDecimal("300.00"), 3));
@@ -96,8 +93,9 @@ class EntityManagerRecordManagerTest {
             return new Long[] {order.getId(), customer.getId()};
         });
 
+        assertNotNull(ids);
         Order found = manager.findById(Order.class, ids[0]).orElseThrow();
-        assertEquals("PENDING", found.getStatus());
+        assertEquals(OrderStatus.PENDING, found.getStatus());
         assertEquals(ids[1], found.getCustomer().getId());
     }
 }
