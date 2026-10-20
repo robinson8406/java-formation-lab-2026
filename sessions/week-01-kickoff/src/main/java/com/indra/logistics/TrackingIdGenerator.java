@@ -1,15 +1,31 @@
 package com.indra.logistics;
 
+import java.security.SecureRandom;
+import java.util.Objects;
+
 public class TrackingIdGenerator {
 
-    /**
-     * Genera un ID de seguimiento con formato ORIG-DEST-XXXXXXXX
-     * @param origin  código de origen (ej: "BOG")
-     * @param destination código de destino (ej: "MED")
-     * @return ID único de seguimiento
-     */
+    private static final int RANDOM_PART_LENGTH = 8;
+    private static final String ALPHANUMERIC_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private final SecureRandom secureRandom = new SecureRandom();
+
     public String generate(String origin, String destination) {
-        // TODO: implementar
-        throw new UnsupportedOperationException("Not implemented yet");
+        Route route = new Route(origin, destination);
+        return generate(route);
+    }
+
+    public String generate(Route route) {
+        Objects.requireNonNull(route, "La ruta no puede ser nula");
+        String randomSuffix = generateRandomAlphanumeric(RANDOM_PART_LENGTH);
+        return route.origin() + "-" + route.destination() + "-" + randomSuffix;
+    }
+
+    private String generateRandomAlphanumeric(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int randomIndex = secureRandom.nextInt(ALPHANUMERIC_CHARS.length());
+            builder.append(ALPHANUMERIC_CHARS.charAt(randomIndex));
+        }
+        return builder.toString();
     }
 }
