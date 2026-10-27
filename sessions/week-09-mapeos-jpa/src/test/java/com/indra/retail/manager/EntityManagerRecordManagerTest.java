@@ -1,8 +1,10 @@
 package com.indra.retail.manager;
 
+import com.indra.retail.entities.Address;
 import com.indra.retail.entities.Customer;
 import com.indra.retail.entities.Order;
 import com.indra.retail.entities.OrderItem;
+import com.indra.retail.entities.OrderStatus;
 import com.indra.retail.entities.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,15 +48,30 @@ class EntityManagerRecordManagerTest {
     }
 
     @Test
+    @DisplayName("Persiste Address como parte del Customer")
+    void shouldPersistEmbeddedAddress() {
+        Customer saved = manager.create(new Customer(
+                "Sofia",
+                uniqueEmail(),
+                new Address("Calle 10 #20-30", "Bogota", "110111", "Colombia")
+        ));
+
+        Customer found = manager.findById(Customer.class, saved.getId()).orElseThrow();
+        assertEquals("Bogota", found.getAddress().getCity());
+    }
+
+    @Test
     @DisplayName("Actualiza un Product")
     void shouldUpdateProduct() {
         Product saved = manager.create(new Product("Teclado", new BigDecimal("50.00"), 10));
+        Long initialVersion = saved.getVersion();
 
         saved.setStock(7);
         manager.update(saved);
 
         Product found = manager.findById(Product.class, saved.getId()).orElseThrow();
         assertEquals(7, found.getStock());
+        assertTrue(found.getVersion() > initialVersion);
     }
 
     @Test
@@ -97,7 +114,7 @@ class EntityManagerRecordManagerTest {
         });
 
         Order found = manager.findById(Order.class, ids[0]).orElseThrow();
-        assertEquals("PENDING", found.getStatus());
+        assertEquals(OrderStatus.PENDING, found.getStatus());
         assertEquals(ids[1], found.getCustomer().getId());
     }
 }
