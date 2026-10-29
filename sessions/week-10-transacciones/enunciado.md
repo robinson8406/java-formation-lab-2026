@@ -4,11 +4,11 @@
 
 El start llega con:
 - Entidades `Account` con campos `id`, `owner`, `balance`.
-- `TransferService` con el método `transfer()` esquelético: descuenta y acredita, pero **sin `@Transactional`** — los tests demuestran que el saldo queda inconsistente si algo falla.
+- `TransferService` con el método `transfer()` esquelético: descuenta y acredita, pero **sin `@Transactional`**. Si algo falla, el saldo puede quedar inconsistente.
 - `TransferAuditService` con el método `log()` sin implementar.
-- 2 tests en rojo que describen exactamente el comportamiento esperado.
+- 2 tests con los nombres de los escenarios obligatorios y un `assertTrue(true)` provisional, junto con la preparación de cuentas y utilidades de comprobación.
 
-Tu trabajo es hacer esos 2 tests pasar con las anotaciones correctas.
+El esqueleto pasa `mvn verify`, pero todavía no resuelve el reto. Tu trabajo es sustituir las aserciones provisionales por comprobaciones reales e implementar el comportamiento transaccional necesario para que ambos tests pasen.
 
 ---
 
@@ -20,23 +20,15 @@ Tu trabajo es hacer esos 2 tests pasar con las anotaciones correctas.
 
 **Tarea 1 — Hacer `transfer()` atómico**
 
-Anota `transfer()` correctamente:
-```java
-@Transactional(rollbackFor = InsufficientFundsException.class)
-public void transfer(Long fromId, Long toId, BigDecimal amount) { ... }
-```
-`InsufficientFundsException` es una **checked exception** — sin `rollbackFor` Spring no hace rollback.
+Configura la transacción de `transfer()` para que el débito y el crédito sean atómicos, incluso cuando se lance `InsufficientFundsException`.
+
+`InsufficientFundsException` es una **checked exception**: ten en cuenta las reglas de rollback por defecto de Spring.
 
 **Tarea 2 — Log de auditoría independiente**
 
-Implementa `TransferAuditService.log()` con propagación independiente:
-```java
-@Transactional(propagation = Propagation.REQUIRES_NEW)
-public void log(TransferEvent event) { ... }
-```
-Esto garantiza que el log se guarda aunque la transferencia haga rollback.
+Implementa `TransferAuditService.log()` para persistir el evento y configura una transacción independiente que permita guardar el log aunque la transferencia haga rollback.
 
-**Los 2 tests del start validan exactamente esto:**
+**Los 2 tests obligatorios deben validar lo siguiente:**
 - Test 1: saldo insuficiente → ambas cuentas sin cambio (rollback verificado).
 - Test 2: transferencia fallida → log de auditoría guardado de todas formas.
 
@@ -50,6 +42,7 @@ Esto garantiza que el log se guarda aunque la transferencia haga rollback.
 
 - [ ] Test 1 (rollback por saldo insuficiente) en verde
 - [ ] Test 2 (log survives rollback) en verde
+- [ ] Ambos tests comprueban el comportamiento real, sin aserciones provisionales
 - [ ] `rollbackFor = InsufficientFundsException.class` presente
 - [ ] `TransferAuditService` con `REQUIRES_NEW`
 - [ ] `mvn verify` en verde
