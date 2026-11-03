@@ -61,7 +61,15 @@ class OrderQueryCountTest {
 	void listingOrdersExecutesAtMostThreeQueries() {
 		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
 
+		System.out.println("Queries totals for get Orders with JOIN FETCH="+ measured.queries());
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
+	}
+
+	@Test
+	void listingOrdersExecutesAtMostThreeQueriesOtherWay() {
+		var measured = counter.measure(() -> orderService.listByStatusOtherWay(OrderStatus.CONFIRMED));
+		System.out.println("Queries totals for get Orders with EntityGraph="+ measured.queries());
+		assertThat(measured.queries()).isLessThanOrEqualTo(1);
 	}
 
 	@Test
@@ -69,6 +77,7 @@ class OrderQueryCountTest {
 		var measured = counter.measure(
 				() -> orderService.listByStatus(OrderStatus.CONFIRMED, org.springframework.data.domain.PageRequest.of(0, 20)));
 
+		System.out.println("Queries totals for get Orders Pageable="+ measured.queries());
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
 }

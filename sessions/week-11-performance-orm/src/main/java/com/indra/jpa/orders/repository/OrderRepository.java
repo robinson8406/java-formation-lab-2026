@@ -19,4 +19,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	@Query("SELECT o FROM Order o JOIN FETCH o.items i JOIN FETCH i.product WHERE o.status = :status")
 	List<Order> findByStatusWithItems(OrderStatus status);
 	
+	@EntityGraph(attributePaths = {"items", "items.product"})
+	List<Order> findOrdersByStatus(OrderStatus status);
 }

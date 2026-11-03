@@ -40,4 +40,6 @@
 ## Bonus (opcional)
 
 - Implementar la misma optimización con `@EntityGraph` como alternativa al `JOIN FETCH`.
+Se realiza con `@EntityGraph(attributePaths = {"items", "items.product"})` en cambio del query y da 1 querie para traer la lista sin paginación igual que con `JOIN FETCH`
 - Configurar `hibernate.default_batch_fetch_size=25` y comparar el impacto.
+El numero de queries no varió pero se redujo el tiempo de construcción del build de 22seg a 17seg
