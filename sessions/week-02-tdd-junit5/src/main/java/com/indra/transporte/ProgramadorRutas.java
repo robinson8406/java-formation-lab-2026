@@ -32,4 +32,8 @@ public class ProgramadorRutas {
         return true;
     }
 
+    public List<Horario> getHorariosPorTipo(String tipo) {
+        throw new UnsupportedOperationException("Por implementar");
+    }
+
 }

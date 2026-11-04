@@ -3,7 +3,10 @@ package com.indra.transporte;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -77,9 +80,27 @@ public class ProgramadorRutasTest {
     }
 
     @Test
-    @DisplayName("Debe devolver los horarios del tipo solicitado")
+    @DisplayName("Debe devolver los horarios del tipo de ruta solicitado")
     void debeDevolverLosHorariosDelTipoSolicitado() {
-        fail("Implementar este test para devolver los horarios del tipo solicitado");
+        // GIVEN — dos horarios eléctricos y uno general
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta rutaElectrica = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+        Ruta rutaGeneral   = new Ruta("General",  "R002", "Ciudad C", "Ciudad D");
+
+        Horario h1 = new Horario(bus, rutaElectrica, java.time.LocalTime.of(8, 0),  java.time.LocalTime.of(10, 0));
+        Horario h2 = new Horario(bus, rutaElectrica, java.time.LocalTime.of(12, 0), java.time.LocalTime.of(14, 0));
+        Horario h3 = new Horario(bus, rutaGeneral,   java.time.LocalTime.of(16, 0), java.time.LocalTime.of(18, 0));
+
+        programador.programar(h1);
+        programador.programar(h2);
+        programador.programar(h3);
+
+        // WHEN
+        List<Horario> resultado = programador.getHorariosPorTipo("Electric");
+
+        // THEN
+        assertEquals(2, resultado.size());
+        assertTrue(resultado.stream().allMatch(h -> "Electric".equals(h.getRuta().getTipo())));
     }
 
     @Test
