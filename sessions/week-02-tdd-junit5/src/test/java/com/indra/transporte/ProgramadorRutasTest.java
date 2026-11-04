@@ -104,9 +104,17 @@ public class ProgramadorRutasTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
+    @DisplayName("Debe lanzar IllegalArgumentException cuando el tipo de bus es desconocido")
     void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
-        fail("Implementar este test para lanzar IllegalArgumentException cuando el bus es desconocido");
+        // GIVEN — bus con tipo no reconocido
+        Bus bus = new Bus("XYZ999", "Hydrogen");
+        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta,
+                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+
+        // WHEN / THEN
+        assertThrows(IllegalArgumentException.class, () ->
+                programador.debeValidarTipoRutasYBuses(horario));
     }
 
     @Test
