@@ -26,6 +26,10 @@ public class ProgramadorRutas {
         String tipoBus = horario.getBus().getTipo();
         String tipoRuta = horario.getRuta().getTipo();
 
+        if (!"Electric".equals(tipoBus) && !"Diesel".equals(tipoBus)) {
+            throw new IllegalArgumentException("Tipo de bus desconocido: " + tipoBus);
+        }
+
         if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
