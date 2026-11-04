@@ -5,8 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.quickperf.sql.annotation.ExpectMaxSelect;
+import org.quickperf.sql.annotation.ExpectSelect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -58,6 +59,7 @@ class OrderQueryCountTest {
 	}
 
 	@Test
+    @ExpectSelect(1) 
 	void listingOrdersExecutesAtMostThreeQueries() {
 		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
 
@@ -66,6 +68,7 @@ class OrderQueryCountTest {
 	}
 
 	@Test
+    @ExpectMaxSelect(1) 
 	void listingOrdersExecutesAtMostThreeQueriesOtherWay() {
 		var measured = counter.measure(() -> orderService.listByStatusOtherWay(OrderStatus.CONFIRMED));
 		System.out.println("Queries totals for get Orders with EntityGraph="+ measured.queries());
@@ -73,6 +76,7 @@ class OrderQueryCountTest {
 	}
 
 	@Test
+    @ExpectMaxSelect(3)
 	void pagedListingExecutesAtMostThreeQueries() {
 		var measured = counter.measure(
 				() -> orderService.listByStatus(OrderStatus.CONFIRMED, org.springframework.data.domain.PageRequest.of(0, 20)));
