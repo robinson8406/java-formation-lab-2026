@@ -20,7 +20,14 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        validarRangoHorario(horario);
         horarios.add(horario);
+    }
+
+    private void validarRangoHorario(Horario horario) {
+        if (horario.getHoraLlegada().isBefore(horario.getHoraSalida())) {
+            throw new IllegalArgumentException("La hora de llegada debe ser mayor a la de salida");
+        }
     }
 
     public boolean debeValidarTipoRutasYBuses(Horario horario) {
