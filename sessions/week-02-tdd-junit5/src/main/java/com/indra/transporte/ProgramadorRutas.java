@@ -1,6 +1,7 @@
 package com.indra.transporte;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,12 +11,13 @@ import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.Ruta;
 import com.indra.transporte.model.Tipo;
 
-import lombok.Data;
-
-@Data
 public class ProgramadorRutas {
 
-    List<Horario> horarios = new ArrayList<>();
+    private final List<Horario> horarios = new ArrayList<>();
+
+    public List<Horario> getHorarios() {
+        return Collections.unmodifiableList(horarios);
+    }
 
     public void programar(Horario horario) {
         validarHorarioBase(horario);
@@ -70,7 +72,7 @@ public class ProgramadorRutas {
     }
 
     private void validarRangoHorario(Horario horario) {
-        if (horario.getHoraLlegada().isBefore(horario.getHoraSalida())) {
+        if (!horario.getHoraLlegada().isAfter(horario.getHoraSalida())) {
             throw new IllegalArgumentException("La hora de llegada debe ser mayor a la de salida");
         }
     }
@@ -79,18 +81,25 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        if (horario.getBus() == null) {
+            throw new IllegalArgumentException("El bus no puede ser nulo");
+        }
+        if (horario.getRuta() == null) {
+            throw new IllegalArgumentException("La ruta no puede ser nula");
+        }
+
         String tipoBus = horario.getBus().getTipo();
         String tipoRuta = horario.getRuta().getTipo();
 
-        if (!"Electric".equals(tipoBus) && !"Diesel".equals(tipoBus)) {
+        if (tipoBus == null || (!Tipo.ELECTRIC.getValor().equalsIgnoreCase(tipoBus) && !Tipo.DIESEL.getValor().equalsIgnoreCase(tipoBus))) {
             throw new IllegalArgumentException("Tipo de bus desconocido: " + tipoBus);
         }
 
-        if (!"Electric".equals(tipoRuta) && !"General".equals(tipoRuta)) {
+        if (tipoRuta == null || (!Tipo.ELECTRIC.getValor().equalsIgnoreCase(tipoRuta) && !Tipo.GENERAL.getValor().equalsIgnoreCase(tipoRuta))) {
             throw new UnsupportedTypeException("Tipo de ruta desconocido: " + tipoRuta);
         }
 
-        if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
+        if (Tipo.ELECTRIC.getValor().equalsIgnoreCase(tipoBus) && !Tipo.ELECTRIC.getValor().equalsIgnoreCase(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
