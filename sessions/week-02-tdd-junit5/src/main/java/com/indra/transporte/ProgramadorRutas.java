@@ -33,7 +33,9 @@ public class ProgramadorRutas {
     }
 
     public List<Horario> getHorariosPorTipo(String tipo) {
-        throw new UnsupportedOperationException("Por implementar");
+        return horarios.stream()
+                .filter(h -> tipo.equals(h.getRuta().getTipo()))
+                .toList();
     }
 
 }
