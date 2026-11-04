@@ -11,6 +11,8 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
@@ -223,6 +225,50 @@ public class ProgramadorRutasTest {
                         null, java.time.LocalTime.of(10, 0)));
             });
             assertEquals("La hora de salida y la de llegada no pueden ser nulas", exception.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("Cuando un bus ya tiene horarios programados")
+    class CuandoUnBusYaTieneHorariosProgramados {
+
+        @ParameterizedTest(name = "{0}: existente [{1}-{2}] vs nuevo [{3}-{4}] -> solapa={5}")
+        @CsvSource({
+                "Solapamiento por derecha,   08:00, 10:00, 08:30, 10:30, true",
+                "Solapamiento por izquierda, 08:00, 10:00, 07:30, 08:30, true",
+                "Horario contenido dentro,   08:00, 10:00, 08:15, 09:45, true",
+                "Horario engloba existente,  08:00, 10:00, 07:00, 11:00, true",
+                "Consecutivo después,        08:00, 10:00, 10:00, 12:00, false",
+                "Consecutivo antes,          08:00, 10:00, 06:00, 08:00, false"
+        })
+        @DisplayName("Debe validar correctamente si dos horarios se solapan para el mismo bus")
+        void debeValidarSolapamientoDeHorarios(
+                String caso,
+                String salidaExistente,
+                String llegadaExistente,
+                String salidaNueva,
+                String llegadaNueva,
+                boolean debeSolapar) {
+
+            Bus bus = new Bus("ABC123", "Diesel");
+            Ruta rutaExistente = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Ruta rutaNueva = new Ruta("General", "R002", "Ciudad C", "Ciudad D");
+
+            Horario horarioExistente = new Horario(bus, rutaExistente,
+                    java.time.LocalTime.parse(salidaExistente), java.time.LocalTime.parse(llegadaExistente));
+            Horario horarioNuevo = new Horario(bus, rutaNueva,
+                    java.time.LocalTime.parse(salidaNueva), java.time.LocalTime.parse(llegadaNueva));
+
+            programador.programar(horarioExistente);
+
+            if (debeSolapar) {
+                IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                    programador.programar(horarioNuevo);
+                });
+                assertEquals("El horario se solapa con otro ya programado", exception.getMessage());
+            } else {
+                assertDoesNotThrow(() -> programador.programar(horarioNuevo));
+            }
         }
     }
 }
