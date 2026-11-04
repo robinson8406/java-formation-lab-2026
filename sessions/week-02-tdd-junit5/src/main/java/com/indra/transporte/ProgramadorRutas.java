@@ -23,7 +23,23 @@ public class ProgramadorRutas {
         validarDatosDeLaRuta(horario.getRuta());
         validarRangoHorario(horario);
         debeValidarTipoRutasYBuses(horario);
+        validarHorarioSolapado(horario);
         horarios.add(horario);
+    }
+
+    private void validarHorarioSolapado(Horario nuevoHorario) {
+        for (Horario horarioExistente : horarios) {
+            if (!Objects.equals(horarioExistente.getBus().getPlaca(), nuevoHorario.getBus().getPlaca())) {
+                continue;
+            }
+
+            boolean seSolapa = nuevoHorario.getHoraSalida().isBefore(horarioExistente.getHoraLlegada())
+                    && nuevoHorario.getHoraLlegada().isAfter(horarioExistente.getHoraSalida());
+
+            if (seSolapa) {
+                throw new IllegalArgumentException("El horario se solapa con otro ya programado");
+            }
+        }
     }
 
     private void validarHorarioBase(Horario horario) {
