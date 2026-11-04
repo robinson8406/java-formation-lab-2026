@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
+import com.indra.transporte.model.Ruta;
 import com.indra.transporte.model.Tipo;
 
 import lombok.Data;
@@ -17,11 +18,39 @@ public class ProgramadorRutas {
     List<Horario> horarios = new ArrayList<>();
 
     public void programar(Horario horario) {
+        validarHorarioBase(horario);
+        validarDatosDelBus(horario.getBus());
+        validarDatosDeLaRuta(horario.getRuta());
+        validarRangoHorario(horario);
+        debeValidarTipoRutasYBuses(horario);
+        horarios.add(horario);
+    }
+
+    private void validarHorarioBase(Horario horario) {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        validarRangoHorario(horario);
-        horarios.add(horario);
+        if (horario.getBus() == null) {
+            throw new IllegalArgumentException("El bus no puede ser nulo");
+        }
+        if (horario.getRuta() == null) {
+            throw new IllegalArgumentException("La ruta no puede ser nula");
+        }
+        if (horario.getHoraSalida() == null || horario.getHoraLlegada() == null) {
+            throw new IllegalArgumentException("La hora de salida y la de llegada no pueden ser nulas");
+        }
+    }
+
+    private void validarDatosDelBus(Bus bus) {
+        if (bus.getPlaca() == null || bus.getPlaca().isBlank()) {
+            throw new IllegalArgumentException("La placa del bus no puede estar vacía");
+        }
+    }
+
+    private void validarDatosDeLaRuta(Ruta ruta) {
+        if (ruta.getCodigo() == null || ruta.getCodigo().isBlank()) {
+            throw new IllegalArgumentException("El código de la ruta no puede estar vacío");
+        }
     }
 
     private void validarRangoHorario(Horario horario) {
