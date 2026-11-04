@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.Ruta;
@@ -118,8 +119,16 @@ public class ProgramadorRutasTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
+    @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo de ruta es desconocido")
     void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
-        fail("Implementar este test para lanzar UnsupportedTypeException cuando el tipo es desconocido");
+        // GIVEN — ruta con tipo no reconocido
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta ruta = new Ruta("Submarine", "R001", "Ciudad A", "Ciudad B");
+        Horario horario = new Horario(bus, ruta,
+                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+
+        // WHEN / THEN
+        assertThrows(UnsupportedTypeException.class, () ->
+                programador.debeValidarTipoRutasYBuses(horario));
     }
 }
