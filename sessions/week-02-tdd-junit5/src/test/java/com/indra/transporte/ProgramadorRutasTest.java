@@ -158,4 +158,71 @@ public class ProgramadorRutasTest {
             assertEquals("La hora de llegada debe ser mayor a la de salida", exception.getMessage());
         }
     }
+
+    @Nested
+    @DisplayName("Cuando el horario es nulo o vacío")
+    class CuandoElHorarioEsNuloOInvalido {
+
+        @Test
+        @DisplayName("Debe rechazar un horario nulo")
+        void debeRechazarHorarioNulo() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(null);
+            });
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con bus nulo")
+        void debeRechazarHorarioConBusNulo() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(null, new Ruta("General", "R001", "Ciudad A", "Ciudad B"),
+                        java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0)));
+            });
+            assertEquals("El bus no puede ser nulo", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con ruta nula")
+        void debeRechazarHorarioConRutaNula() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(new Bus("ABC123", "Diesel"), null,
+                        java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0)));
+            });
+            assertEquals("La ruta no puede ser nula", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un bus con placa vacía")
+        void debeRechazarBusConPlacaVacia() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(new Bus("   ", "Diesel"),
+                        new Ruta("General", "R001", "Ciudad A", "Ciudad B"),
+                        java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0)));
+            });
+            assertEquals("La placa del bus no puede estar vacía", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar una ruta con código vacío")
+        void debeRechazarRutaConDatosVacios() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(new Bus("ABC123", "Diesel"),
+                        new Ruta("General", "   ", "Ciudad A", "Ciudad B"),
+                        java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0)));
+            });
+            assertEquals("El código de la ruta no puede estar vacío", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con horas nulas")
+        void debeRechazarHorarioConHorasNulas() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(new Bus("ABC123", "Diesel"),
+                        new Ruta("General", "R001", "Ciudad A", "Ciudad B"),
+                        null, java.time.LocalTime.of(10, 0)));
+            });
+            assertEquals("La hora de salida y la de llegada no pueden ser nulas", exception.getMessage());
+        }
+    }
 }
