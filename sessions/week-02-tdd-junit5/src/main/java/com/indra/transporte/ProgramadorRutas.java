@@ -3,6 +3,7 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Horario;
 
 import lombok.Data;
@@ -28,6 +29,10 @@ public class ProgramadorRutas {
 
         if (!"Electric".equals(tipoBus) && !"Diesel".equals(tipoBus)) {
             throw new IllegalArgumentException("Tipo de bus desconocido: " + tipoBus);
+        }
+
+        if (!"Electric".equals(tipoRuta) && !"General".equals(tipoRuta)) {
+            throw new UnsupportedTypeException("Tipo de ruta desconocido: " + tipoRuta);
         }
 
         if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
