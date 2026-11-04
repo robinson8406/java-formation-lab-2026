@@ -9,10 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.support.TransactionTemplate;
-
 import java.math.BigDecimal;
 import java.util.UUID;
-
+import com.indra.retail.entities.OrderStatus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -85,8 +84,6 @@ class EntityManagerRecordManagerTest {
     @Test
     @DisplayName("Persiste un Order con sus ítems en cascada")
     void shouldPersistOrderWithItems() {
-        // Todo en una transacción: las entidades quedan managed y el test no
-        // depende de qué cascade tenga el mapeo.
         Long[] ids = transactionTemplate.execute(status -> {
             Customer customer = manager.create(new Customer("Marta", uniqueEmail()));
             Product product = manager.create(new Product("Monitor", new BigDecimal("300.00"), 3));
@@ -97,7 +94,7 @@ class EntityManagerRecordManagerTest {
         });
 
         Order found = manager.findById(Order.class, ids[0]).orElseThrow();
-        assertEquals("PENDING", found.getStatus());
+        assertEquals(OrderStatus.PENDING, found.getStatus());
         assertEquals(ids[1], found.getCustomer().getId());
     }
 }
