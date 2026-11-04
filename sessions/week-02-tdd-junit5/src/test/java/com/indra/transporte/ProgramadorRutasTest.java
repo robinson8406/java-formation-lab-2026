@@ -80,55 +80,62 @@ public class ProgramadorRutasTest {
         }
     }
 
-    @Test
-    @DisplayName("Debe devolver los horarios del tipo de ruta solicitado")
-    void debeDevolverLosHorariosDelTipoSolicitado() {
-        // GIVEN — dos horarios eléctricos y uno general
-        Bus bus = new Bus("ABC123", "Diesel");
-        Ruta rutaElectrica = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
-        Ruta rutaGeneral   = new Ruta("General",  "R002", "Ciudad C", "Ciudad D");
+    @Nested
+    @DisplayName("Cuando consultamos horarios por tipo de bus")
+    class CuandoConsultamosHorariosPorTipoBus {
 
-        Horario h1 = new Horario(bus, rutaElectrica, java.time.LocalTime.of(8, 0),  java.time.LocalTime.of(10, 0));
-        Horario h2 = new Horario(bus, rutaElectrica, java.time.LocalTime.of(12, 0), java.time.LocalTime.of(14, 0));
-        Horario h3 = new Horario(bus, rutaGeneral,   java.time.LocalTime.of(16, 0), java.time.LocalTime.of(18, 0));
+        @Test
+        @DisplayName("Debe devolver los horarios del tipo solicitado")
+        void debeDevolverLosHorariosDelTipoSolicitado() {
+            Bus busElectrico = new Bus("ABC123", "Electric");
+            Bus busDiesel = new Bus("XYZ999", "Diesel");
+            Ruta rutaElectrica1 = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Ruta rutaElectrica2 = new Ruta("Electric", "R010", "Ciudad C", "Ciudad D");
+            Ruta rutaGeneral = new Ruta("General", "R020", "Ciudad E", "Ciudad F");
 
-        programador.programar(h1);
-        programador.programar(h2);
-        programador.programar(h3);
+            Horario horario1 = new Horario(busElectrico, rutaElectrica1,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            Horario horario2 = new Horario(busElectrico, rutaElectrica2,
+                    java.time.LocalTime.of(12, 0), java.time.LocalTime.of(14, 0));
+            Horario horario3 = new Horario(busDiesel, rutaGeneral,
+                    java.time.LocalTime.of(9, 0), java.time.LocalTime.of(11, 0));
 
-        // WHEN
-        List<Horario> resultado = programador.getHorariosPorTipo("Electric");
+            programador.programar(horario1);
+            programador.programar(horario2);
+            programador.programar(horario3);
 
-        // THEN
-        assertEquals(2, resultado.size());
-        assertTrue(resultado.stream().allMatch(h -> "Electric".equals(h.getRuta().getTipo())));
-    }
+            List<Horario> horarios = programador.consultarHorariosPorTipoBus(busElectrico, "Electric");
 
-    @Test
-    @DisplayName("Debe lanzar IllegalArgumentException cuando el tipo de bus es desconocido")
-    void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
-        // GIVEN — bus con tipo no reconocido
-        Bus bus = new Bus("XYZ999", "Hydrogen");
-        Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
-        Horario horario = new Horario(bus, ruta,
-                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            assertEquals(2, horarios.size());
+            assertEquals(List.of(horario1, horario2), horarios);
+        }
 
-        // WHEN / THEN
-        assertThrows(IllegalArgumentException.class, () ->
-                programador.debeValidarTipoRutasYBuses(horario));
-    }
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
+        void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
+            Bus busDesconocido = new Bus("ZZZ000", "Electric");
 
-    @Test
-    @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo de ruta es desconocido")
-    void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
-        // GIVEN — ruta con tipo no reconocido
-        Bus bus = new Bus("ABC123", "Diesel");
-        Ruta ruta = new Ruta("Submarine", "R001", "Ciudad A", "Ciudad B");
-        Horario horario = new Horario(bus, ruta,
-                java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.consultarHorariosPorTipoBus(busDesconocido, "Electric");
+            });
 
-        // WHEN / THEN
-        assertThrows(UnsupportedTypeException.class, () ->
-                programador.debeValidarTipoRutasYBuses(horario));
+            assertEquals("Bus desconocido", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
+        void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
+            Bus bus = new Bus("ABC123", "Electric");
+            Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = new Horario(bus, ruta,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            programador.programar(horario);
+
+            UnsupportedTypeException exception = assertThrows(UnsupportedTypeException.class, () -> {
+                programador.consultarHorariosPorTipoBus(bus, "Volador");
+            });
+
+            assertEquals("Tipo de bus no soportado", exception.getMessage());
+        }
     }
 }
