@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,21 +65,20 @@ class OrderQueryCountTest {
 		assertThat(measured.queries()).isPositive();
 	}
 
-	// TODO (reto, paso 5): quita @Disabled, implementa el fix en OrderRepository y deja pasar este test.
-	@Disabled("Reto: pasa a verde cuando elimines el N+1")
 	@Test
 	void listingOrdersExecutesAtMostThreeQueries() {
-		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
+		var measured = counter.measure(
+				() -> orderService.listByStatus(OrderStatus.CONFIRMED));
 
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
 
-	// TODO (reto, requisito de paginación): este test también debe quedar en verde.
-	@Disabled("Reto: el listado paginado tampoco puede tener N+1")
 	@Test
 	void pagedListingExecutesAtMostThreeQueries() {
 		var measured = counter.measure(
-				() -> orderService.listByStatus(OrderStatus.CONFIRMED, org.springframework.data.domain.PageRequest.of(0, 20)));
+				() -> orderService.listByStatus(
+						OrderStatus.CONFIRMED,
+						org.springframework.data.domain.PageRequest.of(0, 20)));
 
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
