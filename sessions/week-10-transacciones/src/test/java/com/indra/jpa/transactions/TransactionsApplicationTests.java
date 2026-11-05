@@ -1,7 +1,7 @@
 package com.indra.jpa.transactions;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 
@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.indra.jpa.transactions.model.Account;
+import com.indra.jpa.transactions.exception.InsufficientFundsException;
+import com.indra.jpa.transactions.model.TransferEvent;
 import com.indra.jpa.transactions.repository.AccountRepository;
 import com.indra.jpa.transactions.repository.TransferEventRepository;
 import com.indra.jpa.transactions.service.TransferService;
@@ -41,12 +43,34 @@ class TransactionsApplicationTests {
 
 	@Test
 	void insufficientFundsRollsBackBothBalances() {
-		assertTrue(true);
+		assertThrows(InsufficientFundsException.class,
+				() -> transferService.transfer(source.getId(), destination.getId(), new BigDecimal("150.00")));
+
+		assertBalance(source.getId(), "100.00");
+		assertBalance(destination.getId(), "50.00");
 	}
 
 	@Test
 	void auditSurvivesTransferRollback() {
-		assertTrue(true);
+		assertThrows(InsufficientFundsException.class,
+				() -> transferService.transfer(source.getId(), destination.getId(), new BigDecimal("150.00")));
+
+		assertBalance(source.getId(), "100.00");
+		assertBalance(destination.getId(), "50.00");
+		assertThat(transferEventRepository.findAll())
+				.hasSize(1)
+				.first()
+				.extracting(TransferEvent::getFromAccountId, TransferEvent::getToAccountId, TransferEvent::getAmount)
+				.containsExactly(source.getId(), destination.getId(), new BigDecimal("150.00"));
+	}
+
+	@Test
+	void successfulTransferUpdatesBothBalances() throws InsufficientFundsException {
+		transferService.transfer(source.getId(), destination.getId(), new BigDecimal("25.00"));
+
+		assertBalance(source.getId(), "75.00");
+		assertBalance(destination.getId(), "75.00");
+		assertThat(transferEventRepository.findAll()).hasSize(1);
 	}
 
 	private Account createAccount(String owner, String balance) {
