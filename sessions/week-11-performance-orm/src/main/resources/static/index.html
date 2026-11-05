@@ -37,6 +37,10 @@ GET <a href="/api/orders/paged?page=0&amp;size=20">/api/orders/paged?page=0&amp;
     <li><code>hibernate.default_batch_fetch_size</code> para paginados.</li>
     <li>No uses <code>FetchType.EAGER</code>: mueve el problema, no lo resuelve.</li>
   </ul>
+
+  <h2>Solución implementada en este reto</h2>
+  <p>En el dataset de 50 órdenes, el acceso LAZY sin optimización ejecuta 201 queries. El batch fetching las reduce a 9; el listado normal usa <code>JOIN FETCH</code> y el <code>@EntityGraph</code> alternativo ejecutan una query.</p>
+  <p>Para paginar sin traer en memoria toda la colección, primero se pagina por IDs y luego se cargan ítems y productos en una consulta de fetch. Con el conteo, el test verifica un máximo de 3 queries y que se conserva el total de resultados.</p>
 </main>
 </body>
 </html>
