@@ -1,7 +1,7 @@
 package com.indra.jpa.transactions;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.indra.jpa.transactions.exception.InsufficientFundsException;
 import com.indra.jpa.transactions.model.Account;
 import com.indra.jpa.transactions.repository.AccountRepository;
 import com.indra.jpa.transactions.repository.TransferEventRepository;
@@ -41,12 +42,30 @@ class TransactionsApplicationTests {
 
 	@Test
 	void insufficientFundsRollsBackBothBalances() {
-		assertTrue(true);
+		
+		assertThatThrownBy(() -> transferService.transfer( source.getId(), destination.getId(), new BigDecimal("200.00")))
+            .isInstanceOf(InsufficientFundsException.class);
+
+		assertBalance(source.getId(), "100.00");
+		assertBalance(destination.getId(), "50.00");
 	}
 
 	@Test
 	void auditSurvivesTransferRollback() {
-		assertTrue(true);
+
+		assertThatThrownBy(() -> transferService.transfer( source.getId(), destination.getId(), new BigDecimal("200.00")))
+            .isInstanceOf(InsufficientFundsException.class);
+
+    	assertThat(transferEventRepository.count()).isEqualTo(1);
+	}
+
+	@Test
+	void successfulTransferUpdatesBalances() throws InsufficientFundsException {
+
+		transferService.transfer(source.getId(),destination.getId(),new BigDecimal("50.00"));
+		assertBalance(source.getId(), "50.00");
+		assertBalance(destination.getId(), "100.00");
+		assertThat(transferEventRepository.count()).isEqualTo(1);
 	}
 
 	private Account createAccount(String owner, String balance) {
