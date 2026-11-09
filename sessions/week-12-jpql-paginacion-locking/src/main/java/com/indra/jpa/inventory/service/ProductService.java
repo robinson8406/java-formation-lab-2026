@@ -23,6 +23,7 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> searchProducts(String name, Pageable pageable) {
         return productRepository.searchProducts(name, pageable);
     }

@@ -25,7 +25,7 @@ class ProductControllerTest {
      
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(Math.min(10, 50))))
+                .andExpect(jsonPath("$.content", hasSize(Math.min(20, 50))))
                 .andExpect(jsonPath("$.totalElements").value(50));
     }
 
