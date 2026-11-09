@@ -5,10 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.indra.jpa.orders.config.DataSeeder;
@@ -25,28 +26,32 @@ class OrderQueryCountTest {
 
 	private static final int ORDERS = 50;
 
-	@Autowired
-	private OrderService orderService;
+	private final OrderService orderService;
+	private final OrderRepository orderRepository;
+	private final DataSeeder seeder;
+	private final EntityManagerFactory emf;
+	private final QueryCounter counter;
 
 	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private DataSeeder seeder;
-
-	@Autowired
-	private EntityManagerFactory emf;
-
-	private QueryCounter counter;
+	public OrderQueryCountTest(OrderService orderService,
+			OrderRepository orderRepository,
+			DataSeeder seeder,
+			EntityManagerFactory emf) {
+		this.orderService = orderService;
+		this.orderRepository = orderRepository;
+		this.seeder = seeder;
+		this.emf = emf;
+		this.counter = new QueryCounter(emf);
+	}
 
 	@BeforeEach
 	void setUp() {
 		orderRepository.deleteAll();
 		seeder.seed(ORDERS);
-		counter = new QueryCounter(emf);
 	}
 
 	@Test
+	@DisplayName("Debe listar órdenes con sus ítems y nombres de producto correctamente")
 	void listsOrdersWithItemsAndProductNames() {
 		List<OrderView> orders = orderService.listByStatus(OrderStatus.CONFIRMED);
 
@@ -57,31 +62,38 @@ class OrderQueryCountTest {
 		});
 	}
 
-	// Diagnóstico para la demo: muestra el N+1 (1 + N órdenes + N*3 productos). No lo borres antes del fix.
 	@Test
+	@DisplayName("Diagnóstico de medición: verifica y reporta el conteo de consultas ejecutadas")
 	void diagnosticPrintsQueryCount() {
 		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
 
-		System.out.println(">>> Queries para " + ORDERS + " órdenes: " + measured.queries());
-		assertThat(measured.queries()).isPositive();
+		System.out.println(">>> Queries optimizadas para " + ORDERS + " órdenes: " + measured.queries());
+		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
 
-	// TODO (reto, paso 5): quita @Disabled, implementa el fix en OrderRepository y deja pasar este test.
-	@Disabled("Reto: pasa a verde cuando elimines el N+1")
 	@Test
+	@DisplayName("Criterio de aceptación: cargar 50 órdenes con sus ítems debe ejecutar como máximo 3 queries")
 	void listingOrdersExecutesAtMostThreeQueries() {
 		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
 
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
 
-	// TODO (reto, requisito de paginación): este test también debe quedar en verde.
-	@Disabled("Reto: el listado paginado tampoco puede tener N+1")
 	@Test
+	@DisplayName("Requisito de paginación: listado paginado no debe generar N+1 (máximo 3 queries)")
 	void pagedListingExecutesAtMostThreeQueries() {
 		var measured = counter.measure(
-				() -> orderService.listByStatus(OrderStatus.CONFIRMED, org.springframework.data.domain.PageRequest.of(0, 20)));
+				() -> orderService.listByStatus(OrderStatus.CONFIRMED, PageRequest.of(0, 20)));
 
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
+	}
+
+	@Test
+	@DisplayName("Bonus: Consulta con JOIN FETCH directo en repositorio ejecuta exactamente 1 query SQL")
+	void repositoryJoinFetchExecutesExactlyOneQuery() {
+		var measured = counter.measure(() -> orderRepository.findByStatusWithItems(OrderStatus.CONFIRMED));
+
+		assertThat(measured.result()).hasSize(ORDERS);
+		assertThat(measured.queries()).isEqualTo(1L);
 	}
 }
