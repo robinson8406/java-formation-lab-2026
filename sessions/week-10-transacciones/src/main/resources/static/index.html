@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Guía breve de transacciones en Spring Boot: ACID, @Transactional, REQUIRED, REQUIRES_NEW, rollbackFor y readOnly.">
+  <title>Transacciones en Spring Boot | Java Lab</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #141616;
+      --ink: #e8ece9;
+      --muted: #aab6b0;
+      --green: #87dfb5;
+      --line: #333b38;
+      --accent: #ffa58e;
+      --code: #0e1110;
+      --surface: #1d2320;
+      --tint: #87dfb509;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body { margin: 0; color: var(--ink); background: linear-gradient(135deg, #ffffff02, transparent 55%), var(--paper); font: 17px/1.75 "Trebuchet MS", sans-serif; }
+    ::selection { background: #87dfb5; color: #141616; }
+    a { color: var(--green); text-underline-offset: 4px; }
+    a:hover { color: var(--ink); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    .wrap { width: min(100% - 48px, 1040px); margin-inline: auto; }
+    .masthead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-block: 22px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .brand { font-weight: bold; color: var(--green); }
+    .edition { color: var(--muted); }
+    .hero { padding-block: 64px 40px; background: repeating-linear-gradient(90deg, transparent, transparent 79px, var(--tint) 80px); }
+    .hero .wrap { animation: reveal .6s ease-out both; }
+    .eyebrow { margin: 0 0 16px; color: var(--green); font-size: 13px; font-weight: bold; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { font-family: Georgia, serif; font-weight: normal; line-height: 1.12; }
+    h1 { max-width: 820px; margin-bottom: 24px; font-size: 64px; text-wrap: balance; }
+    .intro { max-width: 660px; color: var(--muted); font-size: 20px; }
+    nav { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 14px; }
+    nav a { padding-block: 5px; text-decoration: none; border-bottom: 1px solid transparent; transition: color .18s, border-color .18s; }
+    nav a:hover { border-bottom-color: var(--green); }
+    section { padding-block: 48px; border-top: 1px solid var(--line); }
+    .section-heading { display: flex; align-items: baseline; gap: 18px; margin-bottom: 24px; }
+    .number { color: var(--accent); font: bold 14px "Trebuchet MS", sans-serif; }
+    h2 { margin: 0; min-width: 0; font-size: 36px; overflow-wrap: anywhere; }
+    h3 { margin-bottom: 10px; font-size: 20px; line-height: 1.4; }
+    .lead { max-width: 780px; }
+    strong { font-weight: 700; }
+    code { font-family: Consolas, "Liberation Mono", monospace; font-size: .9em; overflow-wrap: anywhere; }
+    p code, li code, td code, h3 code { color: var(--green); }
+    figure { margin: 28px 0 0; }
+    .transfer { display: block; width: 100%; height: auto; max-width: 700px; }
+    .transfer rect { fill: var(--surface); stroke: var(--line); }
+    .transfer g { fill: var(--ink); }
+    .transfer path { stroke: var(--green); }
+    figcaption { margin-top: 12px; color: var(--muted); font-size: 14px; }
+    .note { margin: 24px 0 0; padding: 16px 20px; border-left: 3px solid var(--accent); background: var(--surface); }
+    .acid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
+    .acid article { border-top: 2px solid var(--green); padding-top: 18px; }
+    .acid p { margin-bottom: 0; color: var(--muted); }
+    .letter { display: inline-block; width: 34px; color: var(--green); font: 30px Georgia, serif; }
+    .table-scroll { overflow-x: auto; margin-block: 24px; border: 1px solid var(--line); border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; }
+    th { color: var(--green); background: var(--surface); }
+    th, td { padding: 15px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tbody tr:nth-child(even) { background: var(--tint); }
+    tbody tr:last-child td { border-bottom: 0; }
+    th:first-child { width: 23%; }
+    pre { margin: 20px 0; padding: 22px; overflow-x: auto; border: 1px solid var(--line); border-top: 2px solid var(--green); border-radius: 6px; background: var(--code); color: var(--ink); font-size: 14px; line-height: 1.7; tab-size: 4; box-shadow: 0 8px 24px #00000018; }
+    pre code { overflow-wrap: normal; }
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+    .comparison article { min-width: 0; }
+    .tag { color: var(--accent); font-size: 13px; font-weight: bold; text-transform: uppercase; }
+    .flow { padding: 16px; margin-block: 20px; border-left: 2px solid var(--green); background: var(--surface); font: 15px/1.8 Consolas, monospace; color: var(--green); overflow-wrap: anywhere; }
+    ul { padding-left: 22px; }
+    li + li { margin-top: 8px; }
+    .takeaway { padding: 24px 0 0; margin: 24px 0 0; border-top: 1px solid var(--line); color: var(--green); font-size: 23px; font-family: Georgia, serif; }
+    footer { padding-block: 28px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    footer p { margin-bottom: 8px; }
+    @media (max-width: 640px) {
+      .wrap { width: calc(100% - 32px); }
+      .hero { padding-top: 40px; }
+      h1 { font-size: 42px; }
+      h2 { font-size: 29px; }
+      .intro { font-size: 18px; }
+      section { padding-block: 36px; }
+      .acid, .comparison { grid-template-columns: 1fr; gap: 24px; }
+      th, td { padding: 12px 10px; }
+      pre { padding: 16px; }
+    }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .hero .wrap { animation: none; }
+      nav a { transition: none; }
+    }
+    @media print {
+      :root { color-scheme: light; --paper: #fff; --ink: #202b29; --muted: #52635d; --green: #12634f; --accent: #b33e2b; --line: #d4ddd6; --surface: #edf1ed; --tint: #12634f06; }
+      body { background: white; font-size: 12px; }
+      .hero, section { padding-block: 20px; }
+      nav { display: none; }
+      pre { white-space: pre-wrap; color: black; background: #eee; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap masthead">
+    <span class="brand">INDRA / JAVA LAB 2026</span>
+    <span class="edition">Semana 10 · Persistencia</span>
+  </header>
+
+  <main id="contenido">
+    <div class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Spring Boot + JPA</p>
+        <h1>Transacciones en Spring Boot</h1>
+        <p class="intro">Una transferencia no puede quedarse a medias. Las transacciones permiten tratar varias operaciones como una sola unidad de trabajo.</p>
+        <nav aria-label="Contenido">
+          <a href="#transaccion">01 / Transacción</a>
+          <a href="#acid">02 / ACID</a>
+          <a href="#transactional">03 / @Transactional</a>
+          <a href="#propagation">04 / Propagación</a>
+          <a href="#rollback">05 / Rollback</a>
+          <a href="#readonly">06 / Solo lectura</a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <section id="transaccion" aria-labelledby="titulo-transaccion">
+        <div class="section-heading"><span class="number">01</span><h2 id="titulo-transaccion">Todo o nada</h2></div>
+        <p class="lead">Una <strong>transacción</strong> agrupa operaciones sobre la base de datos. Si todas terminan correctamente, se confirman con un <strong>commit</strong>. Si se decide cancelar, un <strong>rollback</strong> revierte los cambios de esa transacción.</p>
+        <p class="lead">Por ejemplo: transferir $100 de la cuenta A a la cuenta B exige descontar en una y sumar en la otra. Ambas modificaciones deben confirmarse juntas.</p>
+        <figure>
+          <svg class="transfer" viewBox="0 0 700 150" role="img" aria-labelledby="transfer-title transfer-desc" xmlns="http://www.w3.org/2000/svg">
+            <title id="transfer-title">Transferencia de 100 entre dos cuentas</title>
+            <desc id="transfer-desc">La cuenta A pasa de 500 a 400 y la cuenta B de 200 a 300. El saldo total se mantiene en 700.</desc>
+            <rect x="1" y="1" width="230" height="148" rx="6" fill="#e7eee7" stroke="#b7cbbd"/>
+            <rect x="469" y="1" width="230" height="148" rx="6" fill="#e7eee7" stroke="#b7cbbd"/>
+            <g fill="#202b29" font-family="Trebuchet MS, sans-serif" text-anchor="middle">
+              <text x="116" y="40" font-size="18">CUENTA A</text>
+              <text x="116" y="92" font-size="30">500 → 400</text>
+              <text x="116" y="125" font-size="16">Débito: −100</text>
+              <text x="584" y="40" font-size="18">CUENTA B</text>
+              <text x="584" y="92" font-size="30">200 → 300</text>
+              <text x="584" y="125" font-size="16">Crédito: +100</text>
+              <text x="350" y="60" font-size="17">$100</text>
+              <text x="350" y="123" font-size="14">Una transacción</text>
+            </g>
+            <path d="M260 82 H438 M426 73 L438 82 L426 91" fill="none" stroke="#12634f" stroke-width="3"/>
+          </svg>
+          <figcaption>Si falla el crédito y se ejecuta rollback, también se deshace el débito. El dinero no desaparece.</figcaption>
+        </figure>
+        <p class="note">El alcance importa: una transacción de base de datos no deshace automáticamente un correo enviado ni una llamada a una API externa.</p>
+      </section>
+
+      <section id="acid" aria-labelledby="titulo-acid">
+        <div class="section-heading"><span class="number">02</span><h2 id="titulo-acid">Las cuatro garantías: ACID</h2></div>
+        <div class="acid">
+          <article><h3><span class="letter">A</span> Atomicidad</h3><p>Se aplican todas las operaciones o ninguna. No puede quedar confirmado solo el débito de la transferencia.</p></article>
+          <article><h3><span class="letter">C</span> Consistencia</h3><p>La base pasa de un estado válido a otro, respetando restricciones y reglas correctamente implementadas. En el ejemplo, el total sigue siendo $700.</p></article>
+          <article><h3><span class="letter">I</span> Aislamiento</h3><p>Controla cómo se afectan las transacciones concurrentes. Las garantías concretas dependen del nivel de aislamiento; no significa que todas se ejecuten en serie.</p></article>
+          <article><h3><span class="letter">D</span> Durabilidad</h3><p>Después del commit, los cambios deben persistir incluso ante un reinicio o fallo, según las garantías del motor y su configuración.</p></article>
+        </div>
+      </section>
+
+      <section id="transactional" aria-labelledby="titulo-transactional">
+        <div class="section-heading"><span class="number">03</span><h2 id="titulo-transactional">@Transactional</h2></div>
+        <p class="lead">La anotación de Spring <code>org.springframework.transaction.annotation.Transactional</code> declara el límite transaccional de un método o una clase. Spring usa un gestor de transacciones para abrir o reutilizar una transacción y decidir su commit o rollback al terminar la llamada.</p>
+        <pre><code>@Service
+public class TransferenciaService {
+    @Transactional
+    public void transferir(Long origen, Long destino, BigDecimal monto) {
+        debitar(origen, monto);
+        acreditar(destino, monto);
+    }
+}</code></pre>
+        <p>Configuración predeterminada de las opciones relevantes:</p>
+        <div class="table-scroll" role="region" aria-label="Valores predeterminados de Transactional" tabindex="0">
+          <table>
+            <thead><tr><th scope="col">Opción</th><th scope="col">Valor por defecto</th><th scope="col">Para qué sirve</th></tr></thead>
+            <tbody>
+              <tr><td><code>propagation</code></td><td><code>REQUIRED</code></td><td>Decide si se reutiliza una transacción existente o se crea una nueva.</td></tr>
+              <tr><td><code>isolation</code></td><td><code>DEFAULT</code></td><td>Usa el aislamiento predeterminado del motor de base de datos.</td></tr>
+              <tr><td><code>timeout</code></td><td><code>-1</code></td><td>Sin tiempo límite explícito en la anotación: se usa el del gestor, si lo tiene. Un valor positivo se expresa en segundos.</td></tr>
+              <tr><td><code>readOnly</code></td><td><code>false</code></td><td>Permite declarar que la unidad de trabajo solo consulta datos para facilitar optimizaciones.</td></tr>
+              <tr><td><code>rollbackFor</code></td><td><code>{}</code> (sin reglas adicionales)</td><td>Añade tipos de excepción que deben provocar rollback. Por defecto, Spring lo hace ante <code>RuntimeException</code> y <code>Error</code>, no ante excepciones checked.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note"><strong>Ojo con el proxy:</strong> en el modo habitual de Spring, la llamada debe entrar desde otro bean al método transaccional. Una llamada interna como <code>this.otroMetodo()</code> no activa una nueva configuración de <code>@Transactional</code>. Coloca el límite de negocio en un servicio.</p>
+        <p><small>Las reglas de rollback descritas son las estándar, sin una política global personalizada. En Spring reciente pueden cambiarse globalmente.</small></p>
+      </section>
+
+      <section id="propagation" aria-labelledby="titulo-propagation">
+        <div class="section-heading"><span class="number">04</span><h2 id="titulo-propagation">Compartir o independizar</h2></div>
+        <div class="comparison">
+          <article>
+            <p class="tag">La opción habitual</p>
+            <h3><code>Propagation.REQUIRED</code></h3>
+            <p>Si ya hay una transacción, el método participa en ella. Si no la hay, crea una. Es el valor predeterminado.</p>
+            <div class="flow">Servicio A [TX1]<br>→ Servicio B [misma TX1]</div>
+            <p><strong>Úsalo cuando:</strong> todas las operaciones forman una sola unidad de negocio, como debitar y acreditar una transferencia.</p>
+            <p>Si un método participante marca la transacción como <em>rollback-only</em>, el conjunto no podrá confirmarse aunque el método exterior capture la excepción; puede recibir <code>UnexpectedRollbackException</code> al intentar confirmar.</p>
+          </article>
+          <article>
+            <p class="tag">Una unidad independiente</p>
+            <h3><code>Propagation.REQUIRES_NEW</code></h3>
+            <p>Suspende la transacción actual, si existe, y crea otra independiente. Si no hay una previa, también crea una nueva.</p>
+            <div class="flow">Servicio A [TX1 pausada]<br>→ Servicio B [TX2] → reanuda TX1</div>
+            <p><strong>Úsalo cuando:</strong> un registro de auditoría debe persistir aunque la operación principal termine en rollback.</p>
+            <p>Si TX2 confirma, un rollback posterior de TX1 no la revierte. Si TX2 falla y su excepción se propaga, también puede provocar rollback en TX1 según sus reglas.</p>
+          </article>
+        </div>
+        <pre><code>@Service
+public class AuditoriaService {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void registrarIntento(String detalle) {
+        auditoriaRepository.save(new Auditoria(detalle));
+    }
+}</code></pre>
+        <p>El servicio principal inyecta <code>AuditoriaService</code> y llama a <code>registrarIntento(...)</code> a través del bean de Spring. El fragmento presupone el repositorio y su inyección.</p>
+        <p class="note"><strong>Coste de REQUIRES_NEW:</strong> con JPA/JDBC suele necesitar otra conexión mientras la exterior retiene la suya. Dimensiona el pool y evita que la auditoría dependa de filas aún no confirmadas o bloqueadas por la transacción exterior.</p>
+      </section>
+
+      <section id="rollback" aria-labelledby="titulo-rollback">
+        <div class="section-heading"><span class="number">05</span><h2 id="titulo-rollback">Rollback también para checked</h2></div>
+        <p class="lead">Una excepción checked, como <code>IOException</code> o una excepción de negocio que extiende <code>Exception</code>, <strong>no provoca rollback por defecto</strong>. Usa <code>rollbackFor</code> si ese fallo debe cancelar toda la operación.</p>
+        <pre><code>@Transactional(rollbackFor = SaldoInsuficienteException.class)
+public void transferir(Long origen, Long destino, BigDecimal monto)
+        throws SaldoInsuficienteException {
+    debitar(origen, monto);
+    acreditar(destino, monto);
+}</code></pre>
+        <p>En este ejemplo, <code>SaldoInsuficienteException</code> es checked. La regla incluye ese tipo y sus subclases; las reglas estándar para <code>RuntimeException</code> y <code>Error</code> se mantienen.</p>
+        <p class="note">La excepción debe salir del método interceptado para que Spring aplique la regla. Si la capturas y la ocultas dentro del método, <code>rollbackFor</code> por sí solo no fuerza la reversión. Prefiere excepciones específicas; usa <code>rollbackFor = Exception.class</code> solo si cualquier excepción debe cancelar la operación.</p>
+      </section>
+
+      <section id="readonly" aria-labelledby="titulo-readonly">
+        <div class="section-heading"><span class="number">06</span><h2 id="titulo-readonly">¿Cuándo usar readOnly?</h2></div>
+        <p class="lead">Usa <code>@Transactional(readOnly = true)</code> en servicios que <strong>solo leen</strong>: búsquedas, listados y reportes sin modificaciones. La transacción sigue existiendo, pero comunica una intención de solo lectura al gestor y al proveedor JPA.</p>
+        <pre><code>@Transactional(readOnly = true)
+public List&lt;CuentaDto&gt; consultarCuentas() {
+    return cuentaRepository.findAll().stream()
+            .map(CuentaDto::from)
+            .toList();
+}</code></pre>
+        <ul>
+          <li><strong>Puede optimizar:</strong> con Hibernate y la integración de Spring puede reducir trabajo de seguimiento de cambios y ajustar el comportamiento de flush. El efecto depende del proveedor y de la configuración.</li>
+          <li><strong>No es seguridad:</strong> no garantiza bloquear escrituras en todos los motores. No lo uses como sustituto de permisos ni para métodos que llaman a <code>save</code>, <code>delete</code> o modifican entidades.</li>
+          <li><strong>No redefine una transacción existente:</strong> con <code>REQUIRED</code>, si el método se une a una transacción de escritura, prevalecen las características de la transacción exterior.</li>
+        </ul>
+        <p class="takeaway">Una operación de negocio, un límite claro. REQUIRED para trabajar juntos; REQUIRES_NEW solo cuando la independencia sea intencional.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="wrap">
+    <p>Java Formation Lab · Semana 10 · Ejemplos abreviados para servicios con Spring Data JPA.</p>
+    <a href="https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative.html">Referencia: transacciones declarativas de Spring</a>
+  </footer>
+</body>
+</html>
