@@ -3,6 +3,7 @@ package com.indra.jpa.transactions.service;
 import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.indra.jpa.transactions.exception.InsufficientFundsException;
 import com.indra.jpa.transactions.model.Account;
@@ -20,6 +21,7 @@ public class TransferService {
         this.transferAuditService = transferAuditService;
     }
 
+    @Transactional(rollbackFor = InsufficientFundsException.class)
     public void transfer(Long fromAccountId, Long toAccountId, BigDecimal amount)
             throws InsufficientFundsException {
         if (amount == null || amount.signum() <= 0) {

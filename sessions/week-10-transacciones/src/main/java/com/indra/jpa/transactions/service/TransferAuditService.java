@@ -1,6 +1,8 @@
 package com.indra.jpa.transactions.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.indra.jpa.transactions.model.TransferEvent;
 import com.indra.jpa.transactions.repository.TransferEventRepository;
@@ -14,6 +16,11 @@ public class TransferAuditService {
         this.transferEventRepository = transferEventRepository;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void log(TransferEvent event) {
+        if (event == null) {
+            throw new IllegalArgumentException("TransferEvent cannot be null");
+        }
+        transferEventRepository.save(event);
     }
 }
