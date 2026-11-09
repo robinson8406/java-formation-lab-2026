@@ -1,10 +1,10 @@
 package com.indra.jpa.orders.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.indra.jpa.orders.model.Order;
 import com.indra.jpa.orders.model.OrderItem;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 public record OrderView(Long id, String customerName, String status, List<ItemView> items) {
 

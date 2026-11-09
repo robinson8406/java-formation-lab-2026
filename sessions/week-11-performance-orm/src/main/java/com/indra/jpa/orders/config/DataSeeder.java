@@ -1,16 +1,15 @@
 package com.indra.jpa.orders.config;
 
-import java.math.BigDecimal;
-
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.indra.jpa.orders.model.Order;
 import com.indra.jpa.orders.model.OrderItem;
 import com.indra.jpa.orders.model.OrderStatus;
 import com.indra.jpa.orders.model.Product;
 import com.indra.jpa.orders.repository.OrderRepository;
 import com.indra.jpa.orders.repository.ProductRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 /**
  * Dataset determinista: cada orden tiene 3 ítems y cada ítem un producto distinto,
