@@ -42,7 +42,7 @@ public class ProductService {
         product.setStock(product.getStock() - quantity);
 
         try {
-            productRepository.save(product);
+            productRepository.saveAndFlush(product);
         } catch (OptimisticLockException | ObjectOptimisticLockingFailureException exception) {
             throw new ConcurrentModificationException("Stock modificado concurrentemente, reintenta", exception);
         }
