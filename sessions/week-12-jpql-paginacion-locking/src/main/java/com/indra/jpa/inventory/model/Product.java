@@ -34,6 +34,5 @@ public class Product {
     private int stock;
 
     @Version
-    @Column
     private Long version;
 }
