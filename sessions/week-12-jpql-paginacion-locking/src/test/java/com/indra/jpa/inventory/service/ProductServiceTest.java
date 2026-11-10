@@ -102,7 +102,6 @@ class ProductServiceTest {
         }
     }
 
-    
     @Test
     @DisplayName("Test Consulta de productos en transacción de solo lectura")
     void searchProductsRunsInReadOnlyTransaction() {
@@ -141,8 +140,8 @@ class ProductServiceTest {
         CountDownLatch releaseFirstTransaction = new CountDownLatch(1);
         AtomicInteger firstUpdate = new AtomicInteger(-1);
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        List<Callable<Product>> operations = IntStream.range(0, 3).mapToObj(index -> (Callable<Product>) () ->
-                transactionTemplate.execute(transaction -> {
+        List<Callable<Product>> operations = IntStream.range(0, 3).mapToObj(index -> (Callable<Product>) ()
+                -> transactionTemplate.execute(transaction -> {
                     transactionsReady.countDown();
                     try {
                         if (!startUpdates.await(5, TimeUnit.SECONDS)) {
@@ -190,6 +189,35 @@ class ProductServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("Busqueda de productos con precio min max")
+    void searchProductsAppliesQueryMinMax() {
 
+        BigDecimal maximum = new BigDecimal("100.00");
+        BigDecimal min = new BigDecimal("10.00");
+
+        Page<Product> products = productService.searchProducts(null, min,
+                maximum, PageRequest.of(0, 7));
+
+        assertEquals(7, products.getContent().size());
+        assertTrue(maximum.compareTo(products.getContent().get(0).getPrice()) >= 0);
+        assertTrue(min.compareTo(products.getContent().get(0).getPrice()) < 0);
+        assertTrue(products.getTotalElements() > 7);
+    }
+
+    @Test
+    @DisplayName("Busqueda de productos con specifications")
+    void searchProductsWithSpecification() {
+
+        BigDecimal maximum = new BigDecimal("50.00");
+        BigDecimal min = new BigDecimal("10.00");
+        int minStock = 15;
+
+        List<Product> products = productService.findBySpecificationProduct(min, maximum, minStock);
+
+        assertTrue(products.size() > 1 ? min.compareTo(products.get(1).getPrice()) < 0 : true);
+        assertTrue(products.size() > 1 ? maximum.compareTo(products.get(1).getPrice()) >= 0 : true);
+        assertTrue(products.size() > 1 ? products.get(1).getStock() >= minStock: true);
+    }
 
 }

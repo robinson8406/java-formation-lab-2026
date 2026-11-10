@@ -33,3 +33,17 @@
 | Junior | Semi-senior | Senior | Experto |
 |--------|-------------|--------|---------|
 | Paginación funcional, @Version presente | Test de concurrencia básico | Specification, @QueryHints | Propone estrategia de locking para el dominio completo (cuándo optimista vs pesimista) |
+
+
+Para el uso de bloqueo optimista vs pesimista
+
+Se sugiere usar el optimista cuando se pueda generar un error y sea factible controlar los errores de concurrencia 
+como en el caso de reseva de stock ya que se es espera que el usuario que lo hace pueda esperar o hacer un reintento 
+y este caso no es muy frecuente
+
+aunque en al hacer un pago si ya escalaramos a un carrito de compras deberiamos pasar a bloqueo pesimista para evitar 
+errores en el pago.
+
+Por otro lado el bloqueo pesimista depende de la alta concurrencia que podramos tener y se espera en el sistema que 
+varias transacciones accedan a incrementar o disminuir el stock con mucha frecuencia y los retrasos en esto tienen 
+impactos en la operacion del negocio, o en extremo caso se deberá buscar una solucion diferente.

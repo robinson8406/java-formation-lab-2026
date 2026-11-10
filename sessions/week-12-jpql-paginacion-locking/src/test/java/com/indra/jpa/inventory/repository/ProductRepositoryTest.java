@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 import javax.sql.DataSource;
 
@@ -68,5 +69,21 @@ class ProductRepositoryTest {
         assertEquals(5, products.getContent().size());
         assertTrue(products.getTotalElements() > 5);
         assertEquals(List.of(5, 5), timeouts);
+    }
+
+    @Test
+    @DisplayName("Busqueda de productos con precio min max")
+    void searchProductsAppliesQueryMinMax(){
+
+        BigDecimal maximum = new BigDecimal("100.00");
+        BigDecimal min = new BigDecimal("10.00");
+
+        Page<Product> products = productRepository.searchProductsMinMax(null, min, 
+            maximum, PageRequest.of(0, 7));
+
+        assertEquals(7, products.getContent().size());
+        assertTrue(maximum.compareTo(products.getContent().get(0).getPrice()) >= 0);
+        assertTrue(min.compareTo(products.getContent().get(0).getPrice()) < 0);
+        assertTrue(products.getTotalElements() > 7);
     }
 }
