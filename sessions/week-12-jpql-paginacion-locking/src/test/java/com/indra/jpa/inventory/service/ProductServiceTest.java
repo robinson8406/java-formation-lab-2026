@@ -1,7 +1,13 @@
 package com.indra.jpa.inventory.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.ConcurrentModificationException;
@@ -39,17 +45,21 @@ import jakarta.persistence.EntityManager;
 @SpringBootTest
 class ProductServiceTest {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+    private final PlatformTransactionManager transactionManager;
+    private final EntityManager entityManager;
 
     @MockitoSpyBean
     private ProductRepository productRepository;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    @Autowired
-    private EntityManager entityManager;
+    ProductServiceTest(ProductService productService,
+                       PlatformTransactionManager transactionManager,
+                       EntityManager entityManager) {
+        this.productService = productService;
+        this.transactionManager = transactionManager;
+        this.entityManager = entityManager;
+    }
 
     @Test
     @DisplayName("Test de 2 threads concurrentes: solo 1 triunfa `reserveStock()` maneja `OptimisticLockException`")
@@ -102,7 +112,6 @@ class ProductServiceTest {
         }
     }
 
-    
     @Test
     @DisplayName("Test Consulta de productos en transacción de solo lectura")
     void searchProductsRunsInReadOnlyTransaction() {
@@ -190,6 +199,32 @@ class ProductServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("Bonus: Búsqueda dinámica con Specification a través del servicio")
+    void searchProductsWithPriceFiltersViaService() {
+        Page<Product> page = productService.searchProducts(
+                "Monitor",
+                new BigDecimal("180.00"),
+                new BigDecimal("200.00"),
+                PageRequest.of(0, 5)
+        );
 
+        assertNotNull(page);
+        assertTrue(page.getTotalElements() > 0);
+        assertTrue(page.getContent().size() <= 5);
+        assertTrue(page.getContent().stream()
+                .allMatch(p -> p.getPrice().compareTo(new BigDecimal("180.00")) >= 0
+                        && p.getPrice().compareTo(new BigDecimal("200.00")) <= 0
+                        && p.getName().toLowerCase().contains("monitor")));
+    }
+
+    @Test
+    @DisplayName("Validación Fail-Fast: Rechaza cantidades inválidas con excepciones concretas")
+    void validationFailFastRejectsInvalidInputs() {
+        assertThrows(IllegalArgumentException.class, () -> productService.reserveStock(1L, 0));
+        assertThrows(IllegalArgumentException.class, () -> productService.reserveStock(1L, -5));
+        assertThrows(IllegalArgumentException.class, () -> productService.increaseStock(1L, 0));
+        assertThrows(IllegalArgumentException.class, () -> productService.increaseStock(1L, -5));
+    }
 
 }
