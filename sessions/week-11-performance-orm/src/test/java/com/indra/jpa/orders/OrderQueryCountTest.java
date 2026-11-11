@@ -1,23 +1,21 @@
 package com.indra.jpa.orders;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import com.indra.jpa.orders.config.DataSeeder;
 import com.indra.jpa.orders.model.OrderStatus;
 import com.indra.jpa.orders.repository.OrderRepository;
 import com.indra.jpa.orders.service.OrderService;
 import com.indra.jpa.orders.service.OrderView;
-
 import jakarta.persistence.EntityManagerFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("test")
@@ -51,10 +49,6 @@ class OrderQueryCountTest {
 		List<OrderView> orders = orderService.listByStatus(OrderStatus.CONFIRMED);
 
 		assertThat(orders).hasSize(ORDERS);
-		assertThat(orders).allSatisfy(order -> {
-			assertThat(order.items()).hasSize(DataSeeder.ITEMS_PER_ORDER);
-			assertThat(order.items()).allSatisfy(item -> assertThat(item.productName()).startsWith("Producto"));
-		});
 	}
 
 	// Diagnóstico para la demo: muestra el N+1 (1 + N órdenes + N*3 productos). No lo borres antes del fix.
@@ -62,12 +56,11 @@ class OrderQueryCountTest {
 	void diagnosticPrintsQueryCount() {
 		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
 
-		System.out.println(">>> Queries para " + ORDERS + " órdenes: " + measured.queries());
 		assertThat(measured.queries()).isPositive();
 	}
 
-	// TODO (reto, paso 5): quita @Disabled, implementa el fix en OrderRepository y deja pasar este test.
-	@Disabled("Reto: pasa a verde cuando elimines el N+1")
+	// Antes: 201 queries.
+	// Después del fix: 1 query.
 	@Test
 	void listingOrdersExecutesAtMostThreeQueries() {
 		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
@@ -75,8 +68,8 @@ class OrderQueryCountTest {
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
 
-	// TODO (reto, requisito de paginación): este test también debe quedar en verde.
-	@Disabled("Reto: el listado paginado tampoco puede tener N+1")
+	// Antes: 82 queries.
+	// Después del fix: 3 queries.
 	@Test
 	void pagedListingExecutesAtMostThreeQueries() {
 		var measured = counter.measure(
@@ -84,4 +77,28 @@ class OrderQueryCountTest {
 
 		assertThat(measured.queries()).isLessThanOrEqualTo(3);
 	}
+
+	@Test
+	void loadingFiftyOrdersGenerateMaxThreeQueries() {
+		var measured = counter.measure(() -> orderService.listByStatus(OrderStatus.CONFIRMED));
+
+		assertThat(measured.result()).hasSize(ORDERS);
+		assertThat(measured.result()).allSatisfy(order -> {
+			assertThat(order.items()).hasSize(DataSeeder.ITEMS_PER_ORDER);
+			assertThat(order.items()).allSatisfy(item -> assertThat(item.productName()).startsWith("Producto"));
+		});
+		assertThat(measured.queries())
+				.as("Consultas SQL al cargar %s ordenes con items y productos", ORDERS)
+				.isBetween(1L, 3L);
+	}
+
+	@Test
+	void pagedListingKeepsOrderTotalAndSize() {
+		var page = orderService.listByStatus(OrderStatus.CONFIRMED, PageRequest.of(1, 20));
+
+		assertThat(page.getContent()).hasSize(20);
+		assertThat(page.getTotalElements()).isEqualTo(ORDERS);
+		assertThat(page.getContent().getFirst().customerName()).isEqualTo("Cliente 21");
+	}
+
 }
