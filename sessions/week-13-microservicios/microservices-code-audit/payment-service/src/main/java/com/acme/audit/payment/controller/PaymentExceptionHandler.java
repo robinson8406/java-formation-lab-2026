@@ -2,11 +2,18 @@ package com.acme.audit.payment.controller;
 
 import java.time.Instant;
 import java.util.Map;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.ResourceAccessException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
+import com.acme.audit.payment.infrastructure.client.ProviderCommunicationException;
 import com.acme.audit.payment.usecases.PaymentApplicationServiceUseCase;
+
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 
 @RestControllerAdvice
 public class PaymentExceptionHandler {
@@ -34,5 +41,24 @@ public class PaymentExceptionHandler {
                 "status", 503,
                 "code", "PAYMENT_PROVIDER_UNAVAILABLE",
                 "message", "Payment provider did not respond within the configured time"));
+    }
+
+    @ExceptionHandler(ProviderCommunicationException.class)
+    ResponseEntity<Map<String, Object>> providerResultUnknown(
+            ProviderCommunicationException exception) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", 503,
+                "code", "PAYMENT_PROVIDER_RESULT_UNKNOWN",
+                "message", "Payment provider result is unknown; retry with the same Idempotency-Key"));
+    }
+
+    @ExceptionHandler(CallNotPermittedException.class)
+    ResponseEntity<Map<String, Object>> providerCircuitOpen(CallNotPermittedException exception) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", 503,
+                "code", "PAYMENT_PROVIDER_CIRCUIT_OPEN",
+                "message", "Payment provider is temporarily unavailable"));
     }
 }

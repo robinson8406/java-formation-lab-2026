@@ -21,20 +21,6 @@ clients:
   payment:
     base-url: http://localhost:8082
     connect-timeout: 200ms
-    read-timeout: 100ms
+    read-timeout: 600ms
 logging:
   config: classpath:log4j2-spring.xml
-
-
-resilience4j:
-  retry:
-    instances:
-      general:
-        max-attempts: 3
-        wait-duration: 100ms
-        retry-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - com.acme.audit.order.infrastructure.client.PaymentCommunicationException
-        ignore-exceptions:
-          - org.springframework.web.client.HttpClientErrorException
-          - org.springframework.web.client.HttpServerErrorException

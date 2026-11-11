@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 
 class ProviderRetryEventLoggerTest {
 
@@ -68,7 +69,10 @@ class ProviderRetryEventLoggerTest {
     @Test
     void shouldRegisterRetryEventListeners() {
         ProviderRetryEventLogger eventLogger =
-                createEventLogger(createRetryRegistry());
+                createEventLogger(
+                        createRetryRegistry(),
+                        CircuitBreakerRegistry.ofDefaults()
+                );
 
         eventLogger.registerRetryEventListeners();
 
@@ -147,17 +151,70 @@ class ProviderRetryEventLoggerTest {
                 .noneMatch(message -> message.contains("event=RETRY_EXHAUSTED"));
     }
 
+    @Test
+    void shouldLogRetryExhausted() {
+        Retry retry = createRegisteredRetry();
+
+        assertThatThrownBy(() -> retry.executeSupplier(() -> {
+            throw new IllegalStateException("Provider unavailable");
+        }))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Provider unavailable");
+
+        assertThat(appender.messages())
+                .anySatisfy(message -> assertThat(message)
+                        .contains(
+                                "event=RETRY_EXHAUSTED",
+                                "instance=" + RETRY_INSTANCE,
+                                "retriesPerformed=2",
+                                "totalAttempts=3",
+                                "cause=IllegalStateException"
+                        ));
+    }
+
+    @Test
+    void shouldLogCircuitBreakerOpenAndRejectedCall() {
+        var circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
+        var circuitBreaker = circuitBreakerRegistry.circuitBreaker(RETRY_INSTANCE);
+        ProviderRetryEventLogger eventLogger =
+                createEventLogger(createRetryRegistry(), circuitBreakerRegistry);
+
+        eventLogger.registerRetryEventListeners();
+        circuitBreaker.transitionToOpenState();
+        assertThatThrownBy(circuitBreaker::acquirePermission)
+                .isInstanceOf(io.github.resilience4j.circuitbreaker.CallNotPermittedException.class);
+
+        assertThat(appender.messages())
+                .anySatisfy(message -> assertThat(message)
+                        .contains(
+                                "event=STATE_TRANSITION",
+                                "instance=" + RETRY_INSTANCE,
+                                "to=OPEN"
+                        ))
+                .anySatisfy(message -> assertThat(message)
+                        .contains(
+                                "event=CALL_NOT_PERMITTED",
+                                "instance=" + RETRY_INSTANCE
+                        ));
+    }
+
     private Retry createRegisteredRetry() {
         RetryRegistry registry = createRetryRegistry();
 
-        ProviderRetryEventLogger eventLogger = createEventLogger(registry);
+        ProviderRetryEventLogger eventLogger =
+                createEventLogger(registry, CircuitBreakerRegistry.ofDefaults());
         eventLogger.registerRetryEventListeners();
 
         return registry.retry(RETRY_INSTANCE);
     }
 
-    private ProviderRetryEventLogger createEventLogger(RetryRegistry registry) {
-        return new ProviderRetryEventLogger(registry);
+    private ProviderRetryEventLogger createEventLogger(
+            RetryRegistry retryRegistry,
+            CircuitBreakerRegistry circuitBreakerRegistry) {
+        return new ProviderRetryEventLogger(
+                retryRegistry,
+                circuitBreakerRegistry
+        );
     }
 
     private RetryRegistry createRetryRegistry() {

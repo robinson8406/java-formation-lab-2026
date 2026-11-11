@@ -16,8 +16,6 @@ import org.springframework.web.client.RestClientException;
 
 import com.acme.audit.order.application.port.out.PaymentGateway;
 
-import io.github.resilience4j.retry.annotation.Retry;
-
 @Component
 public class PaymentHttpClient implements PaymentGateway {
 
@@ -35,7 +33,6 @@ public class PaymentHttpClient implements PaymentGateway {
     }
 
     @Override
-    @Retry(name = "general")
     public PaymentOutcome charge(
             String key,
             String orderId,
