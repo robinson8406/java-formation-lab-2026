@@ -30,7 +30,7 @@ steps:
   - task: Maven@4
     displayName: 'Build & Test — week-13-microservicios'
     inputs:
-      mavenPomFile: 'sessions/week-13-microservicios/pom.xml'
+      mavenPomFile: 'sessions/week-13-microservicios/microservices-code-audit/pom.xml'
       goals: 'verify'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '21'
