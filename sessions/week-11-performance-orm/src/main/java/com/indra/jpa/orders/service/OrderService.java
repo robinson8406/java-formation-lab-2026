@@ -30,6 +30,11 @@ public class OrderService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<OrderView> listByStatusWithGraph(OrderStatus status) {
+		return orderRepository.findWithGraphByStatus(status).stream().map(OrderView::from).toList();
+	}
+
+	@Transactional(readOnly = true)
 	public Page<OrderView> listByStatus(OrderStatus status, Pageable pageable) {
 		Page<Long> ids = orderRepository.findIdsByStatus(status, pageable);
 
@@ -42,4 +47,5 @@ public class OrderService {
 
 		return ids.map(id -> OrderView.from(byId.get(id)));
 	}
+
 }

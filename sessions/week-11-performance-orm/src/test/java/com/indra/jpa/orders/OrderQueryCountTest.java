@@ -101,4 +101,11 @@ class OrderQueryCountTest {
 		assertThat(page.getContent().getFirst().customerName()).isEqualTo("Cliente 21");
 	}
 
+	@Test
+	void entityGraphExecutesAtMostThreeQueries() {
+		var measured = counter.measure(() -> orderService.listByStatusWithGraph(OrderStatus.CONFIRMED));
+
+		assertThat(measured.queries()).isLessThanOrEqualTo(3);
+	}
+
 }
