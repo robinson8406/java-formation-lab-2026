@@ -29,6 +29,18 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(50));
     }
 
+    @Test
+    @DisplayName("Busqueda de productos filtra por precio minimo y maximo")
+    void searchFiltersByPriceRange() throws Exception {
+        mockMvc.perform(get("/products")
+                .param("minPrice", "100")
+                .param("maxPrice", "200")
+                .param("size", "50"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].price",
+                        everyItem(allOf(greaterThanOrEqualTo(100.0), lessThanOrEqualTo(200.0)))));
+    }
+
 
 
 }

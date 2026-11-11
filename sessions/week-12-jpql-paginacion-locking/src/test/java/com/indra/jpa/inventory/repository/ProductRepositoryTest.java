@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -68,5 +69,18 @@ class ProductRepositoryTest {
         assertEquals(5, products.getContent().size());
         assertTrue(products.getTotalElements() > 5);
         assertEquals(List.of(5, 5), timeouts);
+    }
+
+    @Test
+    @DisplayName("Busqueda paginada aplica los filtros opcionales de precio")
+    void searchProductsFiltersByPriceRange() {
+        Page<Product> products = productRepository.searchProducts(
+                null, new BigDecimal("100.00"), new BigDecimal("200.00"), PageRequest.of(0, 50));
+
+        assertFalse(products.isEmpty());
+        assertTrue(products.getContent().stream().allMatch(product ->
+                product.getPrice().compareTo(new BigDecimal("100.00")) >= 0
+                        && product.getPrice().compareTo(new BigDecimal("200.00")) <= 0));
+        assertEquals(products.getTotalElements(), products.getContent().size());
     }
 }
