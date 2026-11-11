@@ -1,11 +1,10 @@
 package com.indra.jpa.orders;
 
-import java.util.function.Supplier;
-
+import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
 
-import jakarta.persistence.EntityManagerFactory;
+import java.util.function.Supplier;
 
 /** Cuenta las sentencias SQL preparadas por Hibernate durante la ejecución de un bloque. */
 public final class QueryCounter {
