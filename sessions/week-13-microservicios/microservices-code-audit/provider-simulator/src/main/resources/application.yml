@@ -1,0 +1,13 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: payment-provider-simulator
+provider:
+  simulation:
+    # The provider commits the charge, then delays its HTTP response beyond Payment Service's read timeout.
+    response-delay-ms: 500
+logging:
+  config: classpath:log4j2-spring.xml
+  level:
+    com.acme.audit.provider: INFO
