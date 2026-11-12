@@ -1,13 +1,10 @@
 package com.indra.jpa.inventory.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-
+import com.indra.jpa.inventory.model.Product;
+import com.indra.jpa.inventory.repository.ProductRepository;
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,11 +12,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.indra.jpa.inventory.model.Product;
-import com.indra.jpa.inventory.repository.ProductRepository;
-
-import jakarta.persistence.OptimisticLockException;
-import jakarta.persistence.criteria.Predicate;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @Transactional

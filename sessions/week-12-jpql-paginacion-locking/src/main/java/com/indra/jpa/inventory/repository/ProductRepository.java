@@ -1,7 +1,6 @@
 package com.indra.jpa.inventory.repository;
 
-import java.util.Optional;
-
+import com.indra.jpa.inventory.model.Product;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
@@ -11,7 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
-import com.indra.jpa.inventory.model.Product;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
