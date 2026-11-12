@@ -1,6 +1,7 @@
 package com.indra.jpa.inventory.service;
 
 import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,25 +24,40 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    @Transactional(readOnly = true)
     public Page<Product> searchProducts(String name, Pageable pageable) {
         return productRepository.searchProducts(name, pageable);
     }
 
-    public Product increaseStock(Long productId, int quantity) {
+    public Product increaseStock(Long productId, Integer quantity) {
 
-        Product product = productRepository.findByIdForUpdate(productId).get();
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser positiva");
+        }
+
+        Product product = productRepository.findByIdForUpdate(productId)
+                .orElseThrow(() -> new NoSuchElementException("Producto no encontrado: " + productId));
         product.setStock(Math.addExact(product.getStock(), quantity));
         return productRepository.save(product);
     }
 
-    public void reserveStock(Long productId, int quantity) {
+    public void reserveStock(Long productId, Integer quantity) {
 
-        Product product = productRepository.findById(productId).get();
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser positiva");
+        }
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NoSuchElementException("Producto no encontrado: " + productId));
+
+        if (product.getStock() < quantity) {
+            throw new IllegalArgumentException("Stock insuficiente");
+        }
 
         product.setStock(product.getStock() - quantity);
 
         try {
-            productRepository.save(product);
+            productRepository.saveAndFlush(product);
         } catch (OptimisticLockException | ObjectOptimisticLockingFailureException exception) {
             throw new ConcurrentModificationException("Stock modificado concurrentemente, reintenta", exception);
         }

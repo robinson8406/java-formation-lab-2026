@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,8 +31,8 @@ public class Product {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private int stock;
+    private Integer stock;
 
-    @Column
+    @Version
     private Long version;
 }

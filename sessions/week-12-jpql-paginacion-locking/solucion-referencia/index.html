@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#061522">
+  <meta name="description" content="Solución explicada de Week 12: JPQL, paginación, transacciones y locking con evidencia del código y sus pruebas.">
+  <title>Week 12 · JPQL, paginación y locking</title>
+  <style>
+    :root{--night:#061522;--deep:#020b12;--paper:#edf2f4;--white:#fff;--cyan:#25bee8;--ink:#152e3b;--muted:#a5bac6;--line:#29404e;--green:#73dbc0;--amber:#f4c578;--sidebar:244px;--mono:Consolas,'Liberation Mono',monospace}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:32px}body{margin:0;background:var(--night);color:var(--paper);font:17px/1.6 'Gill Sans','Gill Sans MT','Trebuchet MS',sans-serif;letter-spacing:0}a{color:inherit;text-underline-offset:4px}button{font:inherit}button,a{-webkit-tap-highlight-color:transparent}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--cyan);outline-offset:5px}::selection{background:var(--cyan);color:var(--deep)}.skip{position:fixed;top:-100px;left:20px;z-index:20;background:var(--paper);color:var(--ink);padding:10px 20px}.skip:focus{top:12px}.reading-progress{position:fixed;top:0;left:0;width:100%;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left;z-index:30}
+    .sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar);padding:35px 25px 24px;background:var(--deep);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:10}.brand{font-size:23px;font-weight:700;line-height:1.15;letter-spacing:0}.brand small{display:block;color:var(--cyan);font-size:11px;font-weight:400;margin-top:8px;letter-spacing:2px}.chapter{margin-top:42px;font:12px var(--mono);color:var(--muted)}.sidebar nav{margin-top:16px}.sidebar ol{list-style:none;padding:0;margin:0}.sidebar li{height:51px;display:flex;align-items:center}.sidebar nav a{position:relative;display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--muted);font-size:14px;min-height:44px;width:100%;transform-origin:left center;transition:transform .25s,color .25s}.sidebar nav a span{font:10px var(--mono);opacity:.65}.sidebar nav a[aria-current="location"]{transform:scale(1.13);color:var(--white);font-weight:700}.sidebar nav a[aria-current="location"] span{color:var(--cyan);opacity:1}.sidebar nav a:hover{color:var(--cyan)}.sidebar nav a::after{content:'';position:absolute;left:-25px;top:10px;bottom:10px;width:3px;background:var(--cyan);transform:scaleY(0);transition:transform .25s}.sidebar nav a[aria-current="location"]::after{transform:scaleY(1)}.side-footer{margin-top:auto;border-top:1px solid var(--line);padding-top:18px;font-size:12px;color:var(--muted)}.side-footer strong{color:var(--cyan);font:23px var(--mono)}.mobile-index{display:none}
+    main{margin-left:var(--sidebar);overflow:hidden}.section{position:relative;padding:80px 7%;scroll-margin-top:0}.inner{max-width:1070px;margin:auto}.eyebrow{font:11px var(--mono);text-transform:uppercase;letter-spacing:2px;color:var(--cyan);margin:0 0 16px}.hero{padding:0;background:var(--deep)}.reference{margin:0;overflow:hidden;background:var(--deep);position:relative}.reference img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;will-change:transform}.intro{position:relative;padding:35px 7% 50px;background:var(--night);border-bottom:1px solid var(--line)}.intro .inner{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:end}h1{font-size:38px;line-height:1.15;margin:0;font-weight:500;max-width:650px}h1 span{color:var(--cyan)}.intro p:last-child{margin:0;color:var(--muted);font-size:16px}.meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:22px;color:var(--muted);font:11px var(--mono)}.meta b{color:var(--cyan);font-weight:400}.section-head{display:grid;grid-template-columns:60px 1fr;gap:18px;margin-bottom:32px}.section-number{font:36px/1.2 var(--mono);color:var(--cyan);opacity:.8}h2{font-size:32px;line-height:1.2;font-weight:500;margin:0 0 12px}h3{font-size:19px;line-height:1.35;font-weight:600;margin:0 0 12px}.lead{max-width:700px;color:var(--muted);margin:0;font-size:18px}.paper{background:var(--paper);color:var(--ink)}.paper .lead,.paper .explain p,.paper .small{color:#49616d}.paper .eyebrow,.paper .section-number{color:#007b9e}.paper a{color:#006784}.split{display:grid;grid-template-columns:.8fr 1.2fr;gap:34px;align-items:start}.explain p{margin:0 0 23px;color:#c1d0d8}.label{display:block;font:10px var(--mono);text-transform:uppercase;letter-spacing:1.6px;color:var(--cyan);margin-bottom:7px}.paper .label{color:#00718d}.code{margin:0;background:var(--deep);border:1px solid var(--line);border-radius:4px;overflow:hidden;min-width:0;color:#d9e8ed}.code figcaption{padding:10px 16px;font:11px var(--mono);border-bottom:1px solid var(--line);color:#9db6c4;display:flex;justify-content:space-between;gap:12px}.code figcaption a{color:var(--cyan);text-decoration:none}.code pre{margin:0;padding:20px;overflow:auto;tab-size:4;font:13px/1.8 var(--mono);max-width:100%}.code code{font:inherit}.annotation{color:#64d5ef}.keyword{color:#8edcc8}.literal{color:#f4cd96}.evidence{margin-top:28px;border-top:1px solid var(--line);padding-top:18px;display:flex;gap:16px;align-items:baseline;font-size:14px;color:var(--muted)}.paper .evidence{border-color:#c5d3d9;color:#49616d}.evidence b{font:10px var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--cyan);flex-shrink:0}.paper .evidence b{color:#00718d}.evidence code{overflow-wrap:anywhere;font-size:12px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);margin:30px 0 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.metric{padding:22px 15px 22px 0}.metric+.metric{padding-left:22px;border-left:1px solid var(--line)}.metric strong{display:block;font:32px/1.2 var(--mono);color:var(--cyan)}.metric span{display:block;font-size:13px;color:var(--muted);margin-top:8px}.note{border-left:3px solid var(--cyan);padding:0 0 0 18px;font-size:14px;margin:24px 0 0;color:var(--muted)}.paper .note{color:#49616d}.ribbon{position:relative;height:160px;background:var(--deep);overflow:hidden;display:flex;align-items:center;padding:0 7%;border-block:1px solid var(--line)}.ribbon::before{content:'';position:absolute;inset:-80px 0;background-image:linear-gradient(#25bee810 1px,transparent 1px),linear-gradient(90deg,#25bee810 1px,transparent 1px);background-size:35px 35px;transform:perspective(400px) rotateX(30deg);pointer-events:none}.ribbon p{position:relative;margin:0;font:20px/1.6 var(--mono);color:#a7c2d0}.ribbon em{font-style:normal;color:var(--cyan)}
+    .flow{margin-top:30px;border-top:1px solid var(--line);padding-top:24px}.flow-head{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:18px}.flow-head h3{margin:0}.replay{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:7px 12px;background:transparent;color:var(--cyan);border:1px solid var(--line);border-radius:4px;cursor:pointer;font-size:13px}.replay svg{width:15px;height:15px}.replay:hover{background:#25bee812}.lanes{display:grid;gap:10px}.lane{display:grid;grid-template-columns:90px repeat(3,minmax(0,1fr));gap:10px;align-items:center;font:12px/1.5 var(--mono)}.lane>strong{font-weight:400;color:var(--muted)}.event{border-bottom:2px solid var(--line);padding:12px 8px;min-height:66px;background:#ffffff04}.event.good{border-color:var(--green);color:var(--green)}.event.conflict{border-color:var(--amber);color:var(--amber)}.flow.running .event{animation:step-in 2.4s both}.flow.running .event:nth-child(3){animation-delay:.45s}.flow.running .event:nth-child(4){animation-delay:.9s}@keyframes step-in{0%{opacity:.15;transform:translateY(8px)}40%,100%{opacity:1;transform:translateY(0)}}.flow-caption{font-size:12px;color:var(--muted);margin:14px 0 0}.table-wrap{overflow:auto;max-width:100%;border-block:1px solid #c5d3d9}table{width:100%;border-collapse:collapse;font-size:15px;text-align:left}th,td{padding:17px 18px;vertical-align:top;border-bottom:1px solid #c5d3d9;min-width:160px}tr:last-child td,tr:last-child th{border-bottom:0}thead th{font-weight:600;background:#dde8ed;color:var(--ink)}tbody th{font-size:13px;font-weight:600;min-width:115px}td code{font:12px var(--mono);overflow-wrap:anywhere}.nosql{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 36px}.nosql article{padding:25px 0;border-top:1px solid var(--line)}.nosql article p{color:var(--muted);font-size:15px;margin:0}.nosql article h3{color:var(--cyan);font-weight:400;font-size:24px}.nosql code{font:12px var(--mono);color:var(--paper)}.checklist{list-style:none;margin:0;padding:0}.checklist li{display:grid;grid-template-columns:110px 1fr;gap:18px;padding:18px 0;border-top:1px solid #c5d3d9;font-size:15px}.status{font:10px var(--mono);text-transform:uppercase;padding-top:5px;color:#006b64}.status.pending{color:#795c16}.checklist p{margin:5px 0 0;color:#49616d;font-size:13px}.source-list{display:flex;gap:12px 24px;flex-wrap:wrap;margin-top:30px;font-size:13px}.page-footer{padding:30px 7%;display:flex;justify-content:space-between;gap:20px;color:var(--muted);font:11px var(--mono);border-top:1px solid var(--line)}.page-footer a{color:var(--cyan)}.reveal{opacity:1}.motion-ready .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}.motion-ready .reveal.visible{opacity:1;transform:none}
+    .reference img{max-height:480px}
+    .sidebar{overflow-y:auto}.sidebar nav,.side-footer{flex-shrink:0}
+    @media(min-width:1600px){:root{--sidebar:270px}.section{padding-block:95px}.reference{max-height:520px}.reference img{max-height:520px}}
+    @media(max-width:1100px){:root{--sidebar:205px}.sidebar{padding-inline:19px}.sidebar nav a::after{left:-19px}.sidebar nav a{font-size:13px}.section{padding:60px 6%}.split{grid-template-columns:1fr;gap:20px}.intro .inner{grid-template-columns:1fr;gap:18px}h1{font-size:34px}.intro p:last-child{max-width:650px}.section-head{grid-template-columns:45px 1fr}.section-number{font-size:29px}}
+    @media(max-width:760px){html{scroll-padding-top:76px}.sidebar{display:none}.mobile-index{display:block;position:sticky;top:0;z-index:15;background:var(--deep);border-bottom:1px solid var(--line);padding:0 20px}.mobile-index summary{min-height:57px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:14px;list-style:none}.mobile-index summary::-webkit-details-marker{display:none}.mobile-index summary::after{content:'+';font:22px var(--mono);color:var(--cyan)}.mobile-index[open] summary::after{content:'−'}.mobile-index nav{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;padding-bottom:14px}.mobile-index a{padding:10px 0;font-size:13px;text-decoration:none;color:var(--muted)}.mobile-index a[aria-current="location"]{color:var(--cyan);font-weight:700}main{margin-left:0}.section{padding:48px 22px;scroll-margin-top:57px}.intro{padding:28px 22px 36px}h1{font-size:29px}h2{font-size:26px}.lead{font-size:16px}.section-head{grid-template-columns:32px 1fr;gap:12px}.section-number{font-size:23px}.code pre{padding:15px;font-size:11px}.code figcaption{font-size:10px;flex-wrap:wrap;padding:10px 14px}.metrics{grid-template-columns:1fr}.metric{padding:16px 0}.metric+.metric{padding:16px 0;border-left:0;border-top:1px solid var(--line)}.metric strong{font-size:27px}.lane{grid-template-columns:58px repeat(3,minmax(0,1fr));gap:5px;font-size:9px}.event{padding:10px 5px;min-height:76px;overflow-wrap:anywhere}.flow-head{align-items:flex-start}.flow-head h3{font-size:16px}.replay{font-size:12px;padding:6px 9px;white-space:nowrap}.evidence{display:block}.evidence b{display:block;margin-bottom:8px}.ribbon{height:130px;padding-inline:22px}.ribbon p{font-size:14px}.nosql{grid-template-columns:1fr}.checklist li{grid-template-columns:80px 1fr;gap:12px}.page-footer{padding:24px 22px;flex-direction:column}.reference img{will-change:auto}.meta{gap:12px}.table-wrap th,.table-wrap td{padding:13px;min-width:155px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.motion-ready .reveal{opacity:1;transform:none}.reference img{transform:none!important}}
+    @media print{.sidebar,.mobile-index,.reading-progress,.replay{display:none}main{margin:0}.section{break-inside:avoid;padding:25px}.reference{max-height:250px}.reference img{max-height:250px}.motion-ready .reveal{opacity:1;transform:none}.code pre{white-space:pre-wrap}.table-wrap{overflow:visible}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <aside class="sidebar" aria-label="Navegación de la sesión">
+    <div class="brand">Comunidad Java<small>INDRA · COLOMBIA 2026</small></div>
+    <div class="chapter">WEEK 12 / SOLUCIÓN</div>
+    <nav aria-label="Índice"><ol>
+      <li><a href="#inicio" aria-current="location"><span>00</span>El punto de partida</a></li>
+      <li><a href="#paginacion"><span>01</span>JPQL y paginación</a></li>
+      <li><a href="#lectura"><span>02</span>Solo lectura</a></li>
+      <li><a href="#timeouts"><span>03</span>Los tiempos importan</a></li>
+      <li><a href="#optimista"><span>04</span>Locking optimista</a></li>
+      <li><a href="#pesimista"><span>05</span>Locking pesimista</a></li>
+      <li><a href="#comparativa"><span>06</span>Elegir la estrategia</a></li>
+      <li><a href="#nosql"><span>07</span>Más allá de JPA</a></li>
+      <li><a href="#eventos"><span>08</span>Eventos y colas</a></li>
+      <li><a href="#extras"><span>09</span>Extras y defensas</a></li>
+      <li><a href="#evidencia"><span>10</span>Evidencia y cierre</a></li>
+    </ol></nav>
+    <div class="side-footer"><strong id="reading-percent">0%</strong><br>Hibernate / JPA<br>Una solución, decisiones explícitas.</div>
+  </aside>
+  <details class="mobile-index"><summary>Week 12 · <span id="mobile-title">Inicio</span></summary><nav aria-label="Índice móvil">
+    <a href="#inicio">00 · Inicio</a><a href="#paginacion">01 · Paginación</a><a href="#lectura">02 · Solo lectura</a><a href="#timeouts">03 · Timeouts</a><a href="#optimista">04 · Optimista</a><a href="#pesimista">05 · Pesimista</a><a href="#comparativa">06 · Comparativa</a><a href="#nosql">07 · NoSQL</a><a href="#eventos">08 · Eventos y colas</a><a href="#extras">09 · Extras</a><a href="#evidencia">10 · Evidencia</a>
+  </nav></details>
+  <main id="contenido">
+    <section id="inicio" class="hero" aria-labelledby="page-title">
+      <figure class="reference"><img id="reference-image" src="refcolors.jpg" width="1280" height="720" alt="Portada de Comunidad Java, Semana 12: Hibernate/JPA, JPQL, paginación y locking. Ponente Hernán Darío Cárdenas García. Material de referencia de la sesión."></figure>
+      <header class="intro"><div class="inner"><div><p class="eyebrow">Del criterio a la evidencia</p><h1 id="page-title">Consultar mejor.<br><span>Proteger cada cambio.</span></h1><div class="meta"><span><b>01</b> CONSULTAS</span><span><b>02</b> TRANSACCIONES</span><span><b>03</b> CONCURRENCIA</span></div></div><p>La solución de la semana 12, explicada a partir del inventario: consultas paginadas, lectura eficiente y dos formas de resolver la competencia por el mismo stock.</p></div></header>
+    </section>
+    <section id="paginacion" class="section paper" aria-labelledby="title-pagination"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">01</span><div><p class="eyebrow">Traer lo necesario</p><h2 id="title-pagination">Una página, no todo el inventario.</h2><p class="lead">El filtro vive en JPQL. El tamaño y la posición llegan mediante <code>Pageable</code>.</p></div></div>
+      <div class="split"><div class="explain"><p><span class="label">Qué se pide</span>Filtrar por nombre de forma opcional, conservar el total y no paginar una lista cargada completamente en memoria.</p><p><span class="label">Cómo se resolvió</span><code>name == null</code> desactiva el filtro. <code>LOWER</code> permite comparar sin distinguir mayúsculas. Spring Data aplica la paginación y obtiene el total para construir <code>Page&lt;Product&gt;</code>.</p><p>El controlador propone 10 elementos por página; el repositorio recibe el <code>Pageable</code> sin convertir los resultados a una lista completa.</p></div>
+      <figure class="code"><figcaption><span>ProductRepository.java · búsqueda</span><a href="../src/main/java/com/indra/jpa/inventory/repository/ProductRepository.java">Fuente ↗</a></figcaption><pre><code><span class="annotation">@Query</span>(<span class="literal">"SELECT p FROM Product p WHERE "</span>
+    + <span class="literal">"(:name IS NULL OR LOWER(p.name) LIKE "</span>
+    + <span class="literal">"LOWER(CONCAT('%', :name, '%')))"</span>)
+Page&lt;Product&gt; searchProducts(
+    <span class="annotation">@Param</span>(<span class="literal">"name"</span>) String name, Pageable pageable);</code></pre></figure></div>
+      <figure class="code" style="margin-top:24px"><figcaption><span>ProductController.java · tamaño predeterminado</span><a href="../src/main/java/com/indra/jpa/inventory/controller/ProductController.java">Fuente ↗</a></figcaption><pre><code><span class="annotation">@GetMapping</span>
+    <span class="keyword">public</span> Page&lt;Product&gt; search(
+        <span class="annotation">@RequestParam</span>(required = <span class="keyword">false</span>) <span class="annotation">@Size</span>(max = 200) String name,
+        <span class="annotation">@PageableDefault</span>(size = 10) Pageable pageable) {
+        <span class="keyword">return</span> productService.searchProducts(name, pageable);
+    }</code></pre></figure>
+      <p class="note"><strong>Por qué pasa la JUnit:</strong> <code>searchWithoutNameReturnsPaginatedProductsAndTotal</code> llama a <code>GET /products</code> sin parámetros de paginación. <code>@PageableDefault(size = 10)</code> establece el tamaño esperado por <code>hasSize(10)</code>. Los 50 registros de la base de datos semilla explican <code>totalElements == 50</code>: el total no se reduce al tamaño de la página. El tamaño predeterminado no es un máximo; un parámetro <code>size</code> explícito puede sustituirlo dentro del límite configurado por Spring.</p>
+      <figure class="code" style="margin-top:20px"><figcaption><span>ProductControllerTest.java · consulta real a la base de datos</span><a href="../src/test/java/com/indra/jpa/inventory/controller/ProductControllerTest.java">Fuente ↗</a></figcaption><pre><code>mockMvc.perform(get(<span class="literal">"/products"</span>))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath(<span class="literal">"$.content"</span>, hasSize(10)))
+        .andExpect(jsonPath(<span class="literal">"$.totalElements"</span>).value(50));</code></pre></figure>
+      <div class="evidence"><b>Prueba</b><div><code>searchProductsAppliesQueryTimeout</code>: con una página explícita de 5, comprueba <code>content.size() == 5</code> y <code>totalElements &gt; 5</code>. Es independiente del tamaño predeterminado del controlador.</div></div>
+    </div></section>
+    <section id="lectura" class="section" aria-labelledby="title-read"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">02</span><div><p class="eyebrow">Una intención transaccional</p><h2 id="title-read">Leer también es una decisión.</h2><p class="lead">La búsqueda no cambia el dominio: su transacción debe reflejarlo.</p></div></div>
+      <div class="split"><div class="explain"><p><span class="label">Qué se pide</span>Una transacción activa de solo lectura y una sesión Hibernate configurada del mismo modo.</p><p><span class="label">Cómo se resolvió</span>La anotación del método especializa la configuración transaccional de la clase. La consulta se ejecuta dentro del proxy de Spring.</p><p>Es una indicación de optimización; no reemplaza permisos de base de datos ni es una barrera universal contra escrituras.</p></div><figure class="code"><figcaption><span>ProductService.java · searchProducts</span><a href="../src/main/java/com/indra/jpa/inventory/service/ProductService.java">Fuente ↗</a></figcaption><pre><code><span class="annotation">@Transactional</span>(readOnly = <span class="keyword">true</span>)
+<span class="keyword">public</span> Page&lt;Product&gt; searchProducts(
+        String name, Pageable pageable) {
+    <span class="keyword">return</span> productRepository.searchProducts(
+        name, pageable);
+}</code></pre></figure></div>
+      <div class="evidence"><b>Prueba</b><div><code>searchProductsRunsInReadOnlyTransaction</code> captura el estado durante la consulta, no después de salir de ella.</div></div>
+      <figure class="code" style="margin-top:20px"><figcaption><span>ProductServiceTest.java · tres comprobaciones</span></figcaption><pre><code>assertAll(
+    () -&gt; assertTrue(transactionActive.get()),
+    () -&gt; assertTrue(transactionReadOnly.get()),
+    () -&gt; assertTrue(sessionReadOnly.get()));</code></pre></figure>
+    </div></section>
+    <section id="timeouts" class="section" aria-labelledby="title-time"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">03</span><div><p class="eyebrow">El tiempo tiene contexto</p><h2 id="title-time">Tres esperas. No son lo mismo.</h2><p class="lead">Un timeout de consulta no define por sí solo cuánto espera una transacción por un bloqueo.</p></div></div>
+      <div class="metrics"><div class="metric"><strong>3.000 ms</strong><span>Timeout general configurado en H2 y JPA.</span></div><div class="metric"><strong>5.000 ms</strong><span>Hint específico de búsqueda, incluido el count.</span></div><div class="metric"><strong>5 s</strong><span>Esperas de coordinación en el test de concurrencia.</span></div></div>
+      <div class="split" style="margin-top:30px"><div class="explain"><p><span class="label">Qué se pide</span>Identificar el timeout general y aplicar uno particular a <code>searchProducts()</code>.</p><p><span class="label">Cómo se resolvió</span>El hint de 5.000 ms especializa el valor general de 3.000 ms. <code>forCounting = true</code> lo propaga también a la consulta de conteo.</p></div><figure class="code"><figcaption><span>ProductRepository.java · extracto</span></figcaption><pre><code><span class="annotation">@QueryHints</span>(
+    value = <span class="annotation">@QueryHint</span>(
+        name = <span class="literal">"jakarta.persistence.query.timeout"</span>,
+        value = <span class="literal">"5000"</span>),
+    forCounting = <span class="keyword">true</span>)</code></pre></figure></div>
+      <div class="evidence"><b>Prueba</b><div><code>searchProductsAppliesQueryTimeout</code> inspecciona el <code>PreparedStatement</code> y espera <code>assertEquals(List.of(5, 5), timeouts)</code>: JDBC expresa este valor en segundos.</div></div>
+      <p class="note">El código no fija un timeout de bloqueo explícito. El agotamiento de espera observado en H2 depende del motor y su configuración. Los <code>await(5, TimeUnit.SECONDS)</code> coordinan hilos: no configuran ese bloqueo.</p>
+    </div></section>
+    <div class="ribbon" aria-hidden="true"><p>read → change → <em>commit</em><br>¿Qué ocurre si alguien llegó antes?</p></div>
+    <section id="optimista" class="section" aria-labelledby="title-opt"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">04</span><div><p class="eyebrow">reserveStock()</p><h2 id="title-opt">Trabajar en paralelo.<br>Detectar el conflicto al guardar.</h2><p class="lead">Optimista: no bloquear al leer, sino comprobar que la versión sigue siendo la esperada.</p></div></div>
+      <div class="split"><div class="explain"><p><span class="label">Qué se pide</span>Una versión en la entidad y una reserva que detecte modificaciones concurrentes.</p><p><span class="label">Cómo se resolvió</span><code>@Version</code> permite que Hibernate contraste la versión al actualizar. <code>reserveStock()</code> carga con <code>findById()</code>, verifica el stock y lo descuenta.</p><p><code>saveAndFlush()</code> fuerza la escritura dentro del <code>try</code>. El conflicto se traduce a <code>ConcurrentModificationException</code>; no hay reintento automático.</p></div><figure class="code"><figcaption><span>Product.java + ProductService.java · extractos</span></figcaption><pre><code><span class="annotation">@Version</span>
+<span class="keyword">private</span> Long version;
+
+product.setStock(product.getStock() - quantity);
+
+<span class="keyword">try</span> {
+    productRepository.saveAndFlush(product);
+} <span class="keyword">catch</span> (OptimisticLockException
+        | ObjectOptimisticLockingFailureException exception) {
+    <span class="keyword">throw new</span> ConcurrentModificationException(
+        <span class="literal">"Stock modificado concurrentemente, reintenta"</span>,
+        exception);
+}</code></pre></figure></div>
+      <div class="flow" id="optimistic-flow"><div class="flow-head"><h3>Dos reservas. Una misma versión.</h3><button class="replay" type="button" data-replay="optimistic-flow"><i data-lucide="play" aria-hidden="true"></i>Reproducir</button></div><div class="lanes"><div class="lane"><strong>Tx A</strong><span class="event">Lee stock 1<br>versión n</span><span class="event">Reserva 1</span><span class="event good">Commit<br>versión n + 1</span></div><div class="lane"><strong>Tx B</strong><span class="event">Lee stock 1<br>versión n</span><span class="event">Reserva 1</span><span class="event conflict">Conflicto<br>rollback</span></div></div><p class="flow-caption">Secuencia ilustrativa: cualquiera de las dos transacciones puede ganar.</p></div>
+      <div class="evidence"><b>Prueba</b><div><code>concurrentReservationsAllowOnlyOneSuccess</code> sincroniza dos lecturas y verifica <code>firstSucceeded ^ secondSucceeded</code>, stock final 0 y versión inicial + 1.</div></div>
+    </div></section>
+    <section id="pesimista" class="section" aria-labelledby="title-pess"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">05</span><div><p class="eyebrow">increaseStock()</p><h2 id="title-pess">Adquirir el bloqueo.<br>Después, modificar.</h2><p class="lead">Pesimista: serializar las operaciones que compiten por el mismo producto.</p></div></div>
+      <div class="split"><div class="explain"><p><span class="label">Qué se pide</span>Aplicar bloqueo pesimista al incremento sin trasladarlo al flujo de reserva.</p><p><span class="label">Cómo se resolvió</span><code>findByIdForUpdate()</code> adquiere <code>PESSIMISTIC_WRITE</code> dentro de la transacción. El bloqueo se libera al terminarla, no al retornar el método del repositorio.</p><p><code>Math.addExact()</code> evita que la suma desborde silenciosamente. La validación del servicio rechaza cantidades nulas o no positivas, sin máximo propio.</p></div><figure class="code"><figcaption><span>ProductRepository.java + ProductService.java</span></figcaption><pre><code><span class="annotation">@Lock</span>(LockModeType.PESSIMISTIC_WRITE)
+<span class="annotation">@Query</span>(<span class="literal">"SELECT p FROM Product p WHERE p.id = :id"</span>)
+Optional&lt;Product&gt; findByIdForUpdate(
+    <span class="annotation">@Param</span>(<span class="literal">"id"</span>) Long id);
+
+<span class="literal">// Extracto de increaseStock()</span>
+Product product = productRepository.findByIdForUpdate(productId)
+    .orElseThrow(() -&gt; <span class="keyword">new</span> NoSuchElementException(
+        <span class="literal">"Producto no encontrado: "</span> + productId));
+product.setStock(Math.addExact(product.getStock(), quantity));
+<span class="keyword">return</span> productRepository.save(product);</code></pre></figure></div>
+      <div class="flow" id="pessimistic-flow"><div class="flow-head"><h3>Tres transacciones. Un registro disputado.</h3><button class="replay" type="button" data-replay="pessimistic-flow"><i data-lucide="play" aria-hidden="true"></i>Reproducir</button></div><div class="lanes"><div class="lane"><strong>Tx A</strong><span class="event">Adquiere<br>el bloqueo</span><span class="event">Mantiene<br>transacción</span><span class="event good">Incrementa<br>y confirma</span></div><div class="lane"><strong>Tx B</strong><span class="event">Solicita<br>el bloqueo</span><span class="event">Espera</span><span class="event conflict">Falla por<br>timeout</span></div><div class="lane"><strong>Tx C</strong><span class="event">Solicita<br>el bloqueo</span><span class="event">Espera</span><span class="event conflict">Falla por<br>timeout</span></div></div><p class="flow-caption">Escenario del test: A retiene el bloqueo hasta que B y C agotan la espera. En otras condiciones, podrían continuar tras liberarse.</p></div>
+      <div class="evidence"><b>Prueba</b><div><code>increaseStockLocksProductUntilTransactionCompletes</code> verifica un incremento confirmado, stock final 11 y dos causas <code>PessimisticLockingFailureException</code>.</div></div>
+    </div></section>
+    <section id="comparativa" class="section paper" aria-labelledby="title-compare"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">06</span><div><p class="eyebrow">La decisión depende del dominio</p><h2 id="title-compare">No hay un bloqueo mejor para todo.</h2><p class="lead">Frecuencia de conflictos, duración de las transacciones y coste del reintento determinan la elección.</p></div></div>
+      <div class="table-wrap" role="region" tabindex="0" aria-label="Comparativa de estrategias"><table><thead><tr><th scope="col">Decisión</th><th scope="col">Optimista · reserveStock()</th><th scope="col">Pesimista · increaseStock()</th></tr></thead><tbody><tr><th scope="row">Mecanismo</th><td><code>@Version</code> detecta si otro modificó el registro.</td><td><code>PESSIMISTIC_WRITE</code> bloquea el registro al consultarlo.</td></tr><tr><th scope="row">Concurrencia</th><td>Permite trabajar simultáneamente; uno puede fallar al guardar.</td><td>Los demás esperan el bloqueo o fallan por timeout.</td></tr><tr><th scope="row">Ventaja</th><td>Menos espera cuando hay pocos conflictos.</td><td>Serializa operaciones sobre un registro disputado.</td></tr><tr><th scope="row">Riesgo</th><td>Conflictos y reintentos bajo alta competencia.</td><td>Esperas, deadlocks y consumo de conexiones.</td></tr><tr><th scope="row">Uso habitual</th><td>Ediciones o reservas con conflictos poco frecuentes.</td><td>Operaciones cortas con alta competencia sobre el mismo registro.</td></tr></tbody></table></div>
+      <p class="note">En este ejercicio el bloqueo pesimista queda limitado a la reposición. La reserva conserva el mecanismo optimista; no se añade un bloqueo de lectura para intentar resolver el mismo problema dos veces.</p>
+    </div></section>
+    <section id="nosql" class="section" aria-labelledby="title-nosql"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">07</span><div><p class="eyebrow">El problema no termina en SQL</p><h2 id="title-nosql">NoSQL también controla la concurrencia.</h2><p class="lead">El mecanismo depende del motor. No es una traducción directa de las anotaciones de JPA.</p></div></div>
+      <div class="nosql"><article><h3>MongoDB</h3><p>Actualizaciones atómicas por documento. Para control optimista, incluir la versión esperada en el filtro e incrementarla en la actualización; comprobar que se modificó un documento.</p></article><article><h3>DynamoDB</h3><p>Escrituras condicionales mediante <code>ConditionExpression</code>: actualizar solo si la versión coincide. Si la condición falla, la aplicación decide si reintenta.</p></article><article><h3>Cassandra</h3><p>Lightweight Transactions con <code>IF</code> para cambios condicionales. Su coordinación tiene un coste adicional: no equivale a bloquear una fila con JPA.</p></article><article><h3>Redis</h3><p><code>WATCH + MULTI/EXEC</code> permite control optimista. Los scripts Lua ejecutan operaciones atómicas en el servidor, con restricciones de claves en entornos cluster.</p></article></div>
+      <p class="note">La pregunta común es la misma: ¿cómo detecto que el dato cambió y qué debe hacer la aplicación cuando pierde la competencia?</p>
+    </div></section>
+    <section id="eventos" class="section" aria-labelledby="title-events"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">08</span><div><p class="eyebrow">Posible evolución · Event-driven architecture</p><h2 id="title-events">Aceptar ahora.<br>Confirmar mediante un evento.</h2><p class="lead">Una cola absorbe picos de solicitudes y desacopla el inventario del pedido. La reserva pasa a ser un proceso asíncrono, no una confirmación inmediata.</p></div></div>
+      <div class="split"><div class="explain"><p><span class="label">Qué cambiaría</span>En lugar de invocar directamente <code>reserveStock()</code>, la API registra una solicitud y devuelve <code>202 Accepted</code> con un <code>requestId</code> y una URL de estado. El cliente consulta si está pendiente, confirmada o rechazada.</p><p><span class="label">Una opción concreta</span>Azure Service Bus recibe el comando <code>ReserveStock</code>. Un consumidor de inventario actualiza el stock y genera <code>StockReserved</code> o <code>ReservationRejected</code>; los demás servicios reaccionan al resultado.</p><p>Un comando pide una acción; un evento comunica un hecho ya confirmado. Este diseño es una propuesta: no está implementado en el código de la semana.</p></div><figure class="code"><figcaption><span>Contrato propuesto · comando, no código actual</span></figcaption><pre><code>{
+  <span class="literal">"type"</span>: <span class="literal">"ReserveStock"</span>,
+  <span class="literal">"schemaVersion"</span>: 1,
+  <span class="literal">"messageId"</span>: <span class="literal">"cmd-reserva-123"</span>,
+  <span class="literal">"requestId"</span>: <span class="literal">"reserva-123"</span>,
+  <span class="literal">"productId"</span>: 1,
+  <span class="literal">"quantity"</span>: 2,
+  <span class="literal">"correlationId"</span>: <span class="literal">"pedido-456"</span>
+}</code></pre></figure></div>
+      <div class="flow" id="event-flow"><div class="flow-head"><h3>Del pedido al resultado, sin doble escritura insegura.</h3><button class="replay" type="button" data-replay="event-flow"><i data-lucide="play" aria-hidden="true"></i>Reproducir</button></div><div class="lanes"><div class="lane"><strong>Entrada</strong><span class="event">API registra<br>solicitud + Outbox</span><span class="event">Relay publica<br>ReserveStock</span><span class="event good">Cola de<br>comandos</span></div><div class="lane"><strong>Inventario</strong><span class="event">Inbox evita<br>duplicados</span><span class="event">Stock + estado<br>+ Outbox, commit</span><span class="event good">ACK después<br>del commit</span></div><div class="lane"><strong>Salida</strong><span class="event">Relay publica<br>evento confirmado</span><span class="event">Topic con<br>suscripciones</span><span class="event good">Pedido / avisos<br>actualizan estado</span></div></div><p class="flow-caption">Cada fila resume una etapa. La entrega puede repetirse: ni el broker ni el relay garantizan por sí solos un efecto de negocio exactamente una vez.</p></div>
+      <div class="nosql" style="margin-top:30px"><article><h3>01 · Entrada durable</h3><p>Guardar solicitud y comando Outbox en la misma transacción de base de datos. Una clave de idempotencia única por solicitud evita reservas nuevas cuando el cliente repite el POST. El relay reintenta publicar conservando el mismo <code>messageId</code>.</p></article><article><h3>02 · Un propietario del stock</h3><p>Inventario es el único escritor. Reservas e incrementos pasan por la misma cola con <code>SessionId = productId</code>. Las sesiones permiten procesamiento ordenado por producto; limitar la concurrencia dentro de cada sesión y proteger igualmente la escritura en base de datos.</p></article><article><h3>03 · Consumidor idempotente</h3><p>Una restricción única de Inbox sobre consumidor y <code>messageId</code> reclama el mensaje de forma atómica. Inbox, modificación del stock, estado de solicitud y evento Outbox se confirman juntos. Si esa transacción falla, todo se revierte.</p></article><article><h3>04 · Recuperación operable</h3><p>Confirmar el mensaje solo después del commit. Un fallo antes del commit provoca reentrega; un fallo después del commit se reconoce mediante Inbox y no vuelve a descontar. Renovar el bloqueo del mensaje durante operaciones largas, con tiempos acotados.</p></article></div>
+      <figure class="code" style="margin-top:24px"><figcaption><span>Consumidor · pseudocódigo de una posible solución</span></figcaption><pre><code><span class="keyword">validar</span> contrato, cantidad positiva y requestId
+<span class="keyword">BEGIN</span> transacción de base de datos
+  reclamar messageId en Inbox con restricción UNIQUE
+  si ya fue procesado: no repetir el efecto
+  si es nuevo:
+    <span class="keyword">UPDATE</span> products <span class="keyword">SET</span> stock = stock - :quantity,
+                        version = version + 1
+    <span class="keyword">WHERE</span> id = :productId <span class="keyword">AND</span> stock &gt;= :quantity
+    según filas afectadas: confirmar o rechazar solicitud
+    insertar resultado en Outbox con eventId estable
+<span class="keyword">COMMIT</span>
+confirmar mensaje al broker (ACK)
+relay publica evento Outbox; consumidores deduplican eventId</code></pre></figure>
+      <p class="note">La actualización condicional es una alternativa a la lectura y escritura JPA actuales, no un fragmento para copiar encima de ellas. Un resultado de cero filas requiere distinguir producto inexistente de stock insuficiente. El SQL directo debe coordinar versión y contexto de persistencia si convive con JPA. La cola no elimina los bloqueos internos de la base de datos.</p>
+      <div class="evidence"><b>Consistencia</b><div>El stock, el estado de la reserva y su Outbox cambian atómicamente en inventario. Pedido, notificaciones y proyecciones se actualizan con consistencia eventual. Cancelar una reserva requiere una compensación explícita e idempotente, no un rollback distribuido.</div></div>
+      <div class="table-wrap" style="margin-top:26px;border-color:var(--line)" role="region" tabindex="0" aria-label="Política propuesta de mensajes"><table><thead><tr><th scope="col">Resultado</th><th scope="col">Tratamiento propuesto</th></tr></thead><tbody><tr><th scope="row">Stock insuficiente</th><td>Confirmar el rechazo de negocio y publicar <code>ReservationRejected</code>. No reintentar como si fuera un fallo técnico.</td></tr><tr><th scope="row">Fallo transitorio</th><td>Rollback y reentrega con backoff exponencial, jitter y máximo de intentos. No bloquear al consumidor con esperas largas.</td></tr><tr><th scope="row">Mensaje inválido</th><td>Enviar a dead-letter queue (DLQ) con motivo y correlación; no realizar el descuento.</td></tr><tr><th scope="row">Intentos agotados</th><td>DLQ, alerta e investigación. Redrive controlado conserva los identificadores para no duplicar efectos.</td></tr></tbody></table></div>
+      <div class="evidence"><b>Pruebas propuestas</b><div>Duplicar un mensaje descuenta una sola vez; competir por la última unidad confirma una sola reserva; caer antes y después del commit conserva el resultado; interrumpir el relay no pierde eventos; agotar reintentos mueve el mensaje a DLQ. Medir antigüedad de mensajes, reentregas, latencia y tamaño de DLQ.</div></div>
+    </div></section>
+    <section id="extras" class="section" aria-labelledby="title-extras"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">09</span><div><p class="eyebrow">Extras · validación y escenarios adicionales</p><h2 id="title-extras">Defender la entrada.<br>Probar cómo conviven los cambios.</h2><p class="lead">Las restricciones HTTP y las reglas de negocio tienen responsabilidades distintas. Las pruebas adicionales muestran qué ocurre cuando reserva e incremento usan el mismo producto.</p></div></div>
+      <div class="split"><div class="explain"><h3>Controlador: límites antes del servicio</h3><p><span class="label">Nombre de búsqueda</span><code>@Size(max = 200)</code> limita la longitud a 200 caracteres. Al ser opcional, un nombre ausente no activa el filtro; esta anotación no exige texto no vacío.</p><p><span class="label">Cantidad de entrada</span><code>@Min(1)</code> y <code>@Max(999999)</code> aceptan valores entre 1 y 999999 en ambos POST. Es un rango numérico, no una validación de la longitud del texto recibido.</p><p>El parámetro es <code>Integer</code>. Spring rechaza cantidades ausentes, no numéricas o que desbordan ese tipo durante la conversión; la validación de método rechaza el rango inválido antes de ejecutar el servicio.</p></div><figure class="code"><figcaption><span>ProductController.java · parámetros reales</span><a href="../src/main/java/com/indra/jpa/inventory/controller/ProductController.java">Fuente ↗</a></figcaption><pre><code><span class="annotation">@RequestParam</span>(required = <span class="keyword">false</span>)
+<span class="annotation">@Size</span>(max = 200) String name
+
+<span class="annotation">@RequestParam</span>(<span class="literal">"quantity"</span>)
+<span class="annotation">@Min</span>(1) <span class="annotation">@Max</span>(999999) Integer quantity</code></pre></figure></div>
+      <div class="evidence"><b>Pruebas HTTP</b><div><code>searchAcceptsNameAtMaximumLength</code> y <code>searchRejectsNameAboveMaximumLength</code> contrastan 200 y 201 caracteres. <code>stockEndpointsAcceptMaximumQuantity</code> acepta 999999; <code>stockEndpointsRejectInvalidQuantities</code> espera 400 para cantidades fuera de rango, ausentes, no numéricas o superiores al límite de <code>Integer</code>.</div></div>
+      <div class="split" style="margin-top:36px"><div class="explain"><h3>Servicio: reglas aunque no haya HTTP</h3><p><span class="label">Evitar null y operaciones inversas</span>Ambos métodos rechazan <code>null</code>, cero y negativos antes de consultar el producto. Así se evita el desempaquetado de un nulo y que una cantidad negativa invierta el efecto de la operación.</p><p><span class="label">Evitar stock negativo</span><code>reserveStock()</code> comprueba el stock antes de restar. Una cantidad igual al stock sí es válida: deja el inventario en cero.</p><p>El servicio no limita el máximo a 999999. En el incremento, <code>Math.addExact()</code> lanza <code>ArithmeticException</code> si la suma desborda, en lugar de guardar un resultado incorrecto. Estas excepciones de servicio no implican por sí solas una respuesta HTTP 400.</p></div><figure class="code"><figcaption><span>ProductService.java · extractos</span><a href="../src/main/java/com/indra/jpa/inventory/service/ProductService.java">Fuente ↗</a></figcaption><pre><code><span class="keyword">if</span> (quantity == <span class="keyword">null</span> || quantity &lt;= 0) {
+    <span class="keyword">throw new</span> IllegalArgumentException(
+        <span class="literal">"La cantidad debe ser positiva"</span>);
+}
+
+<span class="keyword">if</span> (product.getStock() &lt; quantity) {
+    <span class="keyword">throw new</span> IllegalArgumentException(
+        <span class="literal">"Stock insuficiente"</span>);
+}
+
+product.setStock(Math.addExact(product.getStock(), quantity));</code></pre></figure></div>
+      <div class="flow" id="mixed-lock-flow"><div class="flow-head"><h3>JUnit adicional: una reserva con versión obsoleta</h3><button class="replay" type="button" data-replay="mixed-lock-flow"><i data-lucide="play" aria-hidden="true"></i>Reproducir</button></div><div class="lanes"><div class="lane"><strong>Incremento</strong><span class="event">Bloquea producto<br>suma 5, sin commit</span><span class="event">Espera señal<br>de liberación</span><span class="event good">Commit<br>versión n + 1</span></div><div class="lane"><strong>Reserva</strong><span class="event">Lee versión n<br>intenta reservar 2</span><span class="event">Llega al guardado<br>con versión n</span><span class="event conflict">Conflicto optimista<br>rollback</span></div></div><p class="flow-caption">Escenario coordinado del test, no una garantía de que toda lectura ignore bloqueos en cualquier motor o nivel de aislamiento.</p></div>
+      <div class="evidence"><b>JUnit</b><div><code>staleReservationFailsAfterCommittedIncrease</code>: los <code>CountDownLatch</code> mantienen abierto el incremento hasta que la reserva ha leído la versión inicial y ha entrado al guardado. El <code>doAnswer</code> observa la versión y ejecuta <code>merge()</code> y <code>flush()</code> reales; no fabrica el conflicto. Al liberar el incremento, la reserva obsoleta falla y solo se cuenta un commit exitoso.</div></div>
+      <figure class="code" style="margin-top:20px"><figcaption><span>ProductServiceTest.java · resultado del escenario concurrente</span><a href="../src/test/java/com/indra/jpa/inventory/service/ProductServiceTest.java">Fuente ↗</a></figcaption><pre><code>assertFalse(staleReservationSucceeded);
+assertEquals(1, successfulCommits.get());
+assertEquals(initialStock + incrementQuantity,
+    finalProduct.getStock());
+assertEquals(initialVersion + 1, finalProduct.getVersion());</code></pre></figure>
+      <p class="note">Con stock inicial S y versión n, el estado final es S + 5 y n + 1. La reserva de 2 no se confirma ni se reintenta automáticamente. El test demuestra que el bloqueo pesimista del incremento no vuelve válida una copia obsoleta leída por la reserva optimista.</p>
+      <div class="flow" id="sequential-flow"><div class="flow-head"><h3>JUnit adicional: dos cambios válidos en secuencia</h3><button class="replay" type="button" data-replay="sequential-flow"><i data-lucide="play" aria-hidden="true"></i>Reproducir</button></div><div class="lanes"><div class="lane"><strong>Reserva</strong><span class="event">Lee estado actual</span><span class="event">Reserva 3</span><span class="event good">Commit<br>stock S − 3</span></div><div class="lane"><strong>Incremento</strong><span class="event">Empieza después<br>del primer commit</span><span class="event">Suma 8</span><span class="event good">Commit<br>stock S + 5</span></div></div><p class="flow-caption">No hay competencia simultánea: la segunda operación comienza después de confirmar la primera.</p></div>
+      <div class="evidence"><b>JUnit</b><div><code>reserveThenIncreaseStockInSeparateTransactions</code> utiliza dos llamadas consecutivas a <code>TransactionTemplate</code>. La primera confirma la reserva; la segunda lee el estado actualizado y confirma el incremento. Se verifica que ninguno de los cambios se pierda.</div></div>
+      <figure class="code" style="margin-top:20px"><figcaption><span>ProductServiceTest.java · transacciones separadas</span></figcaption><pre><code>transactionTemplate.executeWithoutResult(
+    transaction -&gt; productService.reserveStock(
+        productId, reservationQuantity));
+transactionTemplate.executeWithoutResult(
+    transaction -&gt; productService.increaseStock(
+        productId, incrementQuantity));
+
+<span class="keyword">int</span> expectedStock = initialStock
+    - reservationQuantity + incrementQuantity;
+assertEquals(expectedStock, finalProduct.getStock());</code></pre></figure>
+      <p class="note">Ambas pruebas restauran stock y versión en <code>finally</code>; la concurrente también libera la señal, termina los hilos y reinicia el spy. Los tiempos de espera acotan la coordinación del test: no configuran el timeout de bloqueo de la base de datos.</p>
+    </div></section>
+    <section id="evidencia" class="section paper" aria-labelledby="title-evidence"><div class="inner reveal">
+      <div class="section-head"><span class="section-number">10</span><div><p class="eyebrow">Cerrar con evidencia, no con suposiciones</p><h2 id="title-evidence">Qué demuestra la solución.</h2><p class="lead">Resumen por lectura del código y sus pruebas. Esta página no ejecuta ni certifica el estado del pipeline.</p></div></div>
+      <ul class="checklist"><li><span class="status">En código</span><div>JPQL paginado y filtro opcional.<p>El caso sin filtro tiene evidencia; el filtro con nombre no nulo no tiene una prueba real de repositorio identificada.</p></div></li><li><span class="status">En pruebas</span><div>Transacción y sesión Hibernate de solo lectura.<p>Tres estados inspeccionados durante la llamada al repositorio.</p></div></li><li><span class="status">En pruebas</span><div>Timeout particular de consulta y conteo.<p>El test inspecciona 5 segundos en ambos PreparedStatement; no demuestra que una consulta lenta sea cancelada en todos los motores.</p></div></li><li><span class="status">En pruebas</span><div>Conflicto optimista y espera pesimista.<p>Dos reservas compiten por una versión; tres transacciones compiten por un bloqueo.</p></div></li><li><span class="status pending">Por validar</span><div>Portabilidad y comportamiento bajo carga.<p>No hay timeout de bloqueo explícito ni medición directa de memoria. Revisar dialecto, índices, duración de transacciones y planes de consulta en el motor destino.</p></div></li><li><span class="status pending">No ejecutado</span><div>Gate de calidad: <code>mvn verify</code>.<p>Es un criterio del reviewer. No se ejecutó para elaborar esta página.</p></div></li></ul>
+      <div class="source-list"><a href="../criterios-evaluacion.md">Criterios de evaluación ↗</a><a href="../src/test/java/com/indra/jpa/inventory/service/ProductServiceTest.java">Pruebas del servicio ↗</a><a href="../src/test/java/com/indra/jpa/inventory/repository/ProductRepositoryTest.java">Pruebas del repositorio ↗</a><a href="../src/main/resources/application.properties">Configuración ↗</a></div>
+      <p class="note">Los extractos reflejan la implementación consultada. No representan un diff histórico de Git ni una ejecución de pruebas Java realizada para esta presentación.</p>
+    </div></section>
+    <footer class="page-footer"><span>COMUNIDAD JAVA · WEEK 12 · HIBERNATE / JPA</span><a href="#inicio">Volver al inicio ↑</a></footer>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
+  <!-- jQuery: MIT. Lucide: ISC. Both are optional; core navigation uses native browser APIs. -->
+  <script>
+    (() => {
+      'use strict';
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      const sections = [...document.querySelectorAll('main section[id]')];
+      const links = [...document.querySelectorAll('.sidebar nav a, .mobile-index nav a')];
+      const progress = document.querySelector('.reading-progress');
+      const percent = document.querySelector('#reading-percent');
+      const image = document.querySelector('#reference-image');
+      const mobileIndex = document.querySelector('.mobile-index');
+      let scheduled = false;
+      let activeId = '';
+
+      function updateReading() {
+        scheduled = false;
+        const maximum = document.documentElement.scrollHeight - innerHeight;
+        const ratio = maximum > 0 ? Math.min(1, Math.max(0, scrollY / maximum)) : 0;
+        progress.style.transform = `scaleX(${ratio})`;
+        percent.textContent = `${Math.round(ratio * 100)}%`;
+        let current = sections[0];
+        const boundary = innerWidth <= 760 ? 145 : innerHeight * .3;
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= boundary) current = section;
+        }
+        if (ratio > .995) current = sections[sections.length - 1];
+        if (activeId !== current.id) {
+          activeId = current.id;
+          links.forEach(link => {
+            if (link.hash === `#${activeId}`) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+          const label = links.find(link => link.hash === `#${activeId}`);
+          document.querySelector('#mobile-title').textContent = label ? label.textContent.trim().replace(/^\d+\s*/, '') : 'Inicio';
+        }
+        image.style.transform = !reducedMotion.matches && innerWidth > 760
+          ? `translateY(${Math.min(scrollY, image.offsetHeight) * .1}px)` : '';
+      }
+
+      function requestUpdate() {
+        if (!scheduled) { scheduled = true; requestAnimationFrame(updateReading); }
+      }
+
+      addEventListener('scroll', requestUpdate, { passive: true });
+      addEventListener('resize', requestUpdate);
+      addEventListener('load', requestUpdate);
+      reducedMotion.addEventListener('change', requestUpdate);
+      document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', event => {
+          const target = document.querySelector(link.hash);
+          if (!target) return;
+          mobileIndex.open = false;
+          if (window.jQuery && !reducedMotion.matches) {
+            event.preventDefault();
+            const offset = innerWidth <= 760 ? 57 : 24;
+            window.jQuery('html, body').stop().animate({ scrollTop: scrollY + target.getBoundingClientRect().top - offset }, 450, () => {
+              history.replaceState(null, '', link.hash);
+            });
+          }
+        });
+      });
+
+      if ('IntersectionObserver' in window) {
+        document.documentElement.classList.add('motion-ready');
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: .04 });
+        document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
+      }
+
+      document.querySelectorAll('[data-replay]').forEach(button => {
+        button.addEventListener('click', () => {
+          const flow = document.getElementById(button.dataset.replay);
+          flow.classList.remove('running');
+          requestAnimationFrame(() => requestAnimationFrame(() => flow.classList.add('running')));
+        });
+      });
+      if (window.lucide) window.lucide.createIcons();
+      updateReading();
+    })();
+  </script>
+</body>
+</html>
