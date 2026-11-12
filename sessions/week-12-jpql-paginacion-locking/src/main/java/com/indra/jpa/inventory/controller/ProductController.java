@@ -1,5 +1,7 @@
 package com.indra.jpa.inventory.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -25,8 +27,11 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<Product> search(@RequestParam(required = false) String name, @PageableDefault() Pageable pageable) {
-        return productService.searchProducts(name, pageable);
+    public Page<Product> search(@RequestParam(required = false) String name,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @PageableDefault() Pageable pageable) {
+        return productService.searchProducts(name, minPrice, maxPrice, pageable);
     }
 
     @PostMapping("/{productId}/stock")

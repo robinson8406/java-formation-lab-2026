@@ -104,7 +104,6 @@ class ProductServiceTest {
         }
     }
 
-    
     @Test
     @DisplayName("Test Consulta de productos en transacción de solo lectura")
     void searchProductsRunsInReadOnlyTransaction() {
@@ -117,11 +116,11 @@ class ProductServiceTest {
             transactionReadOnly.set(TransactionSynchronizationManager.isCurrentTransactionReadOnly());
             sessionReadOnly.set(entityManager.unwrap(Session.class).isDefaultReadOnly());
             return Page.empty(pageable);
-        }).when(productRepository).searchProducts("keyboard", pageable);
+        }).when(productRepository).searchProducts(any(), eq(pageable));
 
-        productService.searchProducts("keyboard", pageable);
+        productService.searchProducts("keyboard", null, null, pageable);
 
-        verify(productRepository).searchProducts("keyboard", pageable);
+        verify(productRepository).searchProducts(any(), eq(pageable));
         assertAll(
                 () -> assertTrue(transactionActive.get()),
                 () -> assertTrue(transactionReadOnly.get()),

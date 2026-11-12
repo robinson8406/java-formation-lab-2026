@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import com.indra.jpa.inventory.model.Product;
@@ -63,10 +64,12 @@ class ProductRepositoryTest {
                     });
         }).when(dataSource).getConnection();
 
-        Page<Product> products = productRepository.searchProducts(null, PageRequest.of(0, 5));
+        Specification<Product> spec = (root, query, builder) ->
+                builder.like(builder.lower(root.get("name")), "%keyboard%");
+        Page<Product> products = productRepository.searchProducts(spec, PageRequest.of(0, 5));
 
         assertEquals(5, products.getContent().size());
-        assertTrue(products.getTotalElements() > 5);
+        assertEquals(10, products.getTotalElements());
         assertEquals(List.of(5, 5), timeouts);
     }
 
