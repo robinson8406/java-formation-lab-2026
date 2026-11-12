@@ -69,4 +69,5 @@ class ProductRepositoryTest {
         assertTrue(products.getTotalElements() > 5);
         assertEquals(List.of(5, 5), timeouts);
     }
+
 }

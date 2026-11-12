@@ -91,7 +91,9 @@ class ProductServiceTest {
             Future<Boolean> firstReservation = executor.submit(reserve);
             Future<Boolean> secondReservation = executor.submit(reserve);
 
-            assertTrue(firstReservation.get(20, TimeUnit.SECONDS) ^ secondReservation.get(20, TimeUnit.SECONDS));
+            boolean firstSucceeded = firstReservation.get(20, TimeUnit.SECONDS);
+            boolean secondSucceeded = secondReservation.get(20, TimeUnit.SECONDS);
+            assertTrue(firstSucceeded ^ secondSucceeded);
             Product updatedProduct = productRepository.findById(productId).orElseThrow();
             assertEquals(0, updatedProduct.getStock());
             assertEquals(initialVersion + 1, updatedProduct.getVersion());

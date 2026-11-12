@@ -18,7 +18,6 @@ class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     @Test
     @DisplayName("Busqueda de productos sin nombre retorna productos paginados y total")
     void searchWithoutNameReturnsPaginatedProductsAndTotal() throws Exception {

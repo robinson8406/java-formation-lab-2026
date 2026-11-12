@@ -2,6 +2,7 @@ package com.indra.jpa.inventory.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<Product> search(@RequestParam(required = false) String name, Pageable pageable) {
+    public Page<Product> search(@RequestParam(required = false) String name, @PageableDefault() Pageable pageable) {
         return productService.searchProducts(name, pageable);
     }
 
