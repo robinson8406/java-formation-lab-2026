@@ -1,7 +1,10 @@
 package com.indra.jpa.inventory.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +27,13 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<Product> search(@RequestParam(required = false) String name, Pageable pageable) {
+    public Page<Product> search(@RequestParam(required = false) String name,
+                                @RequestParam(required = false) BigDecimal minPrice,
+                                @RequestParam(required = false) BigDecimal maxPrice,
+                                @PageableDefault(size = 10) Pageable pageable) {
+        if (minPrice != null || maxPrice != null) {
+            return productService.searchProducts(name, minPrice, maxPrice, pageable);
+        }
         return productService.searchProducts(name, pageable);
     }
 
@@ -35,7 +44,7 @@ public class ProductController {
 
     @PostMapping("/{productId}/reservations")
     public ResponseEntity<Void> reserve(@PathVariable Long productId,
-            @RequestParam("quantity") int quantity) {
+                                        @RequestParam("quantity") int quantity) {
         productService.reserveStock(productId, quantity);
         return ResponseEntity.noContent().build();
     }
