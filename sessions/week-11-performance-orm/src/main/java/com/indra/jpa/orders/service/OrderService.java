@@ -19,10 +19,9 @@ public class OrderService {
 		this.orderRepository = orderRepository;
 	}
 
-	// El mapeo a DTO ocurre dentro de la transacción: aquí se materializa el N+1
 	@Transactional(readOnly = true)
 	public List<OrderView> listByStatus(OrderStatus status) {
-		return orderRepository.findByStatus(status).stream().map(OrderView::from).toList();
+		return orderRepository.findByStatusWithItems(status).stream().map(OrderView::from).toList();
 	}
 
 	@Transactional(readOnly = true)

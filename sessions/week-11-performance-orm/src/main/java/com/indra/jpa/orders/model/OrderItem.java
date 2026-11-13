@@ -27,7 +27,6 @@ public class OrderItem {
 	@JoinColumn(name = "order_id")
 	private Order order;
 
-	// LAZY a propósito: cada acceso a product dispara 1 query por ítem (N+1)
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "product_id")
 	private Product product;
