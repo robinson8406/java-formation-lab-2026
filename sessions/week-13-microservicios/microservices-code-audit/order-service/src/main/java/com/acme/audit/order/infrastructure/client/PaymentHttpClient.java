@@ -1,4 +1,3 @@
-
 package com.acme.audit.order.infrastructure.client;
 
 import java.io.IOException;
@@ -15,8 +14,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 import com.acme.audit.order.application.port.out.PaymentGateway;
-
-import io.github.resilience4j.retry.annotation.Retry;
 
 @Component
 public class PaymentHttpClient implements PaymentGateway {
@@ -35,7 +32,6 @@ public class PaymentHttpClient implements PaymentGateway {
     }
 
     @Override
-    @Retry(name = "general")
     public PaymentOutcome charge(
             String key,
             String orderId,
@@ -115,8 +111,6 @@ public class PaymentHttpClient implements PaymentGateway {
                 : id;
     }
 
-   
-
     private record PaymentRequest(
             String orderId,
             BigDecimal amount,
@@ -152,5 +146,4 @@ public class PaymentHttpClient implements PaymentGateway {
         return null;
     }
 
-    
 }
