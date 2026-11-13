@@ -12,10 +12,6 @@ import com.indra.jpa.orders.model.Product;
 import com.indra.jpa.orders.repository.OrderRepository;
 import com.indra.jpa.orders.repository.ProductRepository;
 
-/**
- * Dataset determinista: cada orden tiene 3 ítems y cada ítem un producto distinto,
- * por eso 100 órdenes producen 1 + 100 + 300 = 401 queries con el mapeo LAZY actual.
- */
 @Component
 public class DataSeeder {
 

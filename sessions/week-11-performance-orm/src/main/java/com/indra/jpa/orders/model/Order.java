@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// @Getter/@Setter en lugar de @Data: toString/equals recorren relaciones LAZY y ocultan N+1
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,7 +35,6 @@ public class Order {
 
 	private LocalDateTime createdAt = LocalDateTime.now();
 
-	// LAZY a propósito: iterar items dispara 1 query por orden (N+1)
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<OrderItem> items = new ArrayList<>();
 

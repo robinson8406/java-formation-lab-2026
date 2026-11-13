@@ -7,7 +7,6 @@ import org.hibernate.stat.Statistics;
 
 import jakarta.persistence.EntityManagerFactory;
 
-/** Cuenta las sentencias SQL preparadas por Hibernate durante la ejecución de un bloque. */
 public final class QueryCounter {
 
 	private final Statistics statistics;
