@@ -6,6 +6,7 @@ import com.acme.audit.order.application.CreateOrderCommand;
 import com.acme.audit.order.application.port.out.OrderStore;
 import com.acme.audit.order.application.port.out.OrderStore.OrderData;
 import com.acme.audit.order.application.port.out.PaymentGateway;
+import com.acme.audit.order.infrastructure.client.PaymentCommunicationException;
 
 @Service
 public class OrderApplicationServiceUseCase {
@@ -26,7 +27,7 @@ public class OrderApplicationServiceUseCase {
         try {
             var payment = paymentGateway.charge(order.idempotencyKey(), order.orderId(), order.amount(), order.currency());
             return OrderView.from(orderStore.confirm(command.orderId(), payment.paymentId()));
-        } catch (RestClientException failure) {
+        } catch (PaymentCommunicationException | RestClientException failure) {
             orderStore.markPaymentUnavailable(command.orderId());
             throw failure;
         }
