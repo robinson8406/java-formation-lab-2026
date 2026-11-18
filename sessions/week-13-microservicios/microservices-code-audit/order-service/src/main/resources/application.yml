@@ -21,7 +21,7 @@ clients:
   payment:
     base-url: http://localhost:8082
     connect-timeout: 200ms
-    read-timeout: 100ms
+    read-timeout: 300ms
 logging:
   config: classpath:log4j2-spring.xml
 
@@ -30,7 +30,8 @@ resilience4j:
   retry:
     instances:
       general:
-        max-attempts: 3
+        max-attempts: 1
+        fail-after-max-attempts: true
         wait-duration: 100ms
         retry-exceptions:
           - org.springframework.web.client.ResourceAccessException

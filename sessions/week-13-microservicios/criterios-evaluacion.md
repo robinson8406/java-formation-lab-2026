@@ -5,6 +5,8 @@
 
 **¿Cómo podemos garantizar que una operación de pago se procese una sola vez, aunque existan timeouts, reintentos y pérdida de comunicación entre servicios?**
 
+sugiero el uso de una maquina de estados para el procesamiento de los pagos para que retome desde el punto apropiado y no tener multiples procesamientos por reintentos o timeouts u otro problema de comunicación.
+
 ### ¿Qué vamos a evaluar?
 
 | Aspecto | ¿Qué esperamos? |
