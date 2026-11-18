@@ -36,7 +36,7 @@ public class PaymentController {
 	@PostMapping
 	public ResponseEntity<PaymentResponse> create(@RequestHeader("Idempotency-Key") @NotBlank @Size(max = 150) String key,
 			@Valid @RequestBody CreatePaymentRequest request) {
-		key = UUID.randomUUID().toString();
+		
 		PaymentResult result = service.process(key, new CreatePaymentCommand(request.orderId(), request.amount(), request.currency()));
 		
 				
