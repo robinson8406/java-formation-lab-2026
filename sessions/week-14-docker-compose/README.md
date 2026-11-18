@@ -6,7 +6,7 @@
 
 Contenerizar la aplicación Spring Boot y orquestar el stack completo (app + base de datos) con Podman Compose para garantizar un entorno reproducible entre dev y CI.
 
-> **¿Por qué Podman?** Por política de licencias se usa Podman en lugar de Docker Desktop. La sintaxis de Containerfile/Dockerfile y del archivo `compose.yml` es idéntica — el conocimiento aplica en ambos entornos.
+> **¿Por qué Podman?** Por política de licencias se usa Podman en lugar de Docker Desktop. La sintaxis del `Dockerfile` y del archivo `compose.yml` es idéntica — el conocimiento aplica en ambos entornos.
 
 ## Contexto técnico
 
@@ -18,5 +18,5 @@ Contenerizar la aplicación Spring Boot y orquestar el stack completo (app + bas
 | Tiempo | Actividad |
 |--------|-----------|
 | 0–20' | Revisión `week-13-solution`: cuándo NO microservicios |
-| 20–40' | Contexto + demo: `podman run` vs `podman compose up`, layers en Containerfile — Containerfile multi-stage + compose (ver `enunciado.md`) |
+| 20–40' | Contexto + demo: `podman run` vs `podman compose up`, layers en el Dockerfile — Dockerfile multi-stage + compose (ver `enunciado.md`) |
 | 40–60' | Q&A (se resuelve entre semana, PR antes del jueves siguiente) |

@@ -2,7 +2,7 @@
 
 ## Checklist del reviewer
 
-### Containerfile
+### Dockerfile
 - [ ] Multi-stage: stage `builder` con JDK, stage `runtime` con JRE
 - [ ] Imagen final < 300MB (verificar con `podman images`)
 - [ ] Usuario no-root en el stage runtime
@@ -29,4 +29,4 @@
 
 | Junior | Semi-senior | Senior | Experto |
 |--------|-------------|--------|---------|
-| Containerfile funcional, compose básico | Multi-stage, usuario no-root, health check | JAVA_OPTS, .env, imagen < 200MB | Propone estrategia de CI con Podman en modo rootless, multi-platform, y cache de layers |
+| Dockerfile funcional, compose básico | Multi-stage, usuario no-root, health check | JAVA_OPTS, .env, imagen < 200MB | Propone estrategia de CI con Podman en modo rootless, multi-platform, y cache de layers |

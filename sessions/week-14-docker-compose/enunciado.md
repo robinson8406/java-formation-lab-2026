@@ -4,23 +4,20 @@
 
 El equipo de **Indra Retail** tiene problemas de onboarding: cada nuevo desarrollador tarda 2 horas en configurar el entorno local (Java, Postgres, variables de entorno, migraciones). Tu tarea es contenerizar la aplicación para que cualquiera pueda levantar el entorno completo con `podman compose up`.
 
-> **Nota**: El programa usa **Podman** por política de licencias. La sintaxis de Containerfile (equivalente a Dockerfile) y de `compose.yml` es 100% compatible — lo que aprendas aquí aplica igualmente con Docker en otros proyectos.
+> **Nota**: El programa usa **Podman** por política de licencias. Usamos el nombre de archivo `Dockerfile` (en vez de `Containerfile`) porque es el más extendido y Podman lo reconoce igual — lo que aprendas aquí aplica igualmente con Docker en otros proyectos.
 
 ## Lo que debes implementar
 
-### 1. Containerfile multi-stage
-
-> Podman usa `Containerfile` por convención, pero también acepta `Dockerfile`. Ambos nombres son válidos.
+### 1. Dockerfile multi-stage
 
 ```dockerfile
 # Stage 1: Build
-FROM eclipse-temurin:21-jdk AS builder
+FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
-COPY .mvn .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
+COPY pom.xml ./
+RUN mvn dependency:go-offline
 COPY src ./src
-RUN ./mvnw package -DskipTests
+RUN mvn package -DskipTests
 
 # Stage 2: Runtime
 FROM eclipse-temurin:21-jre AS runtime
@@ -37,7 +34,7 @@ Ajusta según el proyecto del `week-14-start`.
 ### 2. compose.yml
 
 Crea `compose.yml` con:
-- Servicio `app`: construye desde el Containerfile, espera a que `db` esté healthy.
+- Servicio `app`: construye desde el Dockerfile, espera a que `db` esté healthy.
 - Servicio `db`: imagen `postgres:16-alpine`, con `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` en variables de entorno.
 - Health check en `db`: `pg_isready`.
 - Volumen persistente para los datos de Postgres.
@@ -61,12 +58,12 @@ podman compose up --build
 
 - La imagen final (`runtime`) no debe contener el JDK — solo JRE.
 - El contenedor no debe correr como `root`.
-- Las credenciales de base de datos **nunca** en el `Containerfile` ni en `compose.yml` directamente.
+- Las credenciales de base de datos **nunca** en el `Dockerfile` ni en `compose.yml` directamente.
 - **Criterio no funcional (seguridad)**: usuario no-root, sin secretos hardcodeados en imágenes.
 
 ## Criterio de aceptación del PR
 
-- [ ] Containerfile multi-stage: imagen final < 300MB
+- [ ] Dockerfile multi-stage: imagen final < 300MB
 - [ ] `podman compose up` levanta app + db correctamente
 - [ ] Health check en el servicio `db`
 - [ ] `.env.example` presente, `.env` en `.gitignore`
