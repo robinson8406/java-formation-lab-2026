@@ -46,7 +46,7 @@ El nivel se evidencia en _cómo_ resolviste el problema — no en _qué_ problem
 | 11 | 2026-10-29 | Hibernate / JPA | Performance ORM | ✅ |
 | 12 | 2026-11-05 | Hibernate / JPA | JPQL + paginación + locking | ✅ |
 | 13 | 2026-11-12 | Micro + Cloud + DevOps | Microservicios | ✅ |
-| 14 | 2026-11-19 | Micro + Cloud + DevOps | Podman + compose | ⏳ |
+| 14 | 2026-11-19 | Micro + Cloud + DevOps | Podman + compose | ✅ |
 | 15 | 2026-11-26 | Micro + Cloud + DevOps | Azure DevOps Pipelines (CI) | ⏳ |
 | 16 | 2026-12-03 | Micro + Cloud + DevOps | Azure DevOps Release | ⏳ |
 | 17 | 2026-12-10 | Micro + Cloud + DevOps | Azure App Service | ⏳ |
