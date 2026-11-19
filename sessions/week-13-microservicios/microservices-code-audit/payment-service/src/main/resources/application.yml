@@ -22,7 +22,7 @@ clients:
   provider:
     base-url: http://localhost:8083
     connect-timeout: 200ms
-    read-timeout: 800ms
+    read-timeout: 750ms
 
 resilience4j:
   retry:
