@@ -21,7 +21,7 @@ clients:
   payment:
     base-url: http://localhost:8082
     connect-timeout: 200ms
-    read-timeout: 100ms
+    read-timeout: 1800ms
 logging:
   config: classpath:log4j2-spring.xml
 

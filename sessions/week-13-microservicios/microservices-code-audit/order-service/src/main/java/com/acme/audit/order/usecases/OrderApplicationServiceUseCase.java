@@ -1,5 +1,6 @@
 package com.acme.audit.order.usecases;
 
+import com.acme.audit.order.infrastructure.client.PaymentCommunicationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import com.acme.audit.order.application.CreateOrderCommand;
@@ -26,10 +27,14 @@ public class OrderApplicationServiceUseCase {
         try {
             var payment = paymentGateway.charge(order.idempotencyKey(), order.orderId(), order.amount(), order.currency());
             return OrderView.from(orderStore.confirm(command.orderId(), payment.paymentId()));
-        } catch (RestClientException failure) {
+        } catch (RestClientException | PaymentCommunicationException failure) {
             orderStore.markPaymentUnavailable(command.orderId());
             throw failure;
         }
+    }
+
+    public OrderView findById(String orderId) {
+        return OrderView.from(orderStore.findById(orderId));
     }
 
     public record OrderView(String orderId, String status, String paymentId) {

@@ -40,6 +40,10 @@ public class PaymentApplicationServiceUseCase {
     	
     }
 
+    public Optional<StoredPayment> findByIdempotencyKey(String idempotencyKey){
+        return paymentRepository.findByIdempotencyKey(idempotencyKey);
+    }
+
     public long countPayments() {
         return paymentRepository.count();
     }

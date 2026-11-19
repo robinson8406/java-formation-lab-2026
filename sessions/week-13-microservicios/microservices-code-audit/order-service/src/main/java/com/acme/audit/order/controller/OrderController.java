@@ -30,6 +30,12 @@ public class OrderController {
 			@NotBlank @Pattern(regexp = "[A-Z]{3}") String currency) {
 	}
 
+	@GetMapping("/{orderId}")
+	public ResponseEntity<OrderResponse> findById(@PathVariable String orderId) {
+		var v = service.findById(orderId);
+		return ResponseEntity.ok(new OrderResponse(v.orderId(), v.status(), v.paymentId()));
+	}
+
 	public record OrderResponse(String orderId, String status, String paymentId) {
 	}
 }
