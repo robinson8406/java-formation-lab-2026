@@ -36,10 +36,8 @@ public class PaymentController {
 	@PostMapping
 	public ResponseEntity<PaymentResponse> create(@RequestHeader("Idempotency-Key") @NotBlank @Size(max = 150) String key,
 			@Valid @RequestBody CreatePaymentRequest request) {
-		key = UUID.randomUUID().toString();
+
 		PaymentResult result = service.process(key, new CreatePaymentCommand(request.orderId(), request.amount(), request.currency()));
-		
-				
 		return ResponseEntity.status(result.replayed() ? HttpStatus.OK : HttpStatus.CREATED)
 				.body(new PaymentResponse(result.paymentId(), result.orderId(), result.status(), result.replayed()));
 	}
