@@ -30,6 +30,8 @@ resilience4j:
       providerService:
         max-attempts: 3
         wait-duration: 100ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
         retry-exceptions:
           - org.springframework.web.client.ResourceAccessException
           - com.acme.audit.payment.infrastructure.client.ProviderCommunicationException
