@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 14 — Podman + Compose | Indra</title>
+<style>
+  :root {
+    --indra-dark: #0d2535;
+    --indra-teal: #1d7878;
+    --indra-accent: #3da0a0;
+    --indra-bg: #ede9df;
+    --indra-gray: #dad5c9;
+    --indra-text: #0d2535;
+    --indra-muted: #647a7a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Gill Sans', 'Gill Sans MT', 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+    background: #111; color: var(--indra-text); overflow: hidden; height: 100vh;
+  }
+  .deck { width: 100vw; height: 100vh; position: relative; }
+  .slide {
+    width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+    display: none; flex-direction: column;
+  }
+  .slide.active { display: flex; }
+  #progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--indra-accent); transition: width .4s ease; z-index: 100; }
+  .nav { position: fixed; bottom: 46px; right: 28px; display: flex; gap: 10px; z-index: 100; }
+  .nav button {
+    background: rgba(13,37,53,.82); color: #fff; border: 1px solid rgba(255,255,255,.3);
+    border-radius: 6px; padding: 8px 18px; cursor: pointer; font-size: 14px;
+    transition: background .2s; box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  }
+  .nav button:hover { background: rgba(13,37,53,.97); }
+  .slide-footer {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 36px; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+    background: rgba(0,0,0,.55); border-top: 1px solid rgba(255,255,255,.07); pointer-events: none;
+  }
+  .footer-logo { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.6); letter-spacing: 2.5px; }
+  .footer-page { font-size: 10px; color: rgba(255,255,255,.6); }
+  .footer-time { font-size: 10px; color: rgba(255,255,255,.75); font-weight: 700; background: rgba(255,255,255,.15); border-radius: 4px; padding: 2px 8px; letter-spacing: .5px; }
+
+  .label { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--indra-teal); margin-bottom: 8px; }
+  .slide-inner { width: 100%; height: 100%; padding: 52px 72px; display: flex; flex-direction: column; }
+  .slide-header { margin-bottom: 28px; }
+  .slide-header h2 { font-size: 36px; font-weight: 700; color: var(--indra-dark); }
+  .slide-header h2 em { font-style: normal; color: var(--indra-teal); }
+  .slide-header p { font-size: 15px; color: var(--indra-muted); margin-top: 6px; }
+
+  /* SLIDE 1 — PORTADA */
+  #s1 {
+    background: linear-gradient(135deg, var(--indra-dark) 0%, #123044 55%, #0a1c28 100%);
+    justify-content: center; align-items: flex-start; position: relative; overflow: hidden;
+  }
+  #s1::before {
+    content: '🐳'; position: absolute; right: -60px; bottom: -80px; font-size: 420px;
+    opacity: .06; transform: rotate(-12deg);
+  }
+  .cover-topbar { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 32px 52px 0; }
+  .week-badge { background: #fff; color: var(--indra-dark); font-size: 22px; font-weight: 800; padding: 10px 24px; border-radius: 8px; letter-spacing: 1px; }
+  .cover-main { display: contents; }
+  .cover-body { padding: 0 52px; max-width: 700px; position: relative; z-index: 1; }
+  .cover-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--indra-accent); margin-bottom: 16px; }
+  .cover-h1 { font-size: 54px; font-weight: 300; line-height: 1.1; color: #fff; margin-bottom: 20px; }
+  .cover-h1 strong { font-weight: 800; color: var(--indra-accent); }
+  .cover-desc {
+    background: rgba(8,22,38,.65); border-left: 4px solid var(--indra-accent); border-radius: 0 8px 8px 0;
+    padding: 18px 22px; max-width: 560px; font-size: 15px; color: rgba(255,255,255,.85); line-height: 1.65;
+    margin-bottom: 28px; backdrop-filter: blur(4px);
+  }
+  .cover-architecture { position: absolute; z-index: 1; top: 50%; right: 52px; transform: translateY(-50%); width: min(38vw, 460px); background: rgba(8,22,38,.72); border: 1px solid rgba(255,255,255,.16); border-radius: 14px; padding: 22px; backdrop-filter: blur(5px); }
+  .cover-architecture h2 { color: #fff; font-size: 17px; margin-bottom: 5px; }
+  .cover-architecture > p { color: rgba(255,255,255,.55); font-size: 12px; margin-bottom: 16px; }
+  .cover-compose { border: 1px solid rgba(61,160,160,.45); border-radius: 10px; padding: 12px; }
+  .cover-compose-title { color: var(--indra-accent); font: 700 12px 'Cascadia Code','Consolas',monospace; text-align: center; margin-bottom: 10px; }
+  .cover-components { display: grid; grid-template-columns: 1fr 24px 1fr; align-items: center; gap: 5px; }
+  .cover-component { min-height: 78px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; text-align: center; border-radius: 8px; padding: 9px 5px; font-size: 12px; font-weight: 700; color: #fff; }
+  .cover-component.app { background: rgba(61,160,160,.17); border: 1px solid rgba(61,160,160,.4); }
+  .cover-component.db { background: rgba(33,150,243,.14); border: 1px solid rgba(33,150,243,.32); }
+  .cover-component small { color: rgba(255,255,255,.62); font-size: 10px; font-weight: 400; }
+  .cover-connection { color: var(--indra-accent); text-align: center; font-size: 18px; }
+  .cover-network { color: rgba(255,255,255,.45); font-size: 10px; margin-top: 8px; text-align: center; }
+  .cover-kpis { display: flex; gap: 20px; position: absolute; z-index: 1; left: 0; bottom: 52px; padding: 0 52px; }
+  .cover-kpi { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 12px 22px; min-width: 90px; }
+  .cover-kpi .kval { font-size: 26px; font-weight: 800; color: var(--indra-accent); line-height: 1; }
+  .cover-kpi .klabel { font-size: 11px; color: rgba(255,255,255,.55); margin-top: 4px; letter-spacing: .5px; text-align: center; }
+  @media (max-width: 1200px) {
+    .cover-topbar { padding: 24px 32px 0; }
+    .cover-body { max-width: 52%; padding: 0 32px; }
+    .cover-h1 { font-size: 42px; }
+    .cover-desc { max-width: 100%; font-size: 13px; padding: 14px 16px; }
+    .cover-architecture { padding: 16px; }
+    .cover-kpis { gap: 10px; padding: 0 32px; }
+    .cover-kpi { padding: 10px 14px; min-width: 76px; }
+  }
+  @media (max-width: 700px) {
+    #s1 { overflow-y: auto; }
+    .cover-topbar { padding: 18px 20px 0; }
+    .cover-topbar > div:last-child { display: none; }
+    .cover-main { display: contents; }
+    .cover-body { max-width: 100%; padding: 22px 20px; }
+    .cover-h1 { font-size: 36px; }
+    .cover-architecture { position: relative; top: auto; right: auto; transform: none; width: auto; margin: 0 20px 20px; }
+    .cover-kpis { position: relative; left: auto; bottom: auto; flex-wrap: wrap; padding: 0 20px; margin-bottom: 48px; }
+  }
+
+  /* PREREQUISITOS */
+  #prereq { background: var(--indra-bg); }
+  .prereq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; flex: 1; align-content: center; }
+  .prereq-card { display: flex; gap: 16px; align-items: flex-start; background: #fff; border-radius: 12px; padding: 20px 22px; border-left: 4px solid var(--indra-teal); }
+  .prereq-icon { font-size: 26px; flex-shrink: 0; }
+  .prereq-card h3 { font-size: 15px; color: var(--indra-dark); margin-bottom: 5px; }
+  .prereq-card p { font-size: 13px; color: var(--indra-muted); line-height: 1.5; }
+  .prereq-card code { background: var(--indra-bg); border-radius: 4px; padding: 2px 5px; font-family: 'Cascadia Code','Consolas',monospace; }
+  .prereq-check { grid-column: 1 / -1; display: flex; gap: 14px; align-items: center; justify-content: center; background: var(--indra-dark); border-radius: 10px; padding: 14px 18px; color: #fff; font-size: 14px; }
+  .prereq-check code { color: var(--indra-accent); font-family: 'Cascadia Code','Consolas',monospace; }
+
+  /* SLIDE — PROBLEMA / SOLUCIÓN */
+  #s2 { background: var(--indra-dark); }
+  #s2 .label { color: var(--indra-accent); }
+  #s2 .slide-header h2 { color: #fff; }
+  .ps-grid { display: grid; grid-template-columns: 1fr 48px 1fr; gap: 10px; flex: 1; align-items: start; }
+  .ps-col { display: flex; flex-direction: column; gap: 14px; }
+  .ps-title { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; padding: 8px 14px; border-radius: 6px; width: fit-content; }
+  .ps-title.problem { background: rgba(239,83,80,.15); color: #ef9a9a; }
+  .ps-title.solution { background: rgba(61,160,160,.15); color: var(--indra-accent); }
+  .ps-item { display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,.04); border-radius: 10px; padding: 16px 18px; }
+  .ps-item .ps-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .ps-item h3 { font-size: 14.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .ps-item p { font-size: 13px; color: rgba(255,255,255,.6); line-height: 1.5; }
+  .divider-arrow { display: flex; align-items: center; justify-content: center; font-size: 30px; color: var(--indra-accent); height: 100%; }
+
+  /* SLIDE 3 — CONTAINERFILE MULTI-STAGE */
+  #s3 { background: var(--indra-bg); }
+  .stage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
+  .stage-card { background: var(--indra-dark); border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .stage-card.runtime { background: #0f2e2e; }
+  .stage-card h3 { color: var(--indra-accent); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .stage-card pre { background: rgba(0,0,0,.35); border-radius: 8px; padding: 14px 16px; overflow: auto; font-size: 12.5px; line-height: 1.6; color: #d8e6e6; font-family: 'Cascadia Code', 'Consolas', monospace; flex: 1; }
+  .stage-card .tag-line { font-size: 12px; color: rgba(255,255,255,.55); }
+  .stage-foot { display: flex; gap: 10px; margin-top: 30px; }
+  .pill { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: #fff; color: var(--indra-teal); border: 1px solid var(--indra-gray); }
+
+  /* SLIDE 4 — OBJETIVO COMPOSE (problema → objetivo) */
+  #s4 { background: #fff; }
+  .target-grid { display: grid; grid-template-columns: 1fr 48px 1fr; gap: 10px; flex: 1; align-items: center; }
+  .target-col { display: flex; flex-direction: column; gap: 14px; }
+  .manual-box { display: flex; gap: 12px; align-items: center; background: var(--indra-bg); border-radius: 10px; padding: 14px 16px; font-size: 14px; color: var(--indra-text); }
+  .arch-diagram { background: var(--indra-dark); border-radius: 12px; padding: 22px 20px; display: flex; flex-direction: column; gap: 18px; align-items: center; }
+  .arch-cmd { font-family: 'Cascadia Code','Consolas',monospace; font-size: 13px; color: var(--indra-accent); background: rgba(0,0,0,.35); border-radius: 8px; padding: 8px 16px; }
+  .arch-row { display: flex; align-items: center; gap: 14px; width: 100%; justify-content: center; }
+  .arch-box { border-radius: 10px; padding: 14px 16px; font-size: 13.5px; font-weight: 700; text-align: center; line-height: 1.5; }
+  .arch-box span { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.65); margin-top: 4px; }
+  .arch-box.app { background: rgba(61,160,160,.18); color: var(--indra-accent); border: 1px solid rgba(61,160,160,.4); }
+  .arch-box.db { background: rgba(33,150,243,.15); color: #8ecdf7; border: 1px solid rgba(33,150,243,.35); }
+  .arch-link { font-size: 20px; color: rgba(255,255,255,.55); text-align: center; }
+  .arch-link span { display: block; font-size: 10px; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+  /* SLIDE 5 — ENV VARS */
+  #s5 { background: var(--indra-dark); }
+  #s5 .label { color: var(--indra-accent); }
+  #s5 .slide-header h2 { color: #fff; }
+  .env-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
+  .env-card { background: rgba(255,255,255,.04); border-radius: 12px; padding: 20px 22px; }
+  .env-card h3 { color: var(--indra-accent); font-size: 14px; margin-bottom: 12px; font-weight: 700; }
+  .env-card code.file { display: block; background: rgba(0,0,0,.35); border-radius: 8px; padding: 14px 16px; font-family: 'Cascadia Code','Consolas',monospace; font-size: 12.5px; color: #d8e6e6; line-height: 1.7; white-space: pre-wrap; }
+  .danger-strip { margin-top: 18px; display: flex; gap: 12px; align-items: center; background: rgba(239,83,80,.12); border: 1px solid rgba(239,83,80,.3); border-radius: 10px; padding: 12px 16px; }
+  .danger-strip span.d-icon { font-size: 20px; }
+  .danger-strip p { font-size: 13px; color: #ffcdd2; }
+
+  /* SLIDE 6 — VERIFICACIÓN / CHECKLIST */
+  #s6 { background: var(--indra-bg); }
+  .verify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; }
+  .verify-steps { display: flex; flex-direction: column; gap: 12px; }
+  .verify-step { display: flex; gap: 14px; align-items: flex-start; background: #fff; border-radius: 10px; padding: 14px 16px; border-left: 4px solid var(--indra-accent); }
+  .verify-step .vs-num { width: 26px; height: 26px; border-radius: 50%; background: var(--indra-teal); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .verify-step code { font-family: 'Cascadia Code','Consolas',monospace; font-size: 12.5px; background: var(--indra-bg); padding: 2px 6px; border-radius: 4px; }
+  .verify-step p { font-size: 13px; color: var(--indra-muted); margin-top: 4px; }
+  .checklist-box { background: var(--indra-dark); border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+  .checklist-box h3 { color: var(--indra-accent); font-size: 14px; margin-bottom: 4px; }
+  .check-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: rgba(255,255,255,.82); line-height: 1.5; }
+  .check-item .c-mark { color: var(--indra-accent); font-weight: 800; }
+
+  /* SLIDE 7 — MADUREZ */
+  #s7 { background: #fff; }
+  .maturity-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; flex: 1; }
+  .maturity-col { border-radius: 12px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .maturity-col.l1 { background: #f3e9df; }
+  .maturity-col.l2 { background: #e8f0ec; }
+  .maturity-col.l3 { background: #e0eff0; }
+  .maturity-col.l4 { background: var(--indra-dark); }
+  .maturity-col.l4 * { color: #fff !important; }
+  .maturity-col h3 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--indra-teal); }
+  .maturity-col p { font-size: 13px; color: var(--indra-text); line-height: 1.5; }
+  .bonus-strip { margin-top: 26px; display: flex; gap: 12px; align-items: center; background: var(--indra-bg); border-radius: 10px; padding: 14px 18px; }
+  .bonus-strip span.b-icon { font-size: 22px; }
+  .bonus-strip p { font-size: 13.5px; color: var(--indra-text); }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="deck">
+
+  <section class="slide active" id="s1" data-time="2 min">
+    <div class="cover-topbar">
+      <div class="week-badge">WEEK 14</div>
+      <div style="color:rgba(255,255,255,.5); font-size:12px; letter-spacing:2px;">PAQUETE · MICRO + CLOUD + DEVOPS</div>
+    </div>
+    <div class="cover-main">
+      <div class="cover-body">
+        <div class="cover-eyebrow">Sesión 14 · 2026-10-01</div>
+        <h1 class="cover-h1">Podman + Compose:<br/><strong>“en mi máquina funciona”</strong><br/>deja de ser el estándar</h1>
+        <div class="cover-desc">
+          Indra Retail pierde 2 horas por onboarding configurando Java, Postgres y variables de entorno a mano.
+          Hoy contenerizamos la app para levantar el entorno completo con un solo comando.
+        </div>
+      </div>
+      <aside class="cover-architecture" aria-label="Arquitectura objetivo de la solución">
+        <h2>Arquitectura objetivo</h2>
+        <p>Un compose coordina la aplicación y su base de datos.</p>
+        <div class="cover-compose">
+          <div class="cover-compose-title">podman compose up</div>
+          <div class="cover-components">
+            <div class="cover-component app">📦 App Spring Boot<small>Dockerfile · puerto 8080</small></div>
+            <div class="cover-connection">⇄</div>
+            <div class="cover-component db">🐘 PostgreSQL 16-alpine<small>health check · volumen</small></div>
+          </div>
+          <div class="cover-network">Red interna · app-network</div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-kpis">
+      <div class="cover-kpi"><div class="kval">76%</div><div class="klabel">score QC<br/>Cloud/Docker</div></div>
+      <div class="cover-kpi"><div class="kval">15%</div><div class="klabel">encuesta pide<br/>CI/CD</div></div>
+      <div class="cover-kpi"><div class="kval">&lt;300MB</div><div class="klabel">meta imagen<br/>runtime</div></div>
+      <div class="cover-kpi"><div class="kval">60'</div><div class="klabel">duración<br/>sesión</div></div>
+    </div>
+  </section>
+
+  <section class="slide" id="prereq" data-time="3 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Antes de comenzar</div>
+        <h2>Deja listo tu <em>entorno</em></h2>
+        <p>Comprueba estos requisitos antes de seguir la demo y resolver el reto</p>
+      </div>
+      <div class="prereq-grid">
+        <div class="prereq-card">
+          <span class="prereq-icon">🦭</span>
+          <div><h3>Podman instalado y activo</h3><p>Instala Podman o Podman Desktop y asegúrate de que la máquina virtual esté iniciada.</p></div>
+        </div>
+        <div class="prereq-card">
+          <span class="prereq-icon">🧩</span>
+          <div><h3>Compose disponible</h3><p><code>podman compose</code> necesita un proveedor compatible, como <code>podman-compose</code> o Docker Compose.</p></div>
+        </div>
+        <div class="prereq-card">
+          <span class="prereq-icon">☕</span>
+          <div><h3>Java 21 y Maven</h3><p>Necesarios para compilar y validar el proyecto localmente con <code>mvn verify</code>.</p></div>
+        </div>
+        <div class="prereq-card">
+          <span class="prereq-icon">📂</span>
+          <div><h3>Proyecto week-14</h3><p>Clona el repositorio y abre <code>sessions/week-14-docker-compose</code>.</p></div>
+        </div>
+        <div class="prereq-check">
+          <span>Verifica Podman y Compose:</span>
+          <code>podman --version</code>
+          <code>podman compose version</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s2" data-time="20 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Contexto del reto</div>
+        <h2>El problema y la <em>solución</em></h2>
+        <p>Indra Retail · onboarding lento y entornos inconsistentes entre dev, CI y staging</p>
+      </div>
+      <div class="ps-grid">
+        <div class="ps-col">
+          <div class="ps-title problem">Hoy</div>
+          <div class="ps-item"><span class="ps-icon">⏱️</span><div><h3>2 horas de setup manual</h3><p>Java, Postgres, variables de entorno y migraciones se configuran a mano en cada laptop nueva.</p></div></div>
+          <div class="ps-item"><span class="ps-icon">🧩</span><div><h3>“En mi máquina funciona”</h3><p>Sin contenedores, el entorno de un dev nunca es idéntico al de CI ni al de staging.</p></div></div>
+          <div class="ps-item"><span class="ps-icon">🔑</span><div><h3>Credenciales dispersas</h3><p><code>application.properties</code> trae la URL, usuario y password de la BD escritos a mano.</p></div></div>
+        </div>
+        <div class="divider-arrow">→</div>
+        <div class="ps-col">
+          <div class="ps-title solution">Al terminar la semana</div>
+          <div class="ps-item"><span class="ps-icon">🐳</span><div><h3>Dockerfile multi-stage</h3><p>Build con JDK, runtime solo con JRE, usuario no-root, imagen &lt; 300MB.</p></div></div>
+          <div class="ps-item"><span class="ps-icon">🧱</span><div><h3>compose.yml reproducible</h3><p><code>podman compose up</code> levanta <strong>app</strong> + <strong>db</strong> con health check y red interna.</p></div></div>
+          <div class="ps-item"><span class="ps-icon">🔐</span><div><h3>Config por entorno</h3><p>Credenciales vía variables de entorno, <code>.env.example</code> versionado y <code>.env</code> ignorado.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s3" data-time="10 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Demo · Dockerfile</div>
+        <h2>Build con JDK, <em>runtime</em> con JRE</h2>
+        <p>Usamos el nombre <code>Dockerfile</code> — el más extendido — y Podman lo reconoce igual que <code>Containerfile</code></p>
+      </div>
+      <div class="stage-grid">
+        <div class="stage-card">
+          <h3>🔨 Stage 1 — builder</h3>
+          <pre>FROM maven:3.9-eclipse-temurin-21 AS builder
+WORKDIR /app
+COPY pom.xml ./
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn package -DskipTests</pre>
+          <div class="tag-line">Compila el jar — esta capa <strong>no</strong> viaja a producción.</div>
+        </div>
+        <div class="stage-card runtime">
+          <h3>🚀 Stage 2 — runtime</h3>
+          <pre>FROM eclipse-temurin:21-jre AS runtime
+WORKDIR /app
+RUN addgroup --system appgroup \
+ && adduser --system --ingroup appgroup appuser
+USER appuser
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]</pre>
+          <div class="tag-line">Solo JRE, usuario no-root, sin herramientas de build.</div>
+        </div>
+      </div>
+      <div class="stage-foot">
+        <span class="pill">✅ sin JDK en runtime</span>
+        <span class="pill">✅ usuario no-root</span>
+        <span class="pill">✅ imagen &lt; 300MB</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s4" data-time="10 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Objetivo del reto</div>
+        <h2>De <em>pasos manuales</em> a <em>un solo comando</em></h2>
+        <p>Esto es lo que vas a construir con <code>compose.yml</code> esta semana</p>
+      </div>
+      <div class="target-grid">
+        <div class="target-col">
+          <div class="ps-title problem">Hoy</div>
+          <div class="manual-box">👤 Instalás y arrancás Postgres a mano</div>
+          <div class="manual-box">⚙️ Copiás variables de entorno una por una</div>
+          <div class="manual-box">🎲 La app a veces arranca antes que la BD esté lista</div>
+        </div>
+        <div class="divider-arrow">→</div>
+        <div class="target-col">
+          <div class="ps-title solution">Objetivo</div>
+          <div class="arch-diagram">
+            <div class="arch-cmd">$ podman compose up</div>
+            <div class="arch-row">
+              <div class="arch-box app">📦 app<span>puerto 8080</span></div>
+              <div class="arch-link">⇄<span>app-network</span></div>
+              <div class="arch-box db">🐘 db · postgres:16-alpine<span>🩺 health check · 💾 volumen</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s5" data-time="8 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Variables de entorno</div>
+        <h2>Credenciales <em>fuera</em> del código</h2>
+        <p>Hoy el <code>week-14-start</code> trae la URL y la contraseña de la BD hardcodeadas</p>
+      </div>
+      <div class="env-grid">
+        <div class="env-card">
+          <h3>❌ application.properties (hoy)</h3>
+          <code class="file">spring.datasource.url=
+  jdbc:postgresql://localhost:5432/retaildb
+spring.datasource.username=retail
+spring.datasource.password=retail123</code>
+        </div>
+        <div class="env-card">
+          <h3>✅ .env.example (lo que vas a crear)</h3>
+          <code class="file">SPRING_DATASOURCE_URL=
+  jdbc:postgresql://db:5432/retaildb
+SPRING_DATASOURCE_USERNAME=
+SPRING_DATASOURCE_PASSWORD=
+
+POSTGRES_DB=retaildb
+POSTGRES_USER=
+POSTGRES_PASSWORD=</code>
+        </div>
+      </div>
+      <div class="danger-strip">
+        <span class="d-icon">⚠️</span>
+        <p>Regla de oro: las credenciales <strong>nunca</strong> van en el Dockerfile ni en el compose.yml directamente — siempre vía <code>.env</code>, y <code>.env</code> siempre en <code>.gitignore</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s6" data-time="7 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Cómo se revisa el PR</div>
+        <h2>Verificación y <em>checklist</em></h2>
+        <p>Esto es lo que el reviewer va a ejecutar y validar</p>
+      </div>
+      <div class="verify-grid">
+        <div class="verify-steps">
+          <div class="verify-step"><div class="vs-num">1</div><div><code>podman compose up --build</code><p>Levanta <strong>app</strong> + <strong>db</strong> sin errores.</p></div></div>
+          <div class="verify-step"><div class="vs-num">2</div><div><code>GET /actuator/health</code><p>Responde <strong>200</strong> en <code>http://localhost:8080</code>.</p></div></div>
+          <div class="verify-step"><div class="vs-num">3</div><div><code>podman images</code><p>Verifica que el runtime pese <strong>&lt; 300MB</strong>.</p></div></div>
+          <div class="verify-step"><div class="vs-num">4</div><div><code>mvn verify</code><p>Debe quedar en verde antes de abrir el PR.</p></div></div>
+        </div>
+        <div class="checklist-box">
+          <h3>Checklist del reviewer</h3>
+          <div class="check-item"><span class="c-mark">✓</span> Multi-stage: builder (JDK) / runtime (JRE)</div>
+          <div class="check-item"><span class="c-mark">✓</span> Usuario no-root en el stage runtime</div>
+          <div class="check-item"><span class="c-mark">✓</span> Health check <code>pg_isready</code> en <code>db</code></div>
+          <div class="check-item"><span class="c-mark">✓</span> <code>app</code> depende de <code>db</code> con <code>service_healthy</code></div>
+          <div class="check-item"><span class="c-mark">✓</span> Volumen persistente + red <code>app-network</code></div>
+          <div class="check-item"><span class="c-mark">✓</span> <code>.env.example</code> presente, <code>.env</code> en <code>.gitignore</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="s7" data-time="3 min">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="label">Escala de madurez</div>
+        <h2>¿Qué distingue a un <em>senior</em> aquí?</h2>
+        <p>El reto es el mismo para todos — la profundidad de la solución marca la diferencia</p>
+      </div>
+      <div class="maturity-grid">
+        <div class="maturity-col l1"><h3>Junior</h3><p>Dockerfile funcional y compose básico que levanta app + db.</p></div>
+        <div class="maturity-col l2"><h3>Semi-senior</h3><p>Multi-stage, usuario no-root y health check correctamente configurado.</p></div>
+        <div class="maturity-col l3"><h3>Senior</h3><p><code>JAVA_OPTS</code> ajustado, <code>.env</code> completo, imagen optimizada &lt; 200MB.</p></div>
+        <div class="maturity-col l4"><h3>Experto</h3><p>Propone CI con Podman rootless, build multi-platform y cache de layers.</p></div>
+      </div>
+      <div class="bonus-strip">
+        <span class="b-icon">🎁</span>
+        <p><strong>Bonus opcional:</strong> agrega <code>adminer</code>/<code>pgadmin</code> al compose y limita el heap de la JVM con <code>JAVA_OPTS</code>.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">← Anterior</button>
+  <button onclick="next()">Siguiente →</button>
+</div>
+<div class="slide-footer">
+  <span class="footer-logo">✕ INDRA GROUP</span>
+  <span id="counter" class="footer-page"></span>
+  <span id="slide-time" class="footer-time"></span>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+
+  function show(n) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(n, slides.length - 1));
+    slides[cur].classList.add('active');
+    document.getElementById('progress').style.width = ((cur + 1) / slides.length * 100) + '%';
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + slides.length;
+    document.getElementById('slide-time').textContent = '⏱ ' + (slides[cur].dataset.time || '');
+  }
+
+  function next() { show(cur + 1); }
+  function prev() { show(cur - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); prev(); }
+  });
+
+  show(0);
+</script>
+</body>
+</html>
