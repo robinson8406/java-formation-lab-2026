@@ -28,6 +28,17 @@ services:
       - "8080:8080"
     networks: [app-network]
 
+  adminer:
+    image: docker.io/library/adminer:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "127.0.0.1:8081:8080"
+    networks: [app-network]
+
 volumes:
   pgdata:
 
