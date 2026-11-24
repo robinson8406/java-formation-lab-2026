@@ -13,4 +13,4 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 USER appuser
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

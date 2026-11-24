@@ -37,6 +37,19 @@ services:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
 
+      # Límite de heap JVM
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    depends_on:
+      - db
+    ports:
+      - "8081:8080"
+    networks:
+      - app-network
+
 volumes:
   postgres-data:
 
