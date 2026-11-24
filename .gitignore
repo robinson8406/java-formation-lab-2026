@@ -7,3 +7,4 @@ target/
 .env
 /.debtdoctor
 .vscode/settings.json
+sesions/week-14-docker-compose/.env
