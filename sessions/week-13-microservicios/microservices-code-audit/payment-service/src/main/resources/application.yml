@@ -22,7 +22,7 @@ clients:
   provider:
     base-url: http://localhost:8083
     connect-timeout: 200ms
-    read-timeout: 800ms
+    read-timeout: 100ms
 
 resilience4j:
   retry:
@@ -36,3 +36,14 @@ resilience4j:
         ignore-exceptions:
           - org.springframework.web.client.HttpClientErrorException
           - org.springframework.web.client.HttpServerErrorException
+  circuitbreaker:
+    instances:
+      providerService:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 5
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 2
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        record-exceptions:
+          - com.acme.audit.payment.infrastructure.client.ProviderCommunicationException

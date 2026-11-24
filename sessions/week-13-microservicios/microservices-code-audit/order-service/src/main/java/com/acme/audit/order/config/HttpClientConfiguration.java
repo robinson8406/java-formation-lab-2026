@@ -16,7 +16,7 @@ public class HttpClientConfiguration {
 	            RestClient.Builder builder,
 	            @Value("${clients.payment.base-url}") String baseUrl,
 	            @Value("${clients.payment.connect-timeout:200ms}") Duration connectTimeout,
-	            @Value("${clients.payment.read-timeout:700ms}") Duration readTimeout) {
+	            @Value("${clients.payment.read-timeout:800ms}") Duration readTimeout) {
 
 	        SimpleClientHttpRequestFactory requestFactory =
 	                new SimpleClientHttpRequestFactory();

@@ -48,8 +48,8 @@ public class ProviderRetryEventLogger {
             .onError(event -> log.error(
                 "PROVIDER_RETRY | event=RETRY_EXHAUSTED | instance={} | retriesPerformed={} | totalAttempts={} | cause={}",
                 event.getName(),
+                Math.max(0, event.getNumberOfRetryAttempts() - 1),
                 event.getNumberOfRetryAttempts(),
-                event.getNumberOfRetryAttempts() + 1,
                 getExceptionName(event.getLastThrowable())
             ))
 

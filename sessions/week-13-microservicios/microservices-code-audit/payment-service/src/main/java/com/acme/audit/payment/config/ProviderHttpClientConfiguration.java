@@ -16,7 +16,7 @@ public class ProviderHttpClientConfiguration {
             RestClient.Builder builder,
             @Value("${clients.provider.base-url}") String baseUrl,
             @Value("${clients.provider.connect-timeout:200ms}") Duration connectTimeout,
-            @Value("${clients.provider.read-timeout:700ms}") Duration readTimeout) {
+            @Value("${clients.provider.read-timeout:100ms}") Duration readTimeout) {
 
         SimpleClientHttpRequestFactory requestFactory =
                 new SimpleClientHttpRequestFactory();

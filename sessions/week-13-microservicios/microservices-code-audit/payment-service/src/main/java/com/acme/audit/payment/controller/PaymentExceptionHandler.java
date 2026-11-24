@@ -6,6 +6,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.HttpClientErrorException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import com.acme.audit.payment.infrastructure.client.ProviderCommunicationException;
 import com.acme.audit.payment.usecases.PaymentApplicationServiceUseCase;
 
 @RestControllerAdvice
@@ -29,10 +31,19 @@ public class PaymentExceptionHandler {
 
     @ExceptionHandler(ResourceAccessException.class)
     ResponseEntity<Map<String, Object>> providerUnavailable(ResourceAccessException exception) {
+        return providerOutcomeUncertain();
+    }
+
+    @ExceptionHandler({ProviderCommunicationException.class, CallNotPermittedException.class})
+    ResponseEntity<Map<String, Object>> providerUnavailable(RuntimeException exception) {
+        return providerOutcomeUncertain();
+    }
+
+    private ResponseEntity<Map<String, Object>> providerOutcomeUncertain() {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
                 "timestamp", Instant.now().toString(),
                 "status", 503,
                 "code", "PAYMENT_PROVIDER_UNAVAILABLE",
-                "message", "Payment provider did not respond within the configured time"));
+                "message", "Payment outcome may be uncertain; retry with the same Idempotency-Key"));
     }
 }

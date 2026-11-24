@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 
 import com.acme.audit.payment.application.port.out.PaymentProviderPort;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 
 @Component
@@ -35,6 +36,7 @@ public class PaymentProviderHttpClient implements PaymentProviderPort {
     }
 
     @Override
+    @CircuitBreaker(name = "providerService")
     @Retry(name = "providerService")
     public ProviderCharge charge(
             String key,

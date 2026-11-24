@@ -147,6 +147,27 @@ class ProviderRetryEventLoggerTest {
                 .noneMatch(message -> message.contains("event=RETRY_EXHAUSTED"));
     }
 
+    @Test
+    void shouldLogActualAttemptCountWhenRetriesAreExhausted() {
+        Retry retry = createRegisteredRetry();
+
+        assertThatThrownBy(() -> retry.executeSupplier(() -> {
+            throw new IllegalStateException("Provider remains unavailable");
+        }))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Provider remains unavailable");
+
+        assertThat(appender.messages())
+                .anySatisfy(message -> assertThat(message)
+                        .contains(
+                                "event=RETRY_EXHAUSTED",
+                                "instance=" + RETRY_INSTANCE,
+                                "retriesPerformed=1",
+                                "totalAttempts=2",
+                                "cause=IllegalStateException"
+                        ));
+    }
+
     private Retry createRegisteredRetry() {
         RetryRegistry registry = createRetryRegistry();
 
