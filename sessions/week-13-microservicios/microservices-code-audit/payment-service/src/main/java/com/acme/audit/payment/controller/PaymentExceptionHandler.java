@@ -1,12 +1,15 @@
 package com.acme.audit.payment.controller;
 
+import com.acme.audit.payment.usecases.PaymentApplicationServiceUseCase;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
 import java.time.Instant;
 import java.util.Map;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.HttpClientErrorException;
-import com.acme.audit.payment.usecases.PaymentApplicationServiceUseCase;
 
 @RestControllerAdvice
 public class PaymentExceptionHandler {

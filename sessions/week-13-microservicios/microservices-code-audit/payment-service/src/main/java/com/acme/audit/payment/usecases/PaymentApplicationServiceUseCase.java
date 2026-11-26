@@ -1,13 +1,14 @@
 package com.acme.audit.payment.usecases;
 
-import java.util.Optional;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
 import com.acme.audit.payment.application.CreatePaymentCommand;
 import com.acme.audit.payment.application.port.out.PaymentProviderPort;
 import com.acme.audit.payment.application.port.out.PaymentRepository;
 import com.acme.audit.payment.application.port.out.PaymentRepository.StoredPayment;
 import com.acme.audit.payment.domain.PaymentResult;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PaymentApplicationServiceUseCase {

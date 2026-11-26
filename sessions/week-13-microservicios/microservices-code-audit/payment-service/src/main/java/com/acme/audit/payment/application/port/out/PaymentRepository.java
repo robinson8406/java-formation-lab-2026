@@ -1,8 +1,9 @@
 package com.acme.audit.payment.application.port.out;
 
+import com.acme.audit.payment.domain.PaymentResult;
+
 import java.math.BigDecimal;
 import java.util.Optional;
-import com.acme.audit.payment.domain.PaymentResult;
 
 public interface PaymentRepository {
     Optional<StoredPayment> findByIdempotencyKey(String idempotencyKey);

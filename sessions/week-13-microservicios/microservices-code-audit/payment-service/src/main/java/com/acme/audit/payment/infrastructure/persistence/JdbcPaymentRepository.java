@@ -1,15 +1,14 @@
 package com.acme.audit.payment.infrastructure.persistence;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.acme.audit.payment.application.port.out.PaymentRepository;
+import com.acme.audit.payment.domain.PaymentResult;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.acme.audit.payment.application.port.out.PaymentRepository;
-import com.acme.audit.payment.domain.PaymentResult;
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class JdbcPaymentRepository implements PaymentRepository {
