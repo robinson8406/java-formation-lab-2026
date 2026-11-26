@@ -1,7 +1,6 @@
 package com.acme.audit.payment.controller;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,6 @@ public class PaymentController {
 	@PostMapping
 	public ResponseEntity<PaymentResponse> create(@RequestHeader("Idempotency-Key") @NotBlank @Size(max = 150) String key,
 			@Valid @RequestBody CreatePaymentRequest request) {
-		key = UUID.randomUUID().toString();
 		PaymentResult result = service.process(key, new CreatePaymentCommand(request.orderId(), request.amount(), request.currency()));
 		
 				
